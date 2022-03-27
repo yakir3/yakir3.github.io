@@ -1,0 +1,411 @@
+<?xml version="1.0" encoding="utf-8"?>
+<search>
+  <entry>
+    <title>Hello World</title>
+    <url>/posts/3eeb.html</url>
+    <content><![CDATA[<link rel="stylesheet" class="aplayer-secondary-style-marker" href="/assets/css/APlayer.min.css"><script src="/assets/js/APlayer.min.js" class="aplayer-secondary-script-marker"></script><script class="meting-secondary-script-marker" src="/assets/js/Meting.min.js"></script><h2 id="Hello-World"><a href="#Hello-World" class="headerlink" title="Hello World!"></a>Hello World!</h2><h3 id="For-test"><a href="#For-test" class="headerlink" title="For test."></a>For test.</h3><figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line"># /bin/bash</span><br><span class="line">echo test</span><br></pre></td></tr></table></figure>
+
+<p>To Google <a href="https://www.google.com/">谷歌</a></p>
+]]></content>
+  </entry>
+  <entry>
+    <title>K8S-RBAC权限控制</title>
+    <url>/posts/fa45.html</url>
+    <content><![CDATA[<link rel="stylesheet" class="aplayer-secondary-style-marker" href="/assets/css/APlayer.min.css"><script src="/assets/js/APlayer.min.js" class="aplayer-secondary-script-marker"></script><script class="meting-secondary-script-marker" src="/assets/js/Meting.min.js"></script><h3 id="一、RBAC简易概述"><a href="#一、RBAC简易概述" class="headerlink" title="一、RBAC简易概述"></a>一、RBAC简易概述</h3><img data-src="/posts/fa45/gaisu.png" class title="概述">
+<h4 id="1-RBAC-四种-API-对象"><a href="#1-RBAC-四种-API-对象" class="headerlink" title="1) RBAC 四种 API 对象"></a>1) RBAC 四种 API 对象</h4><ul>
+<li>Role：一组权限的集合，在一个命名空间中，可以用其来定义一个角色，只能对命名空间内的资源进行授权。如果是集群级别的资源，则需要使用ClusterRole。例如：定义一个角色用来读取Pod的权限</li>
+<li>ClusterRole：具有和角色一致的命名空间资源的管理能力，还可用于以下特殊元素的授权<ul>
+<li>集群范围的资源，例如Node</li>
+<li>非资源型的路径，例如：&#x2F;healthz</li>
+<li>包含全部命名空间的资源，例如Pods<blockquote>
+<p>例如：定义一个集群角色可让用户访问任意secrets</p>
+</blockquote>
+</li>
+</ul>
+</li>
+<li>RoleBinding：角色绑定</li>
+<li>ClusterRoleBinding：集群角色绑定<blockquote>
+<p>角色绑定和集群角色绑定用于把一个角色绑定在一个目标上，可以是User，Group，Service Account，使用RoleBinding为某个命名空间授权，使用ClusterRoleBinding为集群范围内授权。</p>
+</blockquote>
+</li>
+</ul>
+<p><strong>Role和ClusterRole是权限规则的定义</strong></p>
+<ul>
+<li>rules代表具体的授权规则，类似于阿里云RAM中的权限策略Policy</li>
+<li>Role和ClusterRole区别只在于一个是集群级别的资源控制</li>
+</ul>
+<span id="more"></span>
+
+<p><strong>RoleBinding和ClusterRoleBinding是将User、Group、ServiceAccount绑定到Role或ClusterRole中（类似阿里云RAM中将Policy赋权给RAM角色或RAM账号）</strong></p>
+<ul>
+<li>User、Group、ServiceAccount 是 K8S 集群中单独的概念，与系统级别不同。参考：<a href="https://www.qikqiak.com/k8strain2/security/rbac/#%E5%88%9B%E5%BB%BA%E8%A7%92%E8%89%B2">https://www.qikqiak.com/k8strain2/security/rbac/#%E5%88%9B%E5%BB%BA%E8%A7%92%E8%89%B2</a></li>
+<li>RoleBinding 可以引用同一个 namespace 中的任何 Role ；或者一个 RoleBinding 可以引用某 ClusterRole 并将该 ClusterRole 绑定到 RoleBinding 所在的 namespace。</li>
+<li>如需 ClusterRole 绑定到集群中所有 namespace，必须要使用 ClusterRoleBinding</li>
+<li>RoleBinding 对应可引用一个 ClusterRole 对象用于在 RoleBinding 所在的 namespace 内授予用户对所引用的 ClusterRole 中定义的 namespace 资源的访问权限。（在整个集群内定义一组通用角色，然后在不同 namespace 中复用这些角色）</li>
+</ul>
+<h4 id="2-资源引用方式"><a href="#2-资源引用方式" class="headerlink" title="2) 资源引用方式"></a>2) 资源引用方式</h4><ul>
+<li>多数资源可以用其名称的字符串表示，也就是Endpoint中的URL相对路径，例如pod中的日志是GET &#x2F;api&#x2F;v1&#x2F;namaspaces&#x2F;{namespace}&#x2F;pods&#x2F;{podname}&#x2F;log</li>
+<li>如果需要在一个RBAC对象中体现上下级资源，就需要使用“&#x2F;”分割资源和下级资源。</li>
+</ul>
+<p>例如：若想授权让某个主体同时能够读取Pod和Pod log，则可以配置 resources为一个数组</p>
+<figure class="highlight yaml"><table><tr><td class="code"><pre><span class="line"><span class="attr">rules:</span></span><br><span class="line"><span class="bullet">-</span> <span class="attr">apiGroups:</span> [<span class="string">&quot;&quot;</span>]</span><br><span class="line">   <span class="attr">resources:</span> [<span class="string">&quot;pods&quot;</span>,<span class="string">&quot;pods/log&quot;</span>]</span><br><span class="line">   <span class="attr">verbs:</span> [<span class="string">&quot;get&quot;</span>,<span class="string">&quot;list&quot;</span>]</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>通过名称（ResourceName）进行引用，在指定ResourceName后，使用get、delete、update、patch请求，就会被限制在这个资源实例范围内</li>
+</ul>
+<p>例如，下面的声明让一个主体只能对名为my-configmap的ConFigmap进行get和update操作：</p>
+<figure class="highlight yaml"><table><tr><td class="code"><pre><span class="line"><span class="attr">rules:</span></span><br><span class="line"><span class="bullet">-</span> <span class="attr">apiGroups:</span> [<span class="string">&quot;&quot;</span>]</span><br><span class="line">   <span class="attr">resources:</span> [<span class="string">&quot;configmap&quot;</span>]</span><br><span class="line">   <span class="attr">resourceNames:</span> [<span class="string">&quot;my-configmap&quot;</span>]</span><br><span class="line">   <span class="attr">verbs:</span> [<span class="string">&quot;get&quot;</span>,<span class="string">&quot;update&quot;</span>]</span><br></pre></td></tr></table></figure>
+
+
+<h4 id="3-rules-参数说明"><a href="#3-rules-参数说明" class="headerlink" title="3) rules 参数说明"></a>3) rules 参数说明</h4><ul>
+<li>apiGroups：支持的API组列表，例如：”apiVersion: batch&#x2F;v1”等</li>
+<li>resources：支持的资源对象列表，例如pods、deplayments、jobs等</li>
+<li>resourceNames: 指定resource的名称（可选）</li>
+<li>verbs：对资源对象的操作方法列表<blockquote>
+<p>api-resources：所有资源信息<br>apiGroups：api-resources下的分类分组</p>
+<p><a href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.23/#-strong-api-groups-strong-">查看API GROUP分组信息</a></p>
+<ul>
+<li>方式一：kubectl explain xxx ， xxx为 “kubectl api-resources” 输出结果的 NAME 值（输出结果的 VERSION 值为v1 则为默认的Core API 分组，默认以”” 表示，如 pods、services）</li>
+<li>方式二：kubectl get –raw &#x2F;apis&#x2F;apps&#x2F;v1</li>
+</ul>
+</blockquote>
+</li>
+</ul>
+<p>可通过 kubectl get –raw &#x2F;apis&#x2F;rbac.authorization.k8s.io&#x2F;v1 可以获取到 RBAC 四个 API 资源对象的相关信息，如下图：</p>
+<img data-src="/posts/fa45/c31775e8bbe3.png" class title="img.png">
+
+<blockquote>
+<p>创建资源&#x2F;信息的方式</p>
+<ul>
+<li>方式一：kubectl create -f xxx.yaml       –&gt;   文件方式创建</li>
+<li>方式二：kubectl create –arg1&#x3D;xxx –arg2&#x3D;yyy     –&gt;  参数方式创建（后续可通过kubectl edit方式继续编辑）</li>
+</ul>
+</blockquote>
+<h3 id="二、ServiceAccount-测试"><a href="#二、ServiceAccount-测试" class="headerlink" title="二、ServiceAccount 测试"></a>二、ServiceAccount 测试</h3><h4 id="1-创建-serviceaccount-账户并进行对应授权"><a href="#1-创建-serviceaccount-账户并进行对应授权" class="headerlink" title="1) 创建 serviceaccount 账户并进行对应授权"></a>1) 创建 serviceaccount 账户并进行对应授权</h4><ol>
+<li><p>创建 serviceaccount 账户 camel-sva （只需defalut namespace）<br>执行命令：kubectl create serviceaccount camel-sva -n default</p>
+<img data-src="/posts/fa45/634be995b5bc.png" class title="img.png">
+</li>
+<li><p>创建 role 角色 （授权Integration、Kamelet、KameletBinding 3种资源的 curd 权限）<br>执行命令：kubectl create role camel-sva-role –verb&#x3D;* –resource&#x3D;integrations,kamelets,kameletbindings </p>
+<img data-src="/posts/fa45/21812e1bbfad.png" class title="img.png">
+</li>
+<li><p>绑定集群权限<br>命令：kubectl create rolebinding camel-sva-rolebinding –role&#x3D;camel-sva-role –serviceaccount&#x3D;default:camel-sva</p>
+<img data-src="/posts/fa45/7528aa1bf3da.png" class title="img.png">
+</li>
+<li><p>查看账号 secret 信息<br>命令：kubectl get secret&#x2F;camel-sva-token-mdt28 -oyaml</p>
+<img data-src="/posts/fa45/de3ebdd4f016.png" class title="img.png">
+<p>将获取到的 token 值进行 base64 解码后即可用来调用 apiserver 接口，如下图（接口可通过 kubectl get –raw &#x2F;apis&#x2F; 进行获取）：</p>
+<img data-src="/posts/fa45/1572c2ebc891.png" class title="img.png"></li>
+</ol>
+<h4 id="2-创建用户认证的-kubeconfig-文件"><a href="#2-创建用户认证的-kubeconfig-文件" class="headerlink" title="2) 创建用户认证的 kubeconfig 文件"></a>2) 创建用户认证的 kubeconfig 文件</h4><ol>
+<li><p>创建集群配置文件<br>命令：kubectl config set-cluster kubernetes –certificate-authority&#x3D;&#x2F;etc&#x2F;kubernetes&#x2F;pki&#x2F;ca.crt –server&#x3D;”<a href="https://10.0.0.142:6443&quot;">https://10.0.0.142:6443&quot;</a> –embed-certs&#x3D;true –kubeconfig&#x3D;.&#x2F;camel-sva.conf</p>
+</li>
+<li><p>生成 token（base64编码）<br>命令：D&#x3D;$(kubectl get secret camel-sva-token-mdt28 -o jsonpath&#x3D;{.data.token}|base64 -d)</p>
+</li>
+<li><p>为配置文件添加 token 信息，设置一个用户条目<br>命令：kubectl config set-credentials camel-sva –token&#x3D;$D –kubeconfig&#x3D;.&#x2F;camel-sva.conf</p>
+</li>
+<li><p>为配置文件添加权限信息，设置一个 content 条目<br>kubectl config set-context camel-sva@kubernetes –cluster&#x3D;kubernetes –user&#x3D;camel-sva –kubeconfig&#x3D;.&#x2F;camel-sva.conf</p>
+</li>
+<li><p>为配置文件添加权限信息，设置上下文<br>命令：kubectl config use-context camel-sva@kubernetes –kubeconfig&#x3D;.&#x2F;camel-sva.conf</p>
+</li>
+</ol>
+<p>执行完上述命令后即在当前目录生成配置文件：camel-sva.conf，可 copy 到 kubeconfig对应目录，进行操作。</p>
+<img data-src="/posts/fa45/d6da8c845c41.png" class title="img.png">
+<p>使用该配置文件进行 kubectl 命令操作，即可验证用户只拥有对应资源的操作权限。</p>
+<img data-src="/posts/fa45/de4222775e67.png" class title="img.png">
+
+<h4 id="3-API-对象结构"><a href="#3-API-对象结构" class="headerlink" title="3) API 对象结构"></a>3) API 对象结构</h4><img data-src="/posts/fa45/ab8f20ce2acc.png" class title="img.png">
+
+
+<h3 id="三、参考学习"><a href="#三、参考学习" class="headerlink" title="三、参考学习"></a>三、参考学习</h3><ol>
+<li><a href="https://kubernetes.io/zh/docs/reference/access-authn-authz/rbac/#service-account-permissions">https://kubernetes.io/zh/docs/reference/access-authn-authz/rbac/#service-account-permissions</a></li>
+<li><a href="https://www.qikqiak.com/k8strain2/security/rbac/#%E5%88%9B%E5%BB%BA%E8%A7%92%E8%89%B2">https://www.qikqiak.com/k8strain2/security/rbac/#%E5%88%9B%E5%BB%BA%E8%A7%92%E8%89%B2</a></li>
+<li><a href="https://zhuanlan.zhihu.com/p/97793056">https://zhuanlan.zhihu.com/p/97793056</a></li>
+</ol>
+]]></content>
+      <categories>
+        <category>云原生</category>
+      </categories>
+      <tags>
+        <tag>K8S</tag>
+        <tag>阿里云</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>NetworkPolicy隔离策略</title>
+    <url>/posts/8aa0.html</url>
+    <content><![CDATA[<link rel="stylesheet" class="aplayer-secondary-style-marker" href="/assets/css/APlayer.min.css"><script src="/assets/js/APlayer.min.js" class="aplayer-secondary-script-marker"></script><script class="meting-secondary-script-marker" src="/assets/js/Meting.min.js"></script><h3 id="一、背景"><a href="#一、背景" class="headerlink" title="一、背景"></a>一、背景</h3><blockquote>
+<p>一次对当前业务使用ACK 集群的业务调研与改造：针对NetworkPolicy 策略的调研，主要用于新建ACK 集群的网络规划与网络隔离</p>
+</blockquote>
+<h4 id="1）当前云环境ACK-集群使用现状和痛点"><a href="#1）当前云环境ACK-集群使用现状和痛点" class="headerlink" title="1）当前云环境ACK 集群使用现状和痛点"></a>1）当前云环境ACK 集群使用现状和痛点</h4><ol>
+<li><p>UAT&#x2F;线上 环境应用较多，且应用没有做集群内隔离，所有应用全部都在ACK 集群的default namespace 中。没有做到逻辑网络隔离。</p>
+</li>
+<li><p>集群通过暴露公网SLB 方式进行集群调用，存在浪费资源、管理混乱、安全风险等问题。通过namespace 隔离 + NetworkPolicy 策略通信的方式可以实现集群内部应用自行调用，和VPC 打通之后使用NetworkPolicy 的IP 块策略还可实现跨集群的应用内网调用。</p>
+</li>
+</ol>
+<h4 id="2）实现隔离策略价值"><a href="#2）实现隔离策略价值" class="headerlink" title="2）实现隔离策略价值"></a>2）实现隔离策略价值</h4><ol>
+<li><p>降低成本：可以通过网络逻辑隔离的方式将应用已namespace 方式进行隔离，减少冗余的物理设备降低成本。</p>
+</li>
+<li><p>增加效能：避免复杂且多余的网络设计，使应用之间的调用简单且易于排查。</p>
+</li>
+</ol>
+<span id="more"></span>
+<p>问题点：</p>
+<ul>
+<li>应用SLB 暴露公网方式，白名单管理方式存在多人修改不同步且随意添加白名单带来风险问题。多个SLB 带来的白名单、监听等也存在管理记录困难问题。</li>
+<li>通过namespace 隔离，网络规划便于设计（同一VPC 下天然可以通信）。应用间调用完全可以通过集群内部策略实现通信，减少因为网络造成的应用通信异常。</li>
+</ul>
+<img data-src="/posts/8aa0/7b70de99e5f7.png" class title="img.png">
+
+<h3 id="二、概念理解"><a href="#二、概念理解" class="headerlink" title="二、概念理解"></a>二、概念理解</h3><h4 id="1）CNI-插件"><a href="#1）CNI-插件" class="headerlink" title="1）CNI 插件"></a>1）CNI 插件</h4><p>k8s 本身没有对容器之间的通信网络进行实现，而是通过 CNI 定义了容器网络的接口的形式，让其他组件实现CNI来实现容器间的网络通信，CNI主要解决什么问题？</p>
+<ul>
+<li>第一，如何保证每个Pod拥有一个集群内唯一的IP地址？</li>
+<li>第二，如何保证不同节点的IP地址划分不会重复？</li>
+<li>第三，如何保证跨节点的Pod可以互相通信？</li>
+<li>第四，如何保证不同节点的Pod可以与跨节点的主机互相通信？</li>
+</ul>
+<p>常见的CNI 插件：Calico、Flannel、Terway、Weave Net、 以及 Contiv</p>
+<h4 id="2）Terway与Flannel对比"><a href="#2）Terway与Flannel对比" class="headerlink" title="2）Terway与Flannel对比"></a>2）Terway与Flannel对比</h4><p>在创建集群时，ACK提供Terway和Flannel两种网络插件：</p>
+<ul>
+<li>Terway：是阿里云容器服务ACK自研的网络插件。Terway将阿里云的弹性网卡分配给容器，支持基于Kubernetes标准的网络策略来定义容器间的访问策略，支持对单个容器做带宽的限流。Terway拥有更为灵活的IPAM（容器地址分配）策略，避免地址浪费。如果您不需要使用网络策略（Network Policy），可以选择Flannel，其他情况建议选择Terway。</li>
+<li>Flannel：使用的是简单稳定的社区Flannel CNI插件。配合阿里云的VPC的高速网络，能给集群高性能和稳定的容器网络体验。Flannel功能偏简单，支持的特性少。例如，不支持基于Kubernetes标准的网络策略（Network Policy）。更多信息，请参见<a href="https://github.com/coreos/flannel">Flannel</a>。</li>
+</ul>
+<h4 id="3）NetworkPolicy-实现方式"><a href="#3）NetworkPolicy-实现方式" class="headerlink" title="3）NetworkPolicy 实现方式"></a>3）NetworkPolicy 实现方式</h4><ol>
+<li>前置条件：集群安装 CNI（container network interface）插件，阿里云支持两种插件：Flannel（不支持NetworkPolicy）、Terway</li>
+<li>ACK 集群开启NetworkPolicy 方式：</li>
+</ol>
+<ul>
+<li>控制台方式操作（简易操作）：需通过阿里云提工单申请</li>
+<li>命令行方式操作（kubectl 方式）：无需申请可直接操作。开启方式：<ul>
+<li><p>创建Terway集群时可选中** NetworkPolicy支持** 直接开启</p>
+<img data-src="/posts/8aa0/2afdc3d69fa9.png" class title="img.png">
+</li>
+<li><p>通过修改ConfigMap –&gt; eni-config 文件开启</p>
+</li>
+</ul>
+</li>
+</ul>
+<img data-src="/posts/8aa0/6bbe6aab7201.png" class title="img.png">
+
+
+<ol start="3">
+<li>具体实现</li>
+</ol>
+<ul>
+<li><p>NetworkPolicy 支持三种方式进行网络隔离：namespace、ipBlock（CIDR）、Pods</p>
+</li>
+<li><p>默认情况下非隔离接受任何流量。使用NetworkPolicy 资源配置选中Pod 进入隔离状态（白名单规则），隔离规则有入站（ingress）和出站（egress）规则指定（与iptables概念类似，但不同的是 网络策略是并集累积的规则）</p>
+</li>
+<li><p>示例配置：</p>
+<figure class="highlight yaml"><table><tr><td class="code"><pre><span class="line"><span class="attr">apiVersion:</span> <span class="string">networking.k8s.io/v1</span></span><br><span class="line"><span class="attr">kind:</span> <span class="string">NetworkPolicy</span></span><br><span class="line"><span class="attr">metadata:</span></span><br><span class="line">  <span class="attr">name:</span> <span class="string">test-network-policy</span></span><br><span class="line">  <span class="comment"># 为namespace 为data的应用设置策略，默认隔离所有流量</span></span><br><span class="line">  <span class="attr">namespace:</span> <span class="string">data</span></span><br><span class="line"><span class="attr">spec:</span></span><br><span class="line">  <span class="comment"># pod选择器-必需</span></span><br><span class="line">  <span class="attr">podSelector:</span></span><br><span class="line">    <span class="attr">matchLabels:</span></span><br><span class="line">      <span class="attr">role:</span> <span class="string">&quot;data_centerevent&quot;</span></span><br><span class="line">      <span class="comment"># role: &quot;&quot;  role分组标签配置为空时表示匹配当前namespace所有pod</span></span><br><span class="line">  <span class="attr">policyTypes:</span></span><br><span class="line">  <span class="bullet">-</span> <span class="string">Ingress</span></span><br><span class="line">  <span class="bullet">-</span> <span class="string">Egress</span></span><br><span class="line">  <span class="attr">ingress:</span></span><br><span class="line">  <span class="bullet">-</span> <span class="attr">from:</span></span><br><span class="line">    <span class="comment"># 允许 172.17.0.0/16网段，排除 172.17.1.0/24</span></span><br><span class="line">    <span class="bullet">-</span> <span class="attr">ipBlock:</span></span><br><span class="line">        <span class="attr">cidr:</span> <span class="number">172.17</span><span class="number">.0</span><span class="number">.0</span><span class="string">/16</span></span><br><span class="line">        <span class="attr">except:</span></span><br><span class="line">        <span class="bullet">-</span> <span class="number">172.17</span><span class="number">.1</span><span class="number">.0</span><span class="string">/24</span></span><br><span class="line">    <span class="comment"># 允许所有namespace带有&quot;project=apps_project&quot; 标签的所有namesapce Pod流量</span></span><br><span class="line">    <span class="bullet">-</span> <span class="attr">namespaceSelector:</span></span><br><span class="line">        <span class="attr">matchLabels:</span></span><br><span class="line">          <span class="attr">project:</span> <span class="string">apps_project</span></span><br><span class="line">    <span class="comment"># 允许data这个namespace下带有&quot;role=apps&quot; 标签的所有Pod流量</span></span><br><span class="line">    <span class="bullet">-</span> <span class="attr">podSelector:</span></span><br><span class="line">        <span class="attr">matchLabels:</span></span><br><span class="line">          <span class="attr">role:</span> <span class="string">apps</span></span><br><span class="line">    <span class="attr">ports:</span></span><br><span class="line">    <span class="bullet">-</span> <span class="attr">protocol:</span> <span class="string">TCP</span></span><br><span class="line">      <span class="attr">port:</span> <span class="number">8080</span></span><br><span class="line">  <span class="attr">egress:</span></span><br><span class="line">  <span class="comment"># 允许data这个namespace下，带有&quot;role=data_centerevent&quot;的所有Pod到以下CIDR的流出流量</span></span><br><span class="line">  <span class="bullet">-</span> <span class="attr">to:</span></span><br><span class="line">    <span class="bullet">-</span> <span class="attr">ipBlock:</span></span><br><span class="line">        <span class="attr">cidr:</span> <span class="number">10.0</span><span class="number">.0</span><span class="number">.0</span><span class="string">/24</span></span><br><span class="line">    <span class="attr">ports:</span></span><br><span class="line">    <span class="bullet">-</span> <span class="attr">protocol:</span> <span class="string">TCP</span></span><br><span class="line">      <span class="attr">port:</span> <span class="number">6379</span></span><br></pre></td></tr></table></figure></li>
+</ul>
+<h3 id="三、实现方案与难点"><a href="#三、实现方案与难点" class="headerlink" title="三、实现方案与难点"></a>三、实现方案与难点</h3><h4 id="实现难点"><a href="#实现难点" class="headerlink" title="实现难点"></a>实现难点</h4><ul>
+<li>ACK 集群都为托管版，无法通过自行修改配置更改CNI 插件。且更改CNI 插件可能会导致当前网络模型变动造成未知异常</li>
+<li>阿里云ACK 集群有两种CNI 网络插件：Flannel、Terway。阿里云的ACK 集群上面只有Terway 集群支持NetworkPolicy。</li>
+<li>已有网络插件无法平滑进行切换，只能通过删除集群重建物理层的方式重新改为 Terway 集群。</li>
+</ul>
+<h4 id="迁移可行性方案思考"><a href="#迁移可行性方案思考" class="headerlink" title="迁移可行性方案思考"></a>迁移可行性方案思考</h4><ul>
+<li>由于当前集群网络规划冲突且复杂，建议使用重建集群方式。新建一个全新规划的集群然后将应用进行迁移：<ul>
+<li>无状态应用且无外部调用需求类应用，直接进行部署迁移</li>
+<li>部分无依赖&#x2F;弱依赖 应用，使用打包应用群组的方式在新集群进行部署，且新建全新SLB接入新集群应用，通过切换域名解析&#x2F;修改IP 方式将流量切入新集群应用。</li>
+</ul>
+</li>
+</ul>
+<h4 id="参考："><a href="#参考：" class="headerlink" title="参考："></a>参考：</h4><ol>
+<li>Kubernetes 官网：<a href="https://kubernetes.io/zh/docs/concepts/services-networking/network-policies/">https://kubernetes.io/zh/docs/concepts/services-networking/network-policies/</a></li>
+<li>阿里云官网：<a href="https://help.aliyun.com/document_detail/97621.html">https://help.aliyun.com/document_detail&#x2F;97621.html</a></li>
+<li>NetworkPolicy 支持的CNI 插件：<a href="https://www.qikqiak.com/k8strain/network/networkpolicy/">https://www.qikqiak.com/k8strain/network/networkpolicy/</a></li>
+<li>阿里云官网（Terway 集群网络规划策略）：<a href="https://help.aliyun.com/document_detail/86500.html">https://help.aliyun.com/document_detail&#x2F;86500.html</a></li>
+</ol>
+]]></content>
+      <categories>
+        <category>云原生</category>
+      </categories>
+      <tags>
+        <tag>K8S</tag>
+        <tag>阿里云</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>promotheus组件-grafana大盘配置监控大盘与告警通知</title>
+    <url>/posts/9a8h.html</url>
+    <content><![CDATA[<link rel="stylesheet" class="aplayer-secondary-style-marker" href="/assets/css/APlayer.min.css"><script src="/assets/js/APlayer.min.js" class="aplayer-secondary-script-marker"></script><script class="meting-secondary-script-marker" src="/assets/js/Meting.min.js"></script><h3 id="一、背景"><a href="#一、背景" class="headerlink" title="一、背景"></a>一、背景</h3><ul>
+<li>线上ACK 集群部署了StatefulSet 应用（rabbitMQ），由于rabbitMQ 本身自带的management 后台数据展示较为简陋且没有告警功能，因此考虑接入云上产品监控资源数据且对接告警通知功能，主要通过如下产品实现：<ul>
+<li>接入Prometheus 监控+grafana 进行数据图表展示。</li>
+<li>利用Arms 产品获取Prometheus 的监控指标，按照设定的阈值进行告警通知功能。</li>
+</ul>
+</li>
+</ul>
+<h3 id="二、操作过程"><a href="#二、操作过程" class="headerlink" title="二、操作过程"></a>二、操作过程</h3><h4 id="1）接入Prometheus-组件监控，获取数据指标"><a href="#1）接入Prometheus-组件监控，获取数据指标" class="headerlink" title="1）接入Prometheus 组件监控，获取数据指标"></a>1）接入Prometheus 组件监控，获取数据指标</h4><ul>
+<li>进入云产品 <strong>Prometheus监控服务</strong>，选择对应集群。（ACK集群需要先安装Prometheus 监控组件，安装参考：<a href="https://help.aliyun.com/document_detail/161304.html">ARMS Prometheus监控</a>）<img data-src="/posts/9a8h/1.png" class title="img.png"></li>
+</ul>
+<span id="more"></span>
+<ul>
+<li><p>选择 组件监控 ，点击添加组件监控，选择要添加的组件。（本次示例为RabbitMQ）</p>
+<img data-src="/posts/9a8h/2.png" class title="img.png">
+<img data-src="/posts/9a8h/3.png" class title="img.png">
+</li>
+<li><p>添加后即可进入grafana 大盘查看指标数据。验证数据方式可以通过 **curl  xxx:9419&#x2F;metrics ** 获取指标数据，如图:</p>
+<img data-src="/posts/9a8h/4.png" class title="img.png"></li>
+</ul>
+<h4 id="2）grafana-接入数据展示"><a href="#2）grafana-接入数据展示" class="headerlink" title="2）grafana 接入数据展示"></a>2）grafana 接入数据展示</h4><ul>
+<li><p>从Pometheus 控制台，点击对应生成的大盘，进入grafana 数据展示界面</p>
+<img data-src="/posts/9a8h/5.png" class title="img.png">
+</li>
+<li><p>进入grafana Dashboard界面后，需要新增一个panel。操作如下：</p>
+<img data-src="/posts/9a8h/6.png" class title="img.png">
+<img data-src="/posts/9a8h/7.png" class title="img.png">
+<img data-src="/posts/9a8h/8.png" class title="img.png">
+</li>
+<li><p>在ACK集群查看展示组件相关监控数据：在对应ACK 集群中，选择 <strong>运维管理 – Prometheus监控 –Cloud RABBITMQ</strong> ，即可查看大盘数据。</p>
+<img data-src="/posts/9a8h/9.png" class title="img.png"></li>
+</ul>
+<h4 id="3）创建告警阈值与通知"><a href="#3）创建告警阈值与通知" class="headerlink" title="3）创建告警阈值与通知"></a>3）创建告警阈值与通知</h4><ul>
+<li><p>创建钉钉群，并生成钉钉机器人webhook地址。参考：<a href="https://help.aliyun.com/document_detail/251838.html">https://help.aliyun.com/document_detail&#x2F;251838.html</a></p>
+</li>
+<li><p>在云产品 <strong>Prometheus监控服务</strong> 中，将钉钉机器人添加到告警联系人，使用IM机器人方式。</p>
+<img data-src="/posts/9a8h/10.png" class title="img.png">
+</li>
+<li><p>在云产品 <strong>应用实时监控服务ARMS – Prometheus监控 – Prometheus告警规则</strong> 中，点击<strong>创建Prometheus告警规则</strong> ，创建告警规则。告警规则详细如图：</p>
+<img data-src="/posts/9a8h/11.png" class title="img.png">
+<img data-src="/posts/9a8h/12.png" class title="img.png">
+</li>
+<li><p>在云产品 <strong>应用实时监控服务ARMS – 告警管理 – 通知策略</strong> 中，点击<strong>创建通知策略</strong> ，创建告警通知策略。策略配置详细如图：</p>
+<img data-src="/posts/9a8h/13.png" class title="img.png">
+<img data-src="/posts/9a8h/14.png" class title="img.png"></li>
+</ul>
+<h4 id="4）验证告警"><a href="#4）验证告警" class="headerlink" title="4）验证告警"></a>4）验证告警</h4><ul>
+<li>将告警规则中PromQL 语句暂时配置为：sum by (queue)(rabbitmq_queue_messages_unacknowledged{app&#x3D;”rabbi-exporter”}) &gt;&#x3D; 0</li>
+</ul>
+<p>来产生告警</p>
+<ul>
+<li><p>在云产品 <strong>应用实时监控服务ARMS – 告警管理 – 告警发送历史&#x2F;告警事件历史</strong> 中，搜索告警事件与发送结果：</p>
+<img data-src="/posts/9a8h/15.png" class title="img.png">
+<img data-src="/posts/9a8h/16.png" class title="img.png">
+</li>
+<li><p>可以看到钉钉群已正常接收告警通知（告警恢复自动发送恢复通知并停止发送告警消息）</p>
+<img data-src="/posts/9a8h/17.png" class title="img.png"></li>
+</ul>
+<h3 id="三、注意事项"><a href="#三、注意事项" class="headerlink" title="三、注意事项"></a>三、注意事项</h3><ul>
+<li>ACK 集群 RabbitMQ应用告警是创建的临时告警群。后续如需添加其他人或告警通知发布到正式群组按情况进行调整。</li>
+</ul>
+]]></content>
+      <categories>
+        <category>云原生</category>
+      </categories>
+      <tags>
+        <tag>K8S</tag>
+        <tag>阿里云</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>阿里云-RAM与STS权限</title>
+    <url>/posts/fdc.html</url>
+    <content><![CDATA[<link rel="stylesheet" class="aplayer-secondary-style-marker" href="/assets/css/APlayer.min.css"><script src="/assets/js/APlayer.min.js" class="aplayer-secondary-script-marker"></script><script class="meting-secondary-script-marker" src="/assets/js/Meting.min.js"></script><h3 id="一、前言"><a href="#一、前言" class="headerlink" title="一、前言"></a>一、前言</h3><p>当通过OpenApi接口来调用云资源时（即替代控制台的操作），当前的方式有两种：</p>
+<ul>
+<li>通过 AK+SK 方式直接调用，只要该AK所属的账号有相关权限即可调用对应资源（授权分为系统策略和自定义策略）</li>
+<li>阿里云账号（RAM用户）&#x2F;阿里云服务（ECS等）&#x2F;身份提供商（SSO） 通过扮演角色获取角色的临时令牌（即通过调用AssumeRole接口），通过该临时令牌（临时令牌可设定会话时间），通过 STS接口获取到的 临时AK+临时SK+临时STSToken 进行调用对应资源</li>
+</ul>
+<h3 id="二、官方概念介绍"><a href="#二、官方概念介绍" class="headerlink" title="二、官方概念介绍"></a>二、官方概念介绍</h3><ol>
+<li>STS概念</li>
+</ol>
+<ul>
+<li>阿里云STS（Security Token Service）是阿里云提供的一种临时访问权限管理服务。RAM提供RAM用户和RAM角色两种身份。其中，RAM角色不具备永久身份凭证，而只能通过STS获取可以自定义时效和访问权限的临时身份凭证，即安全令牌（STS Token）</li>
+</ul>
+<span id="more"></span>
+<p>建议阅读：<a href="https://help.aliyun.com/document_detail/28756.html">https://help.aliyun.com/document_detail&#x2F;28756.html</a></p>
+<ol start="2">
+<li>RAM概念</li>
+</ol>
+<ul>
+<li>RAM用户：身份实体，可访问阿里云资源的账号或程序；创建时可选择登录场景、AccessKey场景（通过程序调用API）。</li>
+<li><strong>RAM角色</strong>：虚拟用户，向信任的RAM实体账号进行授权（根据STS令牌颁发短时有效的临时访问token）；创建角色后会生成Arn描述符（角色的描述符：每个RAM角色存在唯一值且遵循阿里云arn命名规范）。</li>
+<li>RAM权限策略：一组权限集，使用简单的Policy语法进行描述（分为系统策略和自定义策略）；权限策略是实际细分授权资源集、操作集、授权条件的描述。</li>
+</ul>
+<img data-src="/posts/fdc/ram1.png" class title="img.png">
+
+<blockquote>
+<p>创建RAM角色时有三种类型：</p>
+<ul>
+<li><strong>阿里云账号</strong>：允许RAM用户所扮演的角色。扮演角色的RAM用户可以属于自己的阿里云账号，也可以属于其他阿里云账号。此类角色主要用来解决跨账号访问和临时授权问题</li>
+<li><strong>阿里云服务</strong>：允许云服务所扮演的角色。此类角色主要用于授权云服务代理您进行资源操作（服务又分为两种）<ul>
+<li>普通服务角色：您需要自定义角色名称，选择受信服务，并自定义权限策略</li>
+<li>服务关联角色：您只需选择受信的云服务，云服务会自带预设的角色名称和权限策略</li>
+<li>两种服务角色没太大区别，服务关联角色会多一个预设的配置（一般服务角色用户阿里云跨服务间的调用，例如ECS的授予&#x2F;收回RAM角色功能、RDS云服务调用KMS角色加密等，从某个云产品调用另一个云产品的授权）</li>
+</ul>
+</li>
+</ul>
+</blockquote>
+<img data-src="/posts/fdc/ram2.png" class title="img.png">
+<blockquote>
+<ul>
+<li><strong>身份提供商</strong>：允许可信身份提供商下的用户所扮演的角色。此类角色主要用于实现与阿里云的单点登录（SSO）</li>
+</ul>
+<p><strong>常用的RAM角色一般为创建 阿里云账号 方式（OSS官方推荐使用）</strong></p>
+<ul>
+<li>授权RAM角色介绍：<a href="https://help.aliyun.com/document_detail/116819.html">https://help.aliyun.com/document_detail&#x2F;116819.html</a></li>
+<li>OSS官方推荐使用 阿里云账号 方式：<a href="https://help.aliyun.com/document_detail/100624.html">https://help.aliyun.com/document_detail&#x2F;100624.html</a></li>
+</ul>
+</blockquote>
+<h3 id="三、创建STS角色，自定义授权OSS功能测试"><a href="#三、创建STS角色，自定义授权OSS功能测试" class="headerlink" title="三、创建STS角色，自定义授权OSS功能测试"></a>三、创建STS角色，自定义授权OSS功能测试</h3><p>1）测试账号信息<br>账号：<a href="mailto:&#x64;&#101;&#x76;&#x6f;&#x70;&#115;&#x5f;&#116;&#101;&#115;&#116;&#64;&#x78;&#120;&#x78;&#46;&#111;&#110;&#97;&#x6c;&#105;&#121;&#x75;&#x6e;&#46;&#99;&#111;&#109;">&#x64;&#101;&#x76;&#x6f;&#x70;&#115;&#x5f;&#116;&#101;&#115;&#116;&#64;&#x78;&#120;&#x78;&#46;&#111;&#110;&#97;&#x6c;&#105;&#121;&#x75;&#x6e;&#46;&#99;&#111;&#109;</a><br>AK：xxxxx<br>SK：xxxxx<br>ARN：acs:ram::xxxxx:role&#x2F;xxx-sts<br>OSS Bucket名称：oss-test<br>OSS授权目录：dir111&#x2F;dir111_secondline1&#x2F;</p>
+<p>2）进行授权</p>
+<ul>
+<li>创建RAM用户（子账号），生成AK SK （此步骤忽略）</li>
+<li>测试账号添加STS权限</li>
+</ul>
+<img data-src="/posts/fdc/ram3.png" class title="img.png">
+
+<ul>
+<li>添加权限策略，使用自定义策略授权（OSS官方示例Policy：<a href="https://help.aliyun.com/document_detail/266627.html">https://help.aliyun.com/document_detail&#x2F;266627.html</a>）</li>
+</ul>
+<img data-src="/posts/fdc/ram4.png" class title="img.png">
+
+<ul>
+<li>添加RAM角色并授权Policy</li>
+</ul>
+<img data-src="/posts/fdc/ram5.png" class title="img.png">
+
+<img data-src="/posts/fdc/ram6.png" class title="img.png">
+
+<p>3）测试验证（控制台无法登录RAM账号验证权限情况下，可以使用ossutil或ossbrowser工具进行验证）</p>
+<ul>
+<li>ossutil使用：<a href="https://help.aliyun.com/document_detail/50451.html">https://help.aliyun.com/document_detail&#x2F;50451.html</a></li>
+</ul>
+<img data-src="/posts/fdc/ram7.png" class title="img.png">
+
+<ul>
+<li>ossbrowser使用：<a href="https://help.aliyun.com/document_detail/92268.html">https://help.aliyun.com/document_detail&#x2F;92268.html</a></li>
+</ul>
+<p>4）验证列举和其他相关权限无误后，将ARN信息提供研发即可</p>
+<blockquote>
+<p>权限流程：</p>
+<ol>
+<li>客户端程序&#x2F;调用端发起扮演角色，此时在进入实际要获取的角色权限前，需要通过调用AssumeRole接口返回STS凭证（调用STS接口需要<strong>AliyunSTSAssumeRoleAccess</strong>权限，因此对应RAM账号需要授权该系统策略）</li>
+<li>通过返回的STS临时凭证（临时AK+临时SK+临时token）发起相关云资源接口的调用</li>
+<li>客户端使用STS发起调用时，会验证两个部分的权限策略Policy （注意：最后的权限取这两个权限Policy的交集）</li>
+</ol>
+<ul>
+<li>STS扮演的角色本身授权的权限策略是否拥有对应云资源的权限（系统或自定义的Policy）</li>
+<li>SDK&#x2F;API调用时传入的policy_text参数值，在构造调用请求时传入（<a href="https://help.aliyun.com/document_detail/100624.html">https://help.aliyun.com/document_detail&#x2F;100624.html</a><img data-src="/posts/fdc/ram8.png" class title="img.png"></li>
+</ul>
+</blockquote>
+<h3 id="四、结合实际需求"><a href="#四、结合实际需求" class="headerlink" title="四、结合实际需求"></a>四、结合实际需求</h3><ol>
+<li><p>开发提出需求：需要某一个oss bucket的STS ARN信息</p>
+</li>
+<li><p>需要相关信息：</p>
+</li>
+</ol>
+<ul>
+<li>oss bucket具体需授权目录，必须</li>
+<li>endpoint: oss bucket所属区域，非必须</li>
+<li>bucket-name: oss bucket名称，必须</li>
+<li>调用OSS RAM账号，必须</li>
+</ul>
+<ol start="3">
+<li>通过提供信息进行创建RAM角色、Policy策略新建（注意oss 细粒度的策略）、授权策略到RAM角色中，最后将新建的RAM角色的ARN描述符信息提供给研发。</li>
+</ol>
+]]></content>
+      <tags>
+        <tag>阿里云</tag>
+      </tags>
+  </entry>
+</search>

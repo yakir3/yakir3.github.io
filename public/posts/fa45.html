@@ -1,0 +1,728 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 6.0.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+<link rel="stylesheet" href="https://fonts.loli.net/css?family=Noto Serif SC:300,300italic,400,400italic,700,700italic&display=swap&subset=latin,latin-ext">
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.css">
+  <link rel="stylesheet" href="/lib/pace/pace-theme-minimal.min.css">
+  <script src="/lib/pace/pace.min.js"></script>
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"359sun.top","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"left","always":true,"display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":true,"show_result":true,"style":"mac"},"back2top":{"enable":true,"sidebar":true,"scrollpercent":true},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":true,"mediumzoom":false,"lazyload":true,"pangu":false,"comments":{"style":"tabs","active":"gitalk","storage":true,"lazyload":false,"nav":{"gitalk":{"order":-2}},"activeClass":"gitalk"},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+  <meta name="description" content="一、RBAC简易概述 1) RBAC 四种 API 对象 Role：一组权限的集合，在一个命名空间中，可以用其来定义一个角色，只能对命名空间内的资源进行授权。如果是集群级别的资源，则需要使用ClusterRole。例如：定义一个角色用来读取Pod的权限 ClusterRole：具有和角色一致的命名空间资源的管理能力，还可用于以下特殊元素的授权 集群范围的资源，例如Node 非资源型的路径，例如：&amp;">
+<meta property="og:type" content="article">
+<meta property="og:title" content="K8S-RBAC权限控制">
+<meta property="og:url" content="https://359sun.top/posts/fa45.html">
+<meta property="og:site_name" content="Yakir Blog">
+<meta property="og:description" content="一、RBAC简易概述 1) RBAC 四种 API 对象 Role：一组权限的集合，在一个命名空间中，可以用其来定义一个角色，只能对命名空间内的资源进行授权。如果是集群级别的资源，则需要使用ClusterRole。例如：定义一个角色用来读取Pod的权限 ClusterRole：具有和角色一致的命名空间资源的管理能力，还可用于以下特殊元素的授权 集群范围的资源，例如Node 非资源型的路径，例如：&amp;">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://359sun.top/posts/fa45/gaisu.png">
+<meta property="og:image" content="https://359sun.top/posts/fa45/c31775e8bbe3.png">
+<meta property="og:image" content="https://359sun.top/posts/fa45/634be995b5bc.png">
+<meta property="og:image" content="https://359sun.top/posts/fa45/21812e1bbfad.png">
+<meta property="og:image" content="https://359sun.top/posts/fa45/7528aa1bf3da.png">
+<meta property="og:image" content="https://359sun.top/posts/fa45/de3ebdd4f016.png">
+<meta property="og:image" content="https://359sun.top/posts/fa45/1572c2ebc891.png">
+<meta property="og:image" content="https://359sun.top/posts/fa45/d6da8c845c41.png">
+<meta property="og:image" content="https://359sun.top/posts/fa45/de4222775e67.png">
+<meta property="og:image" content="https://359sun.top/posts/fa45/ab8f20ce2acc.png">
+<meta property="article:published_time" content="2022-03-01T15:55:02.000Z">
+<meta property="article:modified_time" content="2022-03-16T15:39:25.464Z">
+<meta property="article:author" content="Yakir">
+<meta property="article:tag" content="K8S">
+<meta property="article:tag" content="阿里云">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://359sun.top/posts/fa45/gaisu.png">
+
+<link rel="canonical" href="https://359sun.top/posts/fa45.html">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>K8S-RBAC权限控制 | Yakir Blog</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+<link rel="alternate" href="/atom.xml" title="Yakir Blog" type="application/atom+xml">
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">Yakir Blog</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+        <li class="menu-item menu-item-musiclist">
+
+    <a href="/musiclist/" rel="section"><i class="fa fa-music fa-fw"></i>歌单</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="reading-progress-bar"></div>
+
+  <a href="https://github.com/yakir3" class="github-corner" title="Follow me on GitHub" aria-label="Follow me on GitHub" rel="noopener" target="_blank"><svg width="80" height="80" viewBox="0 0 250 250" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path></svg></a>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://359sun.top/posts/fa45.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.jpg">
+      <meta itemprop="name" content="Yakir">
+      <meta itemprop="description" content="Yakir Blog">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Yakir Blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          K8S-RBAC权限控制
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2022-03-01 23:55:02" itemprop="dateCreated datePublished" datetime="2022-03-01T23:55:02+08:00">2022-03-01</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2022-03-16 23:39:25" itemprop="dateModified" datetime="2022-03-16T23:39:25+08:00">2022-03-16</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E4%BA%91%E5%8E%9F%E7%94%9F/" itemprop="url" rel="index"><span itemprop="name">云原生</span></a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span><br>
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+                <span class="post-meta-item-text">本文字数：</span>
+              <span>3.9k</span>
+            </span>
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+                <span class="post-meta-item-text">阅读时长 &asymp;</span>
+              <span>4 分钟</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h3 id="一、RBAC简易概述"><a href="#一、RBAC简易概述" class="headerlink" title="一、RBAC简易概述"></a>一、RBAC简易概述</h3><img data-src="/posts/fa45/gaisu.png" class title="概述">
+<h4 id="1-RBAC-四种-API-对象"><a href="#1-RBAC-四种-API-对象" class="headerlink" title="1) RBAC 四种 API 对象"></a>1) RBAC 四种 API 对象</h4><ul>
+<li>Role：一组权限的集合，在一个命名空间中，可以用其来定义一个角色，只能对命名空间内的资源进行授权。如果是集群级别的资源，则需要使用ClusterRole。例如：定义一个角色用来读取Pod的权限</li>
+<li>ClusterRole：具有和角色一致的命名空间资源的管理能力，还可用于以下特殊元素的授权<ul>
+<li>集群范围的资源，例如Node</li>
+<li>非资源型的路径，例如：&#x2F;healthz</li>
+<li>包含全部命名空间的资源，例如Pods<blockquote>
+<p>例如：定义一个集群角色可让用户访问任意secrets</p>
+</blockquote>
+</li>
+</ul>
+</li>
+<li>RoleBinding：角色绑定</li>
+<li>ClusterRoleBinding：集群角色绑定<blockquote>
+<p>角色绑定和集群角色绑定用于把一个角色绑定在一个目标上，可以是User，Group，Service Account，使用RoleBinding为某个命名空间授权，使用ClusterRoleBinding为集群范围内授权。</p>
+</blockquote>
+</li>
+</ul>
+<p><strong>Role和ClusterRole是权限规则的定义</strong></p>
+<ul>
+<li>rules代表具体的授权规则，类似于阿里云RAM中的权限策略Policy</li>
+<li>Role和ClusterRole区别只在于一个是集群级别的资源控制</li>
+</ul>
+<span id="more"></span>
+
+<p><strong>RoleBinding和ClusterRoleBinding是将User、Group、ServiceAccount绑定到Role或ClusterRole中（类似阿里云RAM中将Policy赋权给RAM角色或RAM账号）</strong></p>
+<ul>
+<li>User、Group、ServiceAccount 是 K8S 集群中单独的概念，与系统级别不同。参考：<a target="_blank" rel="noopener" href="https://www.qikqiak.com/k8strain2/security/rbac/#%E5%88%9B%E5%BB%BA%E8%A7%92%E8%89%B2">https://www.qikqiak.com/k8strain2/security/rbac/#%E5%88%9B%E5%BB%BA%E8%A7%92%E8%89%B2</a></li>
+<li>RoleBinding 可以引用同一个 namespace 中的任何 Role ；或者一个 RoleBinding 可以引用某 ClusterRole 并将该 ClusterRole 绑定到 RoleBinding 所在的 namespace。</li>
+<li>如需 ClusterRole 绑定到集群中所有 namespace，必须要使用 ClusterRoleBinding</li>
+<li>RoleBinding 对应可引用一个 ClusterRole 对象用于在 RoleBinding 所在的 namespace 内授予用户对所引用的 ClusterRole 中定义的 namespace 资源的访问权限。（在整个集群内定义一组通用角色，然后在不同 namespace 中复用这些角色）</li>
+</ul>
+<h4 id="2-资源引用方式"><a href="#2-资源引用方式" class="headerlink" title="2) 资源引用方式"></a>2) 资源引用方式</h4><ul>
+<li>多数资源可以用其名称的字符串表示，也就是Endpoint中的URL相对路径，例如pod中的日志是GET &#x2F;api&#x2F;v1&#x2F;namaspaces&#x2F;{namespace}&#x2F;pods&#x2F;{podname}&#x2F;log</li>
+<li>如果需要在一个RBAC对象中体现上下级资源，就需要使用“&#x2F;”分割资源和下级资源。</li>
+</ul>
+<p>例如：若想授权让某个主体同时能够读取Pod和Pod log，则可以配置 resources为一个数组</p>
+<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">rules:</span></span><br><span class="line"><span class="bullet">-</span> <span class="attr">apiGroups:</span> [<span class="string">&quot;&quot;</span>]</span><br><span class="line">   <span class="attr">resources:</span> [<span class="string">&quot;pods&quot;</span>,<span class="string">&quot;pods/log&quot;</span>]</span><br><span class="line">   <span class="attr">verbs:</span> [<span class="string">&quot;get&quot;</span>,<span class="string">&quot;list&quot;</span>]</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>通过名称（ResourceName）进行引用，在指定ResourceName后，使用get、delete、update、patch请求，就会被限制在这个资源实例范围内</li>
+</ul>
+<p>例如，下面的声明让一个主体只能对名为my-configmap的ConFigmap进行get和update操作：</p>
+<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">rules:</span></span><br><span class="line"><span class="bullet">-</span> <span class="attr">apiGroups:</span> [<span class="string">&quot;&quot;</span>]</span><br><span class="line">   <span class="attr">resources:</span> [<span class="string">&quot;configmap&quot;</span>]</span><br><span class="line">   <span class="attr">resourceNames:</span> [<span class="string">&quot;my-configmap&quot;</span>]</span><br><span class="line">   <span class="attr">verbs:</span> [<span class="string">&quot;get&quot;</span>,<span class="string">&quot;update&quot;</span>]</span><br></pre></td></tr></table></figure>
+
+
+<h4 id="3-rules-参数说明"><a href="#3-rules-参数说明" class="headerlink" title="3) rules 参数说明"></a>3) rules 参数说明</h4><ul>
+<li>apiGroups：支持的API组列表，例如：”apiVersion: batch&#x2F;v1”等</li>
+<li>resources：支持的资源对象列表，例如pods、deplayments、jobs等</li>
+<li>resourceNames: 指定resource的名称（可选）</li>
+<li>verbs：对资源对象的操作方法列表<blockquote>
+<p>api-resources：所有资源信息<br>apiGroups：api-resources下的分类分组</p>
+<p><a target="_blank" rel="noopener" href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.23/#-strong-api-groups-strong-">查看API GROUP分组信息</a></p>
+<ul>
+<li>方式一：kubectl explain xxx ， xxx为 “kubectl api-resources” 输出结果的 NAME 值（输出结果的 VERSION 值为v1 则为默认的Core API 分组，默认以”” 表示，如 pods、services）</li>
+<li>方式二：kubectl get –raw &#x2F;apis&#x2F;apps&#x2F;v1</li>
+</ul>
+</blockquote>
+</li>
+</ul>
+<p>可通过 kubectl get –raw &#x2F;apis&#x2F;rbac.authorization.k8s.io&#x2F;v1 可以获取到 RBAC 四个 API 资源对象的相关信息，如下图：</p>
+<img data-src="/posts/fa45/c31775e8bbe3.png" class title="img.png">
+
+<blockquote>
+<p>创建资源&#x2F;信息的方式</p>
+<ul>
+<li>方式一：kubectl create -f xxx.yaml       –&gt;   文件方式创建</li>
+<li>方式二：kubectl create –arg1&#x3D;xxx –arg2&#x3D;yyy     –&gt;  参数方式创建（后续可通过kubectl edit方式继续编辑）</li>
+</ul>
+</blockquote>
+<h3 id="二、ServiceAccount-测试"><a href="#二、ServiceAccount-测试" class="headerlink" title="二、ServiceAccount 测试"></a>二、ServiceAccount 测试</h3><h4 id="1-创建-serviceaccount-账户并进行对应授权"><a href="#1-创建-serviceaccount-账户并进行对应授权" class="headerlink" title="1) 创建 serviceaccount 账户并进行对应授权"></a>1) 创建 serviceaccount 账户并进行对应授权</h4><ol>
+<li><p>创建 serviceaccount 账户 camel-sva （只需defalut namespace）<br>执行命令：kubectl create serviceaccount camel-sva -n default</p>
+<img data-src="/posts/fa45/634be995b5bc.png" class title="img.png">
+</li>
+<li><p>创建 role 角色 （授权Integration、Kamelet、KameletBinding 3种资源的 curd 权限）<br>执行命令：kubectl create role camel-sva-role –verb&#x3D;* –resource&#x3D;integrations,kamelets,kameletbindings </p>
+<img data-src="/posts/fa45/21812e1bbfad.png" class title="img.png">
+</li>
+<li><p>绑定集群权限<br>命令：kubectl create rolebinding camel-sva-rolebinding –role&#x3D;camel-sva-role –serviceaccount&#x3D;default:camel-sva</p>
+<img data-src="/posts/fa45/7528aa1bf3da.png" class title="img.png">
+</li>
+<li><p>查看账号 secret 信息<br>命令：kubectl get secret&#x2F;camel-sva-token-mdt28 -oyaml</p>
+<img data-src="/posts/fa45/de3ebdd4f016.png" class title="img.png">
+<p>将获取到的 token 值进行 base64 解码后即可用来调用 apiserver 接口，如下图（接口可通过 kubectl get –raw &#x2F;apis&#x2F; 进行获取）：</p>
+<img data-src="/posts/fa45/1572c2ebc891.png" class title="img.png"></li>
+</ol>
+<h4 id="2-创建用户认证的-kubeconfig-文件"><a href="#2-创建用户认证的-kubeconfig-文件" class="headerlink" title="2) 创建用户认证的 kubeconfig 文件"></a>2) 创建用户认证的 kubeconfig 文件</h4><ol>
+<li><p>创建集群配置文件<br>命令：kubectl config set-cluster kubernetes –certificate-authority&#x3D;&#x2F;etc&#x2F;kubernetes&#x2F;pki&#x2F;ca.crt –server&#x3D;”<a href="https://10.0.0.142:6443&quot;">https://10.0.0.142:6443&quot;</a> –embed-certs&#x3D;true –kubeconfig&#x3D;.&#x2F;camel-sva.conf</p>
+</li>
+<li><p>生成 token（base64编码）<br>命令：D&#x3D;$(kubectl get secret camel-sva-token-mdt28 -o jsonpath&#x3D;{.data.token}|base64 -d)</p>
+</li>
+<li><p>为配置文件添加 token 信息，设置一个用户条目<br>命令：kubectl config set-credentials camel-sva –token&#x3D;$D –kubeconfig&#x3D;.&#x2F;camel-sva.conf</p>
+</li>
+<li><p>为配置文件添加权限信息，设置一个 content 条目<br>kubectl config set-context camel-sva@kubernetes –cluster&#x3D;kubernetes –user&#x3D;camel-sva –kubeconfig&#x3D;.&#x2F;camel-sva.conf</p>
+</li>
+<li><p>为配置文件添加权限信息，设置上下文<br>命令：kubectl config use-context camel-sva@kubernetes –kubeconfig&#x3D;.&#x2F;camel-sva.conf</p>
+</li>
+</ol>
+<p>执行完上述命令后即在当前目录生成配置文件：camel-sva.conf，可 copy 到 kubeconfig对应目录，进行操作。</p>
+<img data-src="/posts/fa45/d6da8c845c41.png" class title="img.png">
+<p>使用该配置文件进行 kubectl 命令操作，即可验证用户只拥有对应资源的操作权限。</p>
+<img data-src="/posts/fa45/de4222775e67.png" class title="img.png">
+
+<h4 id="3-API-对象结构"><a href="#3-API-对象结构" class="headerlink" title="3) API 对象结构"></a>3) API 对象结构</h4><img data-src="/posts/fa45/ab8f20ce2acc.png" class title="img.png">
+
+
+<h3 id="三、参考学习"><a href="#三、参考学习" class="headerlink" title="三、参考学习"></a>三、参考学习</h3><ol>
+<li><a target="_blank" rel="noopener" href="https://kubernetes.io/zh/docs/reference/access-authn-authz/rbac/#service-account-permissions">https://kubernetes.io/zh/docs/reference/access-authn-authz/rbac/#service-account-permissions</a></li>
+<li><a target="_blank" rel="noopener" href="https://www.qikqiak.com/k8strain2/security/rbac/#%E5%88%9B%E5%BB%BA%E8%A7%92%E8%89%B2">https://www.qikqiak.com/k8strain2/security/rbac/#%E5%88%9B%E5%BB%BA%E8%A7%92%E8%89%B2</a></li>
+<li><a target="_blank" rel="noopener" href="https://zhuanlan.zhihu.com/p/97793056">https://zhuanlan.zhihu.com/p/97793056</a></li>
+</ol>
+
+    </div>
+
+    
+    
+    
+        
+
+<div>
+<ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>本文作者： </strong>Yakir
+  </li>
+  <li class="post-copyright-link">
+    <strong>本文链接：</strong>
+    <a href="https://359sun.top/posts/fa45.html" title="K8S-RBAC权限控制">https://359sun.top/posts/fa45.html</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" rel="noopener" target="_blank"><i class="fab fa-fw fa-creative-commons"></i>BY-NC-SA</a> 许可协议。转载请注明出处！
+  </li>
+</ul>
+</div>
+
+        
+
+  <div class="followme">
+    <p>欢迎关注我的其它发布渠道</p>
+
+    <div class="social-list">
+
+        <div class="social-item">
+          <a target="_blank" class="social-link" href="/atom.xml">
+            <span class="icon">
+              <i class="fa fa-rss"></i>
+            </span>
+
+            <span class="label">RSS</span>
+          </a>
+        </div>
+    </div>
+  </div>
+
+
+      <footer class="post-footer">
+          
+          <div class="post-tags">
+              <!-- <a href="/tags/k8s/" rel="tag"><i class="fa fa-tag"></i> K8S</a> -->
+              <a href="/tags/k8s/" rel="tag"><i class="fa fa-tag"></i> K8S</a>
+              <!-- <a href="/tags/%E9%98%BF%E9%87%8C%E4%BA%91/" rel="tag"><i class="fa fa-tag"></i> 阿里云</a> -->
+              <a href="/tags/%E9%98%BF%E9%87%8C%E4%BA%91/" rel="tag"><i class="fa fa-tag"></i> 阿里云</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/posts/3eeb.html" rel="prev" title="Hello World">
+      <i class="fa fa-chevron-left"></i> Hello World
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/posts/8aa0.html" rel="next" title="NetworkPolicy隔离策略">
+      NetworkPolicy隔离策略 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+    <div class="comments" id="gitalk-container"></div>
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%B8%80%E3%80%81RBAC%E7%AE%80%E6%98%93%E6%A6%82%E8%BF%B0"><span class="nav-text">一、RBAC简易概述</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#1-RBAC-%E5%9B%9B%E7%A7%8D-API-%E5%AF%B9%E8%B1%A1"><span class="nav-text">1) RBAC 四种 API 对象</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-%E8%B5%84%E6%BA%90%E5%BC%95%E7%94%A8%E6%96%B9%E5%BC%8F"><span class="nav-text">2) 资源引用方式</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#3-rules-%E5%8F%82%E6%95%B0%E8%AF%B4%E6%98%8E"><span class="nav-text">3) rules 参数说明</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BA%8C%E3%80%81ServiceAccount-%E6%B5%8B%E8%AF%95"><span class="nav-text">二、ServiceAccount 测试</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#1-%E5%88%9B%E5%BB%BA-serviceaccount-%E8%B4%A6%E6%88%B7%E5%B9%B6%E8%BF%9B%E8%A1%8C%E5%AF%B9%E5%BA%94%E6%8E%88%E6%9D%83"><span class="nav-text">1) 创建 serviceaccount 账户并进行对应授权</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-%E5%88%9B%E5%BB%BA%E7%94%A8%E6%88%B7%E8%AE%A4%E8%AF%81%E7%9A%84-kubeconfig-%E6%96%87%E4%BB%B6"><span class="nav-text">2) 创建用户认证的 kubeconfig 文件</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#3-API-%E5%AF%B9%E8%B1%A1%E7%BB%93%E6%9E%84"><span class="nav-text">3) API 对象结构</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%B8%89%E3%80%81%E5%8F%82%E8%80%83%E5%AD%A6%E4%B9%A0"><span class="nav-text">三、参考学习</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Yakir"
+      src="/images/avatar.jpg">
+  <p class="site-author-name" itemprop="name">Yakir</p>
+  <div class="site-description" itemprop="description">Yakir Blog</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">5</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">1</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">2</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/yakir3" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;yakir3" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="/atom.xml" title="RSS → &#x2F;atom.xml"><i class="fa fa-rss fa-fw"></i>RSS</a>
+      </span>
+  </div>
+
+
+
+  <div class="links-of-blogroll motion-element links-of-blogroll-block">
+    <div class="links-of-blogroll-title">
+      <!-- modify icon to fire by szw -->
+      <i class="fa fa-history fa-" aria-hidden="true"></i>
+      近期文章
+    </div>
+    <ul class="links-of-blogroll-list">
+      
+      
+        <li class="recent_posts_li">
+          <!--<a href="/" title="" target="_blank"></a>-->
+        </li>
+      
+        <li class="recent_posts_li">
+          <!--<a href="/" title="" target="_blank"></a>-->
+        </li>
+      
+        <li class="recent_posts_li">
+          <!--<a href="/" title="" target="_blank"></a>-->
+        </li>
+      
+    </ul>
+  </div>
+
+
+
+
+      </div>
+        <div class="back-to-top motion-element">
+          <i class="fa fa-arrow-up"></i>
+          <span>0%</span>
+        </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2022</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Yakir</span>
+</div>
+  <div class="powered-by">Powered by Hexo Next
+  </div>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/jquery@3/dist/jquery.min.js"></script>
+  <script src="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/lozad@1/dist/lozad.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+<link rel="stylesheet" href="//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.css">
+
+<script>
+NexT.utils.loadComments(document.querySelector('#gitalk-container'), () => {
+  NexT.utils.getScript('//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.js', () => {
+    var gitalk = new Gitalk({
+      clientID    : 'dc69ab400b19bd3a1bab',
+      clientSecret: '5a20b4b4faa303672257572d4df0be83b97061cb',
+      repo        : 'yakir3.github.io',
+      owner       : 'yakir3',
+      admin       : ['yakir3'],
+      id          : 'ff7845143cefb6693be438ecfdba37c9',
+        language: 'zh-CN',
+      distractionFreeMode: true
+    });
+    gitalk.render('gitalk-container');
+  }, window.Gitalk);
+});
+</script>
+
+</body>
+</html>

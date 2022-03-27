@@ -1,0 +1,107 @@
+// 文章阴影
+.post {
+   margin-top: 50px;
+   margin-bottom: 50px;
+   padding: 25px;
+   -webkit-box-shadow: 0 0 5px rgba(202, 203, 203, .5);
+   -moz-box-shadow: 0 0 5px rgba(202, 203, 204, .5);
+}
+
+
+// 隐藏页面顶部黑色边框
+.headband {display:none;}
+
+
+// 设置背景图片
+body {
+    background:url(/images/background.jpeg);
+    background-repeat: no-repeat;
+    background-attachment:fixed; //不重复
+    background-size: cover;      //填充
+    background-position:50% 50%;
+}
+
+
+// 博客内容透明化
+.content-wrap {
+  opacity: 0.9;
+}
+.sidebar {
+  opacity: 0.9;
+}
+.header-inner {
+  background: rgba(255,255,255,0.9);
+}
+.popup {
+  opacity: 0.9;
+}
+
+
+// 分类&&标签 页面样式
+.post-block.page {
+    margin-top: 40px;
+}
+// 分类页面page
+.category-all-page {
+    box-shadow: 0px 0px 10px 0px rgba(0, 0, 0, 0.5);
+    background-color: #797D7F;
+    padding: 20px 30px 60px 30px;
+    border-radius: 25px 25px 25px 25px;
+}
+.category-all-title {
+    font-family: Impact;
+    font-size: 24px;
+    color: aqua;
+}
+.category-list {
+    overflow: auto;
+}
+.category-list li {
+    height: 100%;
+    float: left;
+    border-right: 3px solid #222;
+    padding: 0 20px;
+}
+.category-all ul li {
+    list-style: none!important;
+}
+.category-list li:last-child {
+    border-right: none;
+}
+.category-list li a {
+    font-size: 16px;
+    text-decoration: none;
+    color: chartreuse;
+    font-family: Helvetica, Verdana, sans-serif;
+    // text-transform: uppercase;
+    -webkit-transition: all 0.5s ease;
+    -moz-transition: all 0.5s ease;
+    -o-transition: all 0.5s ease;
+    -ms-transition: all 0.5s ease;
+    transition: all 0.5s ease;
+}
+.category-list li a:hover {
+    color: black;
+}
+.category-list li.active a {
+    font-weight: bold;
+    color: black;
+}
+
+
+// 标签页面样式
+.tag-cloud a {
+    box-shadow: 0 1px 3px #6f42c1, 0 1px 2px #d9534f;
+    padding: 2px 10px;
+    margin: 8px;
+    background: rgba(193,66,92,0);
+    border-bottom: none;
+    border-radius: 20px;
+}
+
+
+// 代码行样式
+code {
+  background: #555;
+  color: #fff;
+}
