@@ -1,0 +1,739 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 6.1.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+<link rel="stylesheet" href="https://fonts.loli.net/css?family=Noto Serif SC:300,300italic,400,400italic,700,700italic&display=swap&subset=latin,latin-ext">
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.css">
+  <link rel="stylesheet" href="/lib/pace/pace-theme-minimal.min.css">
+  <script src="/lib/pace/pace.min.js"></script>
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"359sun.top","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"left","always":true,"display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":true,"show_result":true,"style":"mac"},"back2top":{"enable":true,"sidebar":true,"scrollpercent":true},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":true,"mediumzoom":false,"lazyload":true,"pangu":false,"comments":{"style":"tabs","active":"gitalk","storage":true,"lazyload":false,"nav":{"gitalk":{"order":-2}},"activeClass":"gitalk"},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+  <meta name="description" content="一、Helm 安装与模板1）Helm 安装部署 安装二进制命令（本地需要连接上kubernetes 集群）">
+<meta property="og:type" content="article">
+<meta property="og:title" content="helm 部署应用">
+<meta property="og:url" content="https://359sun.top/posts/ce0f.html">
+<meta property="og:site_name" content="Yakir Blog">
+<meta property="og:description" content="一、Helm 安装与模板1）Helm 安装部署 安装二进制命令（本地需要连接上kubernetes 集群）">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://359sun.top/posts/ce0f/helm1.png">
+<meta property="og:image" content="https://359sun.top/posts/ce0f/helm2.png">
+<meta property="og:image" content="https://359sun.top/posts/ce0f/helm3.png">
+<meta property="og:image" content="https://359sun.top/posts/ce0f/helm4.png">
+<meta property="og:image" content="https://359sun.top/posts/ce0f/helm5.png">
+<meta property="article:published_time" content="2022-05-04T13:46:04.000Z">
+<meta property="article:modified_time" content="2022-05-04T13:57:27.305Z">
+<meta property="article:author" content="Yakir">
+<meta property="article:tag" content="阿里云">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://359sun.top/posts/ce0f/helm1.png">
+
+<link rel="canonical" href="https://359sun.top/posts/ce0f.html">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>helm 部署应用 | Yakir Blog</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+<link rel="alternate" href="/atom.xml" title="Yakir Blog" type="application/atom+xml">
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">Yakir Blog</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+        <li class="menu-item menu-item-musiclist">
+
+    <a href="/musiclist/" rel="section"><i class="fa fa-music fa-fw"></i>歌单</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="reading-progress-bar"></div>
+
+  <a href="https://github.com/yakir3" class="github-corner" title="Follow me on GitHub" aria-label="Follow me on GitHub" rel="noopener" target="_blank"><svg width="80" height="80" viewBox="0 0 250 250" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path></svg></a>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://359sun.top/posts/ce0f.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.jpg">
+      <meta itemprop="name" content="Yakir">
+      <meta itemprop="description" content="Yakir Blog">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Yakir Blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          helm 部署应用
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+              
+
+              <time title="创建时间：2022-05-04 21:46:04 / 修改时间：21:57:27" itemprop="dateCreated datePublished" datetime="2022-05-04T21:46:04+08:00">2022-05-04</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E4%BA%91%E5%8E%9F%E7%94%9F/" itemprop="url" rel="index"><span itemprop="name">云原生</span></a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span><br>
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+                <span class="post-meta-item-text">本文字数：</span>
+              <span>4.1k</span>
+            </span>
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+                <span class="post-meta-item-text">阅读时长 &asymp;</span>
+              <span>4 分钟</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h3 id="一、Helm-安装与模板"><a href="#一、Helm-安装与模板" class="headerlink" title="一、Helm 安装与模板"></a>一、Helm 安装与模板</h3><h4 id="1）Helm-安装部署"><a href="#1）Helm-安装部署" class="headerlink" title="1）Helm 安装部署"></a>1）Helm 安装部署</h4><ul>
+<li><a target="_blank" rel="noopener" href="https://helm.sh/zh/docs/intro/install/">安装二进制命令</a>（本地需要连接上kubernetes 集群）</li>
+</ul>
+<span id="more"></span>
+<ul>
+<li>安装阿里云helm 插件与操作<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 安装 Helm 插件</span></span><br><span class="line">helm plugin install https://github.com/AliyunContainerService/helm-acr</span><br><span class="line"></span><br><span class="line">&lt;!--more--&gt;</span><br><span class="line"><span class="comment"># 配置本地仓库映射</span></span><br><span class="line"><span class="built_in">export</span> HELM_REPO_USERNAME=<span class="string">&#x27;&lt;企业版实例访问凭证中账号&gt;&#x27;</span></span><br><span class="line"><span class="built_in">export</span> HELM_REPO_PASSWORD=<span class="string">&#x27;&lt;企业版实例访问凭证中密码&gt;&#x27;</span></span><br><span class="line">helm repo add &lt;本地仓库名称&gt; acr://registry-chart-test.cn-hangzhou.cr.aliyuncs.com/&lt;命名空间&gt;/&lt;Chart仓库名称&gt; --username <span class="variable">$&#123;HELM_REPO_USERNAME&#125;</span> --password <span class="variable">$&#123;HELM_REPO_PASSWORD&#125;</span></span><br><span class="line"><span class="comment">#export HELM_REPO_USERNAME=devops@ib_daily</span></span><br><span class="line"><span class="comment">#export HELM_REPO_PASSWORD=2RJPfCgHXroSYQga</span></span><br><span class="line"><span class="comment">#helm repo add aliyun-acr-repo acr://registry-chart-test.cn-hangzhou.cr.aliyuncs.com/chart-test/app-test --username $&#123;HELM_REPO_USERNAME&#125; --password $&#123;HELM_REPO_PASSWORD&#125;</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 推送Chart</span></span><br><span class="line"><span class="comment">#本地创建一个 Chart</span></span><br><span class="line">helm create &lt;Chart 名称&gt;</span><br><span class="line"><span class="comment">#helm create app-test</span></span><br><span class="line"><span class="comment">#推送 Chart 目录</span></span><br><span class="line">helm cm-push &lt;Chart 名称&gt; &lt;本地仓库名称&gt;</span><br><span class="line"><span class="comment">#helm cm-push app-test aliyun-acr-repo</span></span><br><span class="line"><span class="comment">#或者推送 Chart 压缩包</span></span><br><span class="line">helm cm-push &lt;Chart 名称&gt;-&lt;Chart 版本&gt;.tgz &lt;本地仓库名称&gt;</span><br><span class="line"></span><br><span class="line"><span class="comment"># 拉取Chart</span></span><br><span class="line"><span class="comment">#从线上Chart 仓库更新本地Chart 索引</span></span><br><span class="line">helm repo update</span><br><span class="line"><span class="comment">#helm repo update aliyun-acr-repo</span></span><br><span class="line"><span class="comment">#拉取Chart</span></span><br><span class="line">helm fetch &lt;本地仓库名称&gt;/&lt;Chart 名称&gt; --version &lt;Chart 版本&gt;</span><br><span class="line"><span class="comment">#helm fetch aliyun-acr-repo/app-test --version=20211228100329-daily</span></span><br><span class="line"><span class="comment">#或者直接安装Chart</span></span><br><span class="line">helm install -f values.yaml &lt;本地仓库名称&gt;/&lt;Chart 名称&gt; --version &lt;Chart 版本&gt;</span><br><span class="line"><span class="comment">#helm install app-test aliyun-acr-repo/app-test --version 20211228100329-daily --namespace daily-apps</span></span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>helm install 操作实际执行按顺序安装资源：</p>
+<ul>
+<li>Namespace</li>
+<li>NetworkPolicy</li>
+<li>ResourceQuota</li>
+<li>LimitRange</li>
+<li>PodSecurityPolicy</li>
+<li>PodDisruptionBudget</li>
+<li>ServiceAccount</li>
+<li>Secret</li>
+<li>SecretList</li>
+<li>ConfigMap</li>
+<li>StorageClass</li>
+<li>PersistentVolume</li>
+<li>PersistentVolumeClaim</li>
+<li>CustomResourceDefinition</li>
+<li>ClusterRole</li>
+<li>ClusterRoleList</li>
+<li>ClusterRoleBinding</li>
+<li>ClusterRoleBindingList</li>
+<li>Role</li>
+<li>RoleList</li>
+<li>RoleBinding</li>
+<li>RoleBindingList</li>
+<li>Service</li>
+<li>DaemonSet</li>
+<li>Pod</li>
+<li>ReplicationController</li>
+<li>ReplicaSet</li>
+<li>Deployment</li>
+<li>HorizontalPodAutoscaler</li>
+<li>StatefulSet</li>
+<li>Job</li>
+<li>CronJob</li>
+<li>Ingress</li>
+<li>APIService</li>
+</ul>
+</blockquote>
+</li>
+</ul>
+<p><a target="_blank" rel="noopener" href="https://helm.sh/zh/docs/helm/helm/">常用参数</a></p>
+<blockquote>
+<ul>
+<li>查看本地仓库：helm repo list</li>
+<li>添加&#x2F;删除仓库：helm repo add xxx &#x2F; helm repo remove xxx</li>
+<li>推送&#x2F;拉取charts：helm cm-push xxx &#x2F; helm fetch&#x2F;pull xxx</li>
+<li>安装&#x2F;卸载charts：helm install xxx &#x2F;  helm uninstall xxx</li>
+<li>升级&#x2F;回滚：helm upgrade xxx &#x2F; helm rollback xxx <revision></revision></li>
+<li>创建本地自己的charts： helm create xxx</li>
+<li>查看charts 可自定义配置项&#x2F;获取自定义配置项 ：helm show values &#x2F; helm get values</li>
+</ul>
+</blockquote>
+<ul>
+<li>配置跨账号ACR 拉取镜像<blockquote>
+<p>helm 部署时需要pull image 部署，因此需要配置跨账号ACR 拉取镜像。参考：<a target="_blank" rel="noopener" href="https://yuque.antfin.com/kifo8h/nee5aa/wgui7o">跨账号ACR 拉取镜像配置</a></p>
+</blockquote>
+</li>
+</ul>
+<h4 id="2）Helm-模板与语法编写"><a href="#2）Helm-模板与语法编写" class="headerlink" title="2）Helm 模板与语法编写"></a>2）Helm 模板与语法编写</h4><blockquote>
+<p>详情参考：<a target="_blank" rel="noopener" href="https://www.qikqiak.com/k8strain/helm/demo/">Charts 文件格式，模板编写</a></p>
+</blockquote>
+<ul>
+<li><p>内置对象</p>
+</li>
+<li><p>基本目录结构内容：Chart.yaml（chart 信息说明） 、Values.yaml（自定义变量） 、charts（子chart目录，依赖）</p>
+</li>
+<li><p>templates 模板（实际安装到K8S 集群中的资源定义Yaml 模板文件，如deployment、pod 等）</p>
+<ul>
+<li>资源模板：confimap.yaml、deployment.yaml 等</li>
+<li>命名模板：_helpers.tpl</li>
+</ul>
+</li>
+<li><p>函数和流水线：<a target="_blank" rel="noopener" href="https://helm.sh/zh/docs/chart_template_guide/function_list/">函数列表</a>，<a target="_blank" rel="noopener" href="https://helm.sh/zh/docs/chart_template_guide/control_structures/">流程控制</a></p>
+</li>
+<li><p>访问文件</p>
+</li>
+</ul>
+<h3 id="二、测试验证部署app-test"><a href="#二、测试验证部署app-test" class="headerlink" title="二、测试验证部署app-test"></a>二、测试验证部署app-test</h3><h4 id="1）本地安装helm、kubectl（连接K8S-集群）二进制命令"><a href="#1）本地安装helm、kubectl（连接K8S-集群）二进制命令" class="headerlink" title="1）本地安装helm、kubectl（连接K8S 集群）二进制命令"></a>1）本地安装helm、kubectl（连接K8S 集群）二进制命令</h4><h4 id="2）初始化配置app-test"><a href="#2）初始化配置app-test" class="headerlink" title="2）初始化配置app-test"></a>2）初始化配置app-test</h4><ul>
+<li><p>初始化应用目录：helm create app-test</p>
+</li>
+<li><p>应用app-test 目录结构</p>
+</li>
+</ul>
+<img data-src="/posts/ce0f/helm1.png" class title="img.png">
+
+<ul>
+<li>关键配置信息<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># Chart.yaml</span></span><br><span class="line"><span class="attr">apiVersion:</span> <span class="string">v2</span></span><br><span class="line"><span class="attr">name:</span> <span class="string">app-test</span></span><br><span class="line"><span class="attr">description:</span> <span class="string">application</span> <span class="string">app-test</span> <span class="string">for</span> <span class="string">env</span> <span class="string">daily</span></span><br><span class="line"><span class="attr">type:</span> <span class="string">application</span></span><br><span class="line"><span class="attr">version:</span> <span class="number">20211215123042</span><span class="string">-daily</span></span><br><span class="line"><span class="attr">appVersion:</span> <span class="string">20211215123042_daily</span></span><br></pre></td></tr></table></figure>
+<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># values.yaml</span></span><br><span class="line"><span class="attr">replicaCount:</span> <span class="number">1</span></span><br><span class="line"></span><br><span class="line"><span class="attr">image:</span></span><br><span class="line">  <span class="attr">repository:</span> <span class="string">registry-chart-test.cn-hangzhou.cr.aliyuncs.com/ib-ibos/app-test</span></span><br><span class="line">  <span class="attr">pullPolicy:</span> <span class="string">IfNotPresent</span></span><br><span class="line">  <span class="attr">tag:</span> <span class="string">&quot;&quot;</span></span><br><span class="line"></span><br><span class="line"><span class="attr">imagePullSecrets:</span> []</span><br><span class="line"><span class="attr">nameOverride:</span> <span class="string">&quot;&quot;</span></span><br><span class="line"><span class="attr">fullnameOverride:</span> <span class="string">&quot;&quot;</span></span><br><span class="line"></span><br><span class="line"><span class="attr">serviceAccount:</span></span><br><span class="line">  <span class="attr">create:</span> <span class="literal">false</span></span><br><span class="line">  <span class="attr">annotations:</span> &#123;&#125;</span><br><span class="line">  <span class="attr">name:</span> <span class="string">&quot;&quot;</span></span><br><span class="line"></span><br><span class="line"><span class="attr">podAnnotations:</span> &#123;&#125;</span><br><span class="line"></span><br><span class="line"><span class="attr">podSecurityContext:</span> &#123;&#125;</span><br><span class="line"></span><br><span class="line"><span class="attr">securityContext:</span> &#123;&#125;</span><br><span class="line"></span><br><span class="line"><span class="attr">service:</span></span><br><span class="line">  <span class="attr">type:</span> <span class="string">ClusterIP</span></span><br><span class="line">  <span class="attr">port:</span> <span class="number">8080</span></span><br><span class="line">  <span class="attr">create:</span> <span class="literal">false</span></span><br><span class="line"></span><br><span class="line"><span class="attr">ingress:</span></span><br><span class="line">  <span class="attr">enabled:</span> <span class="literal">false</span></span><br><span class="line">  <span class="attr">className:</span> <span class="string">&quot;&quot;</span></span><br><span class="line">  <span class="attr">annotations:</span> &#123;&#125;</span><br><span class="line">  <span class="attr">hosts:</span></span><br><span class="line">    <span class="bullet">-</span> <span class="attr">host:</span> <span class="string">reos.com.cn</span></span><br><span class="line">      <span class="attr">paths:</span></span><br><span class="line">        <span class="bullet">-</span> <span class="attr">path:</span> <span class="string">/</span></span><br><span class="line">          <span class="attr">pathType:</span> <span class="string">ImplementationSpecific</span></span><br><span class="line">  <span class="attr">tls:</span> []</span><br><span class="line"></span><br><span class="line"><span class="attr">resources:</span> &#123;&#125;</span><br><span class="line"></span><br><span class="line"><span class="attr">autoscaling:</span></span><br><span class="line">  <span class="attr">enabled:</span> <span class="literal">false</span></span><br><span class="line">  <span class="attr">minReplicas:</span> <span class="number">1</span></span><br><span class="line">  <span class="attr">maxReplicas:</span> <span class="number">100</span></span><br><span class="line">  <span class="attr">targetCPUUtilizationPercentage:</span> <span class="number">80</span></span><br><span class="line"></span><br><span class="line"><span class="attr">nodeSelector:</span> &#123;&#125;</span><br><span class="line"></span><br><span class="line"><span class="attr">tolerations:</span> []</span><br><span class="line"></span><br><span class="line"><span class="attr">affinity:</span> &#123;&#125;</span><br></pre></td></tr></table></figure></li>
+</ul>
+<h4 id="3）配置镜像仓库，部署应用"><a href="#3）配置镜像仓库，部署应用" class="headerlink" title="3）配置镜像仓库，部署应用"></a>3）配置镜像仓库，部署应用</h4><ul>
+<li>配置远程ACR 企业版仓库，参考 <a href="#ht9xj">Helm安装部署</a> 部分。</li>
+</ul>
+<img data-src="/posts/ce0f/helm2.png" class title="img.png">
+
+<ul>
+<li>部署应用<ul>
+<li><p>执行部署命令</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">helm install app-test aliyun-acr-repo/app-test --version 20211228100329-daily --namespace daily-apps</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>部署结果</p>
+</li>
+</ul>
+</li>
+</ul>
+<img data-src="/posts/ce0f/helm3.png" class title="img.png">
+<img data-src="/posts/ce0f/helm4.png" class title="img.png">
+
+<ul>
+<li>更新版本<img data-src="/posts/ce0f/helm5.png" class title="img.png"></li>
+</ul>
+<h3 id="三、问题点"><a href="#三、问题点" class="headerlink" title="三、问题点"></a>三、问题点</h3><ul>
+<li><p>使用helm 命令安装需本地连接K8S 集群（需提供API Server 公网EIP）</p>
+</li>
+<li><p>与阿里云Edas 产品兼容问题</p>
+<ul>
+<li>使用helm 部署的应用与Edas 不共通，因此使用helm 部署的无法从Edas 上查看应用的相关信息</li>
+<li>Edas 支持将手动部署的Deployment 手动导入，参考：<a target="_blank" rel="noopener" href="https://help.aliyun.com/document_detail/202036.html">https://help.aliyun.com/document_detail&#x2F;202036.html</a>（自行部署导入Edas 的应用暂未确定是否能完整导入Edas 组件注入的变量）</li>
+</ul>
+</li>
+<li><p>版本控制与镜像拉取</p>
+<ul>
+<li>helm 通过配置values 变量值写入或更新 image-&gt;repository 的值进行pull 镜像更新，并通过 helm push 推送pull 的镜像配置到私有仓库中。</li>
+<li>helm 通过upgrade 与rollback 命令进行已部署应用的升级与回滚功能。</li>
+</ul>
+</li>
+<li><p>与原有CI&#x2F;CD 配置使用问题</p>
+<ul>
+<li>helm 部署只能通过本地更新配置并执行，无法与现有的 CI&#x2F;CD 流水线进行配合使用，需要进行调整。</li>
+</ul>
+</li>
+</ul>
+
+    </div>
+
+    
+    
+    
+        
+
+<div>
+<ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>本文作者： </strong>Yakir
+  </li>
+  <li class="post-copyright-link">
+    <strong>本文链接：</strong>
+    <a href="https://359sun.top/posts/ce0f.html" title="helm 部署应用">https://359sun.top/posts/ce0f.html</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" rel="noopener" target="_blank"><i class="fab fa-fw fa-creative-commons"></i>BY-NC-SA</a> 许可协议。转载请注明出处！
+  </li>
+</ul>
+</div>
+
+        
+
+  <div class="followme">
+    <p>欢迎关注我的其它发布渠道</p>
+
+    <div class="social-list">
+
+        <div class="social-item">
+          <a target="_blank" class="social-link" href="/atom.xml">
+            <span class="icon">
+              <i class="fa fa-rss"></i>
+            </span>
+
+            <span class="label">RSS</span>
+          </a>
+        </div>
+    </div>
+  </div>
+
+
+      <footer class="post-footer">
+          
+          <div class="post-tags">
+              <!-- <a href="/tags/%E9%98%BF%E9%87%8C%E4%BA%91/" rel="tag"><i class="fa fa-tag"></i> 阿里云</a> -->
+              <a href="/tags/%E9%98%BF%E9%87%8C%E4%BA%91/" rel="tag"><i class="fa fa-tag"></i> 阿里云</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/posts/539.html" rel="prev" title="git flow 工作流理解">
+      <i class="fa fa-chevron-left"></i> git flow 工作流理解
+    </a></div>
+      <div class="post-nav-item"></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+    <div class="comments" id="gitalk-container"></div>
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%B8%80%E3%80%81Helm-%E5%AE%89%E8%A3%85%E4%B8%8E%E6%A8%A1%E6%9D%BF"><span class="nav-text">一、Helm 安装与模板</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#1%EF%BC%89Helm-%E5%AE%89%E8%A3%85%E9%83%A8%E7%BD%B2"><span class="nav-text">1）Helm 安装部署</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2%EF%BC%89Helm-%E6%A8%A1%E6%9D%BF%E4%B8%8E%E8%AF%AD%E6%B3%95%E7%BC%96%E5%86%99"><span class="nav-text">2）Helm 模板与语法编写</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BA%8C%E3%80%81%E6%B5%8B%E8%AF%95%E9%AA%8C%E8%AF%81%E9%83%A8%E7%BD%B2app-test"><span class="nav-text">二、测试验证部署app-test</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#1%EF%BC%89%E6%9C%AC%E5%9C%B0%E5%AE%89%E8%A3%85helm%E3%80%81kubectl%EF%BC%88%E8%BF%9E%E6%8E%A5K8S-%E9%9B%86%E7%BE%A4%EF%BC%89%E4%BA%8C%E8%BF%9B%E5%88%B6%E5%91%BD%E4%BB%A4"><span class="nav-text">1）本地安装helm、kubectl（连接K8S 集群）二进制命令</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2%EF%BC%89%E5%88%9D%E5%A7%8B%E5%8C%96%E9%85%8D%E7%BD%AEapp-test"><span class="nav-text">2）初始化配置app-test</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#3%EF%BC%89%E9%85%8D%E7%BD%AE%E9%95%9C%E5%83%8F%E4%BB%93%E5%BA%93%EF%BC%8C%E9%83%A8%E7%BD%B2%E5%BA%94%E7%94%A8"><span class="nav-text">3）配置镜像仓库，部署应用</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%B8%89%E3%80%81%E9%97%AE%E9%A2%98%E7%82%B9"><span class="nav-text">三、问题点</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Yakir"
+      src="/images/avatar.jpg">
+  <p class="site-author-name" itemprop="name">Yakir</p>
+  <div class="site-description" itemprop="description">Yakir Blog</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">7</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">2</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">3</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/yakir3" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;yakir3" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="/atom.xml" title="RSS → &#x2F;atom.xml"><i class="fa fa-rss fa-fw"></i>RSS</a>
+      </span>
+  </div>
+
+
+
+  <div class="links-of-blogroll motion-element links-of-blogroll-block">
+    <div class="links-of-blogroll-title">
+      <!-- modify icon to fire by szw -->
+      <i class="fa fa-history fa-" aria-hidden="true"></i>
+      近期文章
+    </div>
+    <ul class="links-of-blogroll-list">
+      
+      
+        <li class="recent_posts_li">
+          <!--<a href="/" title="" target="_blank"></a>-->
+        </li>
+      
+        <li class="recent_posts_li">
+          <!--<a href="/" title="" target="_blank"></a>-->
+        </li>
+      
+        <li class="recent_posts_li">
+          <!--<a href="/" title="" target="_blank"></a>-->
+        </li>
+      
+    </ul>
+  </div>
+
+
+
+
+      </div>
+        <div class="back-to-top motion-element">
+          <i class="fa fa-arrow-up"></i>
+          <span>0%</span>
+        </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2022</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Yakir</span>
+</div>
+  <div class="powered-by">Powered by Hexo Next
+  </div>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/jquery@3/dist/jquery.min.js"></script>
+  <script src="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/lozad@1/dist/lozad.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+<link rel="stylesheet" href="//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.css">
+
+<script>
+NexT.utils.loadComments(document.querySelector('#gitalk-container'), () => {
+  NexT.utils.getScript('//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.js', () => {
+    var gitalk = new Gitalk({
+      clientID    : 'dc69ab400b19bd3a1bab',
+      clientSecret: '5a20b4b4faa303672257572d4df0be83b97061cb',
+      repo        : 'yakir3.github.io',
+      owner       : 'yakir3',
+      admin       : ['yakir3'],
+      id          : 'a452fb45c58e749697d7e7f60be78f6c',
+        language: 'zh-CN',
+      distractionFreeMode: true
+    });
+    gitalk.render('gitalk-container');
+  }, window.Gitalk);
+});
+</script>
+
+</body>
+</html>

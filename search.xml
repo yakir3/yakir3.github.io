@@ -22,6 +22,7 @@
 </ul>
 </li>
 </ul>
+<span id="more"></span>
 <ol start="2">
 <li>GitFlow流程图及描述理解</li>
 </ol>
@@ -536,6 +537,155 @@
       <tags>
         <tag>阿里云</tag>
         <tag>K8S</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>helm 部署应用</title>
+    <url>/posts/ce0f.html</url>
+    <content><![CDATA[<link rel="stylesheet" class="aplayer-secondary-style-marker" href="/assets/css/APlayer.min.css"><script src="/assets/js/APlayer.min.js" class="aplayer-secondary-script-marker"></script><script class="meting-secondary-script-marker" src="/assets/js/Meting.min.js"></script><h3 id="一、Helm-安装与模板"><a href="#一、Helm-安装与模板" class="headerlink" title="一、Helm 安装与模板"></a>一、Helm 安装与模板</h3><h4 id="1）Helm-安装部署"><a href="#1）Helm-安装部署" class="headerlink" title="1）Helm 安装部署"></a>1）Helm 安装部署</h4><ul>
+<li><a href="https://helm.sh/zh/docs/intro/install/">安装二进制命令</a>（本地需要连接上kubernetes 集群）</li>
+</ul>
+<span id="more"></span>
+<ul>
+<li>安装阿里云helm 插件与操作<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line"><span class="comment"># 安装 Helm 插件</span></span><br><span class="line">helm plugin install https://github.com/AliyunContainerService/helm-acr</span><br><span class="line"></span><br><span class="line">&lt;!--more--&gt;</span><br><span class="line"><span class="comment"># 配置本地仓库映射</span></span><br><span class="line"><span class="built_in">export</span> HELM_REPO_USERNAME=<span class="string">&#x27;&lt;企业版实例访问凭证中账号&gt;&#x27;</span></span><br><span class="line"><span class="built_in">export</span> HELM_REPO_PASSWORD=<span class="string">&#x27;&lt;企业版实例访问凭证中密码&gt;&#x27;</span></span><br><span class="line">helm repo add &lt;本地仓库名称&gt; acr://registry-chart-test.cn-hangzhou.cr.aliyuncs.com/&lt;命名空间&gt;/&lt;Chart仓库名称&gt; --username <span class="variable">$&#123;HELM_REPO_USERNAME&#125;</span> --password <span class="variable">$&#123;HELM_REPO_PASSWORD&#125;</span></span><br><span class="line"><span class="comment">#export HELM_REPO_USERNAME=devops@ib_daily</span></span><br><span class="line"><span class="comment">#export HELM_REPO_PASSWORD=2RJPfCgHXroSYQga</span></span><br><span class="line"><span class="comment">#helm repo add aliyun-acr-repo acr://registry-chart-test.cn-hangzhou.cr.aliyuncs.com/chart-test/app-test --username $&#123;HELM_REPO_USERNAME&#125; --password $&#123;HELM_REPO_PASSWORD&#125;</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 推送Chart</span></span><br><span class="line"><span class="comment">#本地创建一个 Chart</span></span><br><span class="line">helm create &lt;Chart 名称&gt;</span><br><span class="line"><span class="comment">#helm create app-test</span></span><br><span class="line"><span class="comment">#推送 Chart 目录</span></span><br><span class="line">helm cm-push &lt;Chart 名称&gt; &lt;本地仓库名称&gt;</span><br><span class="line"><span class="comment">#helm cm-push app-test aliyun-acr-repo</span></span><br><span class="line"><span class="comment">#或者推送 Chart 压缩包</span></span><br><span class="line">helm cm-push &lt;Chart 名称&gt;-&lt;Chart 版本&gt;.tgz &lt;本地仓库名称&gt;</span><br><span class="line"></span><br><span class="line"><span class="comment"># 拉取Chart</span></span><br><span class="line"><span class="comment">#从线上Chart 仓库更新本地Chart 索引</span></span><br><span class="line">helm repo update</span><br><span class="line"><span class="comment">#helm repo update aliyun-acr-repo</span></span><br><span class="line"><span class="comment">#拉取Chart</span></span><br><span class="line">helm fetch &lt;本地仓库名称&gt;/&lt;Chart 名称&gt; --version &lt;Chart 版本&gt;</span><br><span class="line"><span class="comment">#helm fetch aliyun-acr-repo/app-test --version=20211228100329-daily</span></span><br><span class="line"><span class="comment">#或者直接安装Chart</span></span><br><span class="line">helm install -f values.yaml &lt;本地仓库名称&gt;/&lt;Chart 名称&gt; --version &lt;Chart 版本&gt;</span><br><span class="line"><span class="comment">#helm install app-test aliyun-acr-repo/app-test --version 20211228100329-daily --namespace daily-apps</span></span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>helm install 操作实际执行按顺序安装资源：</p>
+<ul>
+<li>Namespace</li>
+<li>NetworkPolicy</li>
+<li>ResourceQuota</li>
+<li>LimitRange</li>
+<li>PodSecurityPolicy</li>
+<li>PodDisruptionBudget</li>
+<li>ServiceAccount</li>
+<li>Secret</li>
+<li>SecretList</li>
+<li>ConfigMap</li>
+<li>StorageClass</li>
+<li>PersistentVolume</li>
+<li>PersistentVolumeClaim</li>
+<li>CustomResourceDefinition</li>
+<li>ClusterRole</li>
+<li>ClusterRoleList</li>
+<li>ClusterRoleBinding</li>
+<li>ClusterRoleBindingList</li>
+<li>Role</li>
+<li>RoleList</li>
+<li>RoleBinding</li>
+<li>RoleBindingList</li>
+<li>Service</li>
+<li>DaemonSet</li>
+<li>Pod</li>
+<li>ReplicationController</li>
+<li>ReplicaSet</li>
+<li>Deployment</li>
+<li>HorizontalPodAutoscaler</li>
+<li>StatefulSet</li>
+<li>Job</li>
+<li>CronJob</li>
+<li>Ingress</li>
+<li>APIService</li>
+</ul>
+</blockquote>
+</li>
+</ul>
+<p><a href="https://helm.sh/zh/docs/helm/helm/">常用参数</a></p>
+<blockquote>
+<ul>
+<li>查看本地仓库：helm repo list</li>
+<li>添加&#x2F;删除仓库：helm repo add xxx &#x2F; helm repo remove xxx</li>
+<li>推送&#x2F;拉取charts：helm cm-push xxx &#x2F; helm fetch&#x2F;pull xxx</li>
+<li>安装&#x2F;卸载charts：helm install xxx &#x2F;  helm uninstall xxx</li>
+<li>升级&#x2F;回滚：helm upgrade xxx &#x2F; helm rollback xxx <revision></revision></li>
+<li>创建本地自己的charts： helm create xxx</li>
+<li>查看charts 可自定义配置项&#x2F;获取自定义配置项 ：helm show values &#x2F; helm get values</li>
+</ul>
+</blockquote>
+<ul>
+<li>配置跨账号ACR 拉取镜像<blockquote>
+<p>helm 部署时需要pull image 部署，因此需要配置跨账号ACR 拉取镜像。参考：<a href="https://yuque.antfin.com/kifo8h/nee5aa/wgui7o">跨账号ACR 拉取镜像配置</a></p>
+</blockquote>
+</li>
+</ul>
+<h4 id="2）Helm-模板与语法编写"><a href="#2）Helm-模板与语法编写" class="headerlink" title="2）Helm 模板与语法编写"></a>2）Helm 模板与语法编写</h4><blockquote>
+<p>详情参考：<a href="https://www.qikqiak.com/k8strain/helm/demo/">Charts 文件格式，模板编写</a></p>
+</blockquote>
+<ul>
+<li><p>内置对象</p>
+</li>
+<li><p>基本目录结构内容：Chart.yaml（chart 信息说明） 、Values.yaml（自定义变量） 、charts（子chart目录，依赖）</p>
+</li>
+<li><p>templates 模板（实际安装到K8S 集群中的资源定义Yaml 模板文件，如deployment、pod 等）</p>
+<ul>
+<li>资源模板：confimap.yaml、deployment.yaml 等</li>
+<li>命名模板：_helpers.tpl</li>
+</ul>
+</li>
+<li><p>函数和流水线：<a href="https://helm.sh/zh/docs/chart_template_guide/function_list/">函数列表</a>，<a href="https://helm.sh/zh/docs/chart_template_guide/control_structures/">流程控制</a></p>
+</li>
+<li><p>访问文件</p>
+</li>
+</ul>
+<h3 id="二、测试验证部署app-test"><a href="#二、测试验证部署app-test" class="headerlink" title="二、测试验证部署app-test"></a>二、测试验证部署app-test</h3><h4 id="1）本地安装helm、kubectl（连接K8S-集群）二进制命令"><a href="#1）本地安装helm、kubectl（连接K8S-集群）二进制命令" class="headerlink" title="1）本地安装helm、kubectl（连接K8S 集群）二进制命令"></a>1）本地安装helm、kubectl（连接K8S 集群）二进制命令</h4><h4 id="2）初始化配置app-test"><a href="#2）初始化配置app-test" class="headerlink" title="2）初始化配置app-test"></a>2）初始化配置app-test</h4><ul>
+<li><p>初始化应用目录：helm create app-test</p>
+</li>
+<li><p>应用app-test 目录结构</p>
+</li>
+</ul>
+<img data-src="/posts/ce0f/helm1.png" class title="img.png">
+
+<ul>
+<li>关键配置信息<figure class="highlight yaml"><table><tr><td class="code"><pre><span class="line"><span class="comment"># Chart.yaml</span></span><br><span class="line"><span class="attr">apiVersion:</span> <span class="string">v2</span></span><br><span class="line"><span class="attr">name:</span> <span class="string">app-test</span></span><br><span class="line"><span class="attr">description:</span> <span class="string">application</span> <span class="string">app-test</span> <span class="string">for</span> <span class="string">env</span> <span class="string">daily</span></span><br><span class="line"><span class="attr">type:</span> <span class="string">application</span></span><br><span class="line"><span class="attr">version:</span> <span class="number">20211215123042</span><span class="string">-daily</span></span><br><span class="line"><span class="attr">appVersion:</span> <span class="string">20211215123042_daily</span></span><br></pre></td></tr></table></figure>
+<figure class="highlight yaml"><table><tr><td class="code"><pre><span class="line"><span class="comment"># values.yaml</span></span><br><span class="line"><span class="attr">replicaCount:</span> <span class="number">1</span></span><br><span class="line"></span><br><span class="line"><span class="attr">image:</span></span><br><span class="line">  <span class="attr">repository:</span> <span class="string">registry-chart-test.cn-hangzhou.cr.aliyuncs.com/ib-ibos/app-test</span></span><br><span class="line">  <span class="attr">pullPolicy:</span> <span class="string">IfNotPresent</span></span><br><span class="line">  <span class="attr">tag:</span> <span class="string">&quot;&quot;</span></span><br><span class="line"></span><br><span class="line"><span class="attr">imagePullSecrets:</span> []</span><br><span class="line"><span class="attr">nameOverride:</span> <span class="string">&quot;&quot;</span></span><br><span class="line"><span class="attr">fullnameOverride:</span> <span class="string">&quot;&quot;</span></span><br><span class="line"></span><br><span class="line"><span class="attr">serviceAccount:</span></span><br><span class="line">  <span class="attr">create:</span> <span class="literal">false</span></span><br><span class="line">  <span class="attr">annotations:</span> &#123;&#125;</span><br><span class="line">  <span class="attr">name:</span> <span class="string">&quot;&quot;</span></span><br><span class="line"></span><br><span class="line"><span class="attr">podAnnotations:</span> &#123;&#125;</span><br><span class="line"></span><br><span class="line"><span class="attr">podSecurityContext:</span> &#123;&#125;</span><br><span class="line"></span><br><span class="line"><span class="attr">securityContext:</span> &#123;&#125;</span><br><span class="line"></span><br><span class="line"><span class="attr">service:</span></span><br><span class="line">  <span class="attr">type:</span> <span class="string">ClusterIP</span></span><br><span class="line">  <span class="attr">port:</span> <span class="number">8080</span></span><br><span class="line">  <span class="attr">create:</span> <span class="literal">false</span></span><br><span class="line"></span><br><span class="line"><span class="attr">ingress:</span></span><br><span class="line">  <span class="attr">enabled:</span> <span class="literal">false</span></span><br><span class="line">  <span class="attr">className:</span> <span class="string">&quot;&quot;</span></span><br><span class="line">  <span class="attr">annotations:</span> &#123;&#125;</span><br><span class="line">  <span class="attr">hosts:</span></span><br><span class="line">    <span class="bullet">-</span> <span class="attr">host:</span> <span class="string">reos.com.cn</span></span><br><span class="line">      <span class="attr">paths:</span></span><br><span class="line">        <span class="bullet">-</span> <span class="attr">path:</span> <span class="string">/</span></span><br><span class="line">          <span class="attr">pathType:</span> <span class="string">ImplementationSpecific</span></span><br><span class="line">  <span class="attr">tls:</span> []</span><br><span class="line"></span><br><span class="line"><span class="attr">resources:</span> &#123;&#125;</span><br><span class="line"></span><br><span class="line"><span class="attr">autoscaling:</span></span><br><span class="line">  <span class="attr">enabled:</span> <span class="literal">false</span></span><br><span class="line">  <span class="attr">minReplicas:</span> <span class="number">1</span></span><br><span class="line">  <span class="attr">maxReplicas:</span> <span class="number">100</span></span><br><span class="line">  <span class="attr">targetCPUUtilizationPercentage:</span> <span class="number">80</span></span><br><span class="line"></span><br><span class="line"><span class="attr">nodeSelector:</span> &#123;&#125;</span><br><span class="line"></span><br><span class="line"><span class="attr">tolerations:</span> []</span><br><span class="line"></span><br><span class="line"><span class="attr">affinity:</span> &#123;&#125;</span><br></pre></td></tr></table></figure></li>
+</ul>
+<h4 id="3）配置镜像仓库，部署应用"><a href="#3）配置镜像仓库，部署应用" class="headerlink" title="3）配置镜像仓库，部署应用"></a>3）配置镜像仓库，部署应用</h4><ul>
+<li>配置远程ACR 企业版仓库，参考 <a href="#ht9xj">Helm安装部署</a> 部分。</li>
+</ul>
+<img data-src="/posts/ce0f/helm2.png" class title="img.png">
+
+<ul>
+<li>部署应用<ul>
+<li><p>执行部署命令</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">helm install app-test aliyun-acr-repo/app-test --version 20211228100329-daily --namespace daily-apps</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>部署结果</p>
+</li>
+</ul>
+</li>
+</ul>
+<img data-src="/posts/ce0f/helm3.png" class title="img.png">
+<img data-src="/posts/ce0f/helm4.png" class title="img.png">
+
+<ul>
+<li>更新版本<img data-src="/posts/ce0f/helm5.png" class title="img.png"></li>
+</ul>
+<h3 id="三、问题点"><a href="#三、问题点" class="headerlink" title="三、问题点"></a>三、问题点</h3><ul>
+<li><p>使用helm 命令安装需本地连接K8S 集群（需提供API Server 公网EIP）</p>
+</li>
+<li><p>与阿里云Edas 产品兼容问题</p>
+<ul>
+<li>使用helm 部署的应用与Edas 不共通，因此使用helm 部署的无法从Edas 上查看应用的相关信息</li>
+<li>Edas 支持将手动部署的Deployment 手动导入，参考：<a href="https://help.aliyun.com/document_detail/202036.html">https://help.aliyun.com/document_detail&#x2F;202036.html</a>（自行部署导入Edas 的应用暂未确定是否能完整导入Edas 组件注入的变量）</li>
+</ul>
+</li>
+<li><p>版本控制与镜像拉取</p>
+<ul>
+<li>helm 通过配置values 变量值写入或更新 image-&gt;repository 的值进行pull 镜像更新，并通过 helm push 推送pull 的镜像配置到私有仓库中。</li>
+<li>helm 通过upgrade 与rollback 命令进行已部署应用的升级与回滚功能。</li>
+</ul>
+</li>
+<li><p>与原有CI&#x2F;CD 配置使用问题</p>
+<ul>
+<li>helm 部署只能通过本地更新配置并执行，无法与现有的 CI&#x2F;CD 流水线进行配合使用，需要进行调整。</li>
+</ul>
+</li>
+</ul>
+]]></content>
+      <categories>
+        <category>云原生</category>
+      </categories>
+      <tags>
+        <tag>阿里云</tag>
       </tags>
   </entry>
 </search>
