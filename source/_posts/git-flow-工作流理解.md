@@ -14,7 +14,7 @@ date: 2022-05-04 21:14:23
    - 远程分支是指需要push到gitlab、github远程仓库中
    - 本地分支指开发人员的本地开发时使用的git版本控制环境
 
-
+<!--more-->
 2. GitFlow流程图及描述理解
 
 {% asset_img gf1.png img.png %}

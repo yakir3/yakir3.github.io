@@ -9,6 +9,137 @@
 ]]></content>
   </entry>
   <entry>
+    <title>git flow 工作流理解</title>
+    <url>/posts/539.html</url>
+    <content><![CDATA[<link rel="stylesheet" class="aplayer-secondary-style-marker" href="/assets/css/APlayer.min.css"><script src="/assets/js/APlayer.min.js" class="aplayer-secondary-script-marker"></script><script class="meting-secondary-script-marker" src="/assets/js/Meting.min.js"></script><h3 id="一、gitflow：版本分支管理策略（相当于对git的包装）"><a href="#一、gitflow：版本分支管理策略（相当于对git的包装）" class="headerlink" title="一、gitflow：版本分支管理策略（相当于对git的包装）"></a>一、gitflow：版本分支管理策略（相当于对git的包装）</h3><ol>
+<li>GitFlow描述</li>
+</ol>
+<ul>
+<li>常用分支包括master、develop、feature、release、hotfix（support分支不常用）</li>
+<li>其中master、develop是远程分支，feature、release、hotfix是本地分支。<ul>
+<li>远程分支是指需要push到gitlab、github远程仓库中</li>
+<li>本地分支指开发人员的本地开发时使用的git版本控制环境</li>
+</ul>
+</li>
+</ul>
+<span id="more"></span>
+<ol start="2">
+<li>GitFlow流程图及描述理解</li>
+</ol>
+<img data-src="/posts/539/gf1.png" class title="img.png">
+<img data-src="/posts/539/gf2.png" class title="img.png">
+
+<ul>
+<li>master：主干分支</li>
+</ul>
+<img data-src="/posts/539/gf3.png" class title="img.png">
+
+<ul>
+<li><p>最稳定分支、功能完整、可随时发布线上环境（只读分支，只能从hotfix&#x2F;release合并 不能修改）</p>
+</li>
+<li><p>在master分支上的推送应该打tag记录追溯；</p>
+</li>
+<li><p>develop：开发分支 ß</p>
+<ul>
+<li>功能最新最全的分支，基于master分支克隆（仅首次克隆）；</li>
+<li>feature分支本地自测通过后合并到develop分支然后删除；</li>
+<li>收集所有上线功能后（包含所有发布到下一个release的代码）从delevop拉去release分支进行提测；</li>
+<li>release&#x2F;hotfix分支上线完毕，合并到develop并推送；</li>
+</ul>
+</li>
+<li><p>feature：功能开发分支</p>
+</li>
+</ul>
+<img data-src="/posts/539/gf4.png" class title="img.png">
+
+<ul>
+<li><p>开发某部分新功能，基于develop分支克隆，功能开发完毕且本地自测通过（编译完成且无异常）合并到develop分支；</p>
+</li>
+<li><p>可存在多个feature分支，即团队多人同时开发创建多个临时分支，功能完成后可选删除；</p>
+</li>
+<li><p>release：测试分支</p>
+</li>
+</ul>
+<img data-src="/posts/539/gf5.png" class title="img.png">
+
+<ul>
+<li><p>用于提交给测试人员进行功能测试，基于feature分支合并到develop之后，从develop分支克隆；</p>
+</li>
+<li><p>测试过程发现BUG在本分支进行修复，修复时创建修复分支bugfix-*，修复完所有bug上线后一次性合并到develop&#x2F;master分支并推送（完成功能），推送master分支时打tag；</p>
+</li>
+<li><p>临时分支，功能上线后可选删除（开启release测试后，不允许develop分支新功能继续合并到release分支，新功能需放到下一个release测试及发布）；</p>
+</li>
+<li><p>hotfix：补丁分支</p>
+</li>
+</ul>
+<img data-src="/posts/539/gf6.png" class title="img.png">
+
+<ul>
+<li>基于master分支克隆，主要用于线上版本进行BUG修复；</li>
+<li>修复bug后合并到develop&#x2F;master分支并推送（所有hotfix分支的修改会进入到下一个release），推送master分支时打tag；</li>
+<li>临时分支，修复bug后可选删除</li>
+</ul>
+<ol start="3">
+<li>开发准则与约定</li>
+</ol>
+<ul>
+<li>准则<ul>
+<li>除了源码相关的东西之外，其他build产生的东西（如：maven的target文件夹，.idea文件夹等），均不能提交进入源码仓库，添加到.gitignore文件中忽略掉</li>
+<li>开发人员要严格按照我们约定的gitflow版本分支管理流程切换到指定分支，开发相应的功能</li>
+<li>任务完成后需要根据测试用例经过严格的自测才能推送develop，严禁将编译不通过，提交不完全的代码推送到远程分支</li>
+</ul>
+</li>
+<li>约定：<ul>
+<li>主分支名称：master    主开发分支：develop</li>
+<li>标签（tag）名称：v*. release，其中“*” 为版本号，“release” 小写，如：v1.0.0. release</li>
+<li>新功能开发分支名称：feature-<em>，其中“</em>” 为对应jira（Aone）上的任务编号</li>
+<li>发布分支名称：release-<em>，其中“</em>” 为版本号，“release”小写，如：release-1.0.0，release分支上修复bug的分支名称为bugfix-*</li>
+<li>master的bug修复分支名称：hotfix-<em>，其中“</em>” 为对应jira（Aone）上的任务编号</li>
+</ul>
+</li>
+</ul>
+<h3 id="二、测试部分"><a href="#二、测试部分" class="headerlink" title="二、测试部分"></a>二、测试部分</h3><ul>
+<li>本地git flow init 初始化仓库，提交develop分支</li>
+</ul>
+<img data-src="/posts/539/gf7.png" class title="img.png">
+<img data-src="/posts/539/gf8.png" class title="img.png">
+
+<ul>
+<li>提交到远程测试用github仓库（使用ssh公钥认证方式），可以看到develop分支已有第一次提交</li>
+</ul>
+<img data-src="/posts/539/gf9.png" class title="img.png">
+
+<ul>
+<li>到tmp目录下新建工作目录，并clone下远程仓库到本地（模拟本地开发）</li>
+</ul>
+<img data-src="/posts/539/gf10.png" class title="img.png">
+
+<ul>
+<li>初始化仓库后，拉取develop分支到本地进行开发。此时可以切出feature分支进行功能开发</li>
+</ul>
+<img data-src="/posts/539/gf11.png" class title="img.png">
+<img data-src="/posts/539/gf12.png" class title="img.png">
+
+<ul>
+<li>开发功能提交后进行提交到远程仓库并track远程分支。后续可以git push持续提交</li>
+</ul>
+<img data-src="/posts/539/gf13.png" class title="img.png">
+<img data-src="/posts/539/gf14.png" class title="img.png">
+
+<ul>
+<li>功能开发完成后，将分支合并到develop分支并删除本地feature分支（加上-F参数可以同时删除远程分支）</li>
+</ul>
+<img data-src="/posts/539/gf15.png" class title="img.png">
+<p>finish提交后即将新功能合并到develop分支，完成新功能开发。后续即执行release发布操作，步骤类似</p>
+]]></content>
+      <categories>
+        <category>Linux</category>
+      </categories>
+      <tags>
+        <tag>git</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>K8S-RBAC权限控制</title>
     <url>/posts/fa45.html</url>
     <content><![CDATA[<link rel="stylesheet" class="aplayer-secondary-style-marker" href="/assets/css/APlayer.min.css"><script src="/assets/js/APlayer.min.js" class="aplayer-secondary-script-marker"></script><script class="meting-secondary-script-marker" src="/assets/js/Meting.min.js"></script><h3 id="一、RBAC简易概述"><a href="#一、RBAC简易概述" class="headerlink" title="一、RBAC简易概述"></a>一、RBAC简易概述</h3><img data-src="/posts/fa45/gaisu.png" class title="概述">
@@ -126,8 +257,8 @@
         <category>云原生</category>
       </categories>
       <tags>
-        <tag>K8S</tag>
         <tag>阿里云</tag>
+        <tag>K8S</tag>
       </tags>
   </entry>
   <entry>
@@ -221,7 +352,118 @@
         <category>云原生</category>
       </categories>
       <tags>
+        <tag>阿里云</tag>
         <tag>K8S</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>阿里云-RAM与STS权限</title>
+    <url>/posts/fdc.html</url>
+    <content><![CDATA[<link rel="stylesheet" class="aplayer-secondary-style-marker" href="/assets/css/APlayer.min.css"><script src="/assets/js/APlayer.min.js" class="aplayer-secondary-script-marker"></script><script class="meting-secondary-script-marker" src="/assets/js/Meting.min.js"></script><h3 id="一、前言"><a href="#一、前言" class="headerlink" title="一、前言"></a>一、前言</h3><p>当通过OpenApi接口来调用云资源时（即替代控制台的操作），当前的方式有两种：</p>
+<ul>
+<li>通过 AK+SK 方式直接调用，只要该AK所属的账号有相关权限即可调用对应资源（授权分为系统策略和自定义策略）</li>
+<li>阿里云账号（RAM用户）&#x2F;阿里云服务（ECS等）&#x2F;身份提供商（SSO） 通过扮演角色获取角色的临时令牌（即通过调用AssumeRole接口），通过该临时令牌（临时令牌可设定会话时间），通过 STS接口获取到的 临时AK+临时SK+临时STSToken 进行调用对应资源</li>
+</ul>
+<h3 id="二、官方概念介绍"><a href="#二、官方概念介绍" class="headerlink" title="二、官方概念介绍"></a>二、官方概念介绍</h3><ol>
+<li>STS概念</li>
+</ol>
+<ul>
+<li>阿里云STS（Security Token Service）是阿里云提供的一种临时访问权限管理服务。RAM提供RAM用户和RAM角色两种身份。其中，RAM角色不具备永久身份凭证，而只能通过STS获取可以自定义时效和访问权限的临时身份凭证，即安全令牌（STS Token）</li>
+</ul>
+<span id="more"></span>
+<p>建议阅读：<a href="https://help.aliyun.com/document_detail/28756.html">https://help.aliyun.com/document_detail&#x2F;28756.html</a></p>
+<ol start="2">
+<li>RAM概念</li>
+</ol>
+<ul>
+<li>RAM用户：身份实体，可访问阿里云资源的账号或程序；创建时可选择登录场景、AccessKey场景（通过程序调用API）。</li>
+<li><strong>RAM角色</strong>：虚拟用户，向信任的RAM实体账号进行授权（根据STS令牌颁发短时有效的临时访问token）；创建角色后会生成Arn描述符（角色的描述符：每个RAM角色存在唯一值且遵循阿里云arn命名规范）。</li>
+<li>RAM权限策略：一组权限集，使用简单的Policy语法进行描述（分为系统策略和自定义策略）；权限策略是实际细分授权资源集、操作集、授权条件的描述。</li>
+</ul>
+<img data-src="/posts/fdc/ram1.png" class title="img.png">
+
+<blockquote>
+<p>创建RAM角色时有三种类型：</p>
+<ul>
+<li><strong>阿里云账号</strong>：允许RAM用户所扮演的角色。扮演角色的RAM用户可以属于自己的阿里云账号，也可以属于其他阿里云账号。此类角色主要用来解决跨账号访问和临时授权问题</li>
+<li><strong>阿里云服务</strong>：允许云服务所扮演的角色。此类角色主要用于授权云服务代理您进行资源操作（服务又分为两种）<ul>
+<li>普通服务角色：您需要自定义角色名称，选择受信服务，并自定义权限策略</li>
+<li>服务关联角色：您只需选择受信的云服务，云服务会自带预设的角色名称和权限策略</li>
+<li>两种服务角色没太大区别，服务关联角色会多一个预设的配置（一般服务角色用户阿里云跨服务间的调用，例如ECS的授予&#x2F;收回RAM角色功能、RDS云服务调用KMS角色加密等，从某个云产品调用另一个云产品的授权）</li>
+</ul>
+</li>
+</ul>
+</blockquote>
+<img data-src="/posts/fdc/ram2.png" class title="img.png">
+<blockquote>
+<ul>
+<li><strong>身份提供商</strong>：允许可信身份提供商下的用户所扮演的角色。此类角色主要用于实现与阿里云的单点登录（SSO）</li>
+</ul>
+<p><strong>常用的RAM角色一般为创建 阿里云账号 方式（OSS官方推荐使用）</strong></p>
+<ul>
+<li>授权RAM角色介绍：<a href="https://help.aliyun.com/document_detail/116819.html">https://help.aliyun.com/document_detail&#x2F;116819.html</a></li>
+<li>OSS官方推荐使用 阿里云账号 方式：<a href="https://help.aliyun.com/document_detail/100624.html">https://help.aliyun.com/document_detail&#x2F;100624.html</a></li>
+</ul>
+</blockquote>
+<h3 id="三、创建STS角色，自定义授权OSS功能测试"><a href="#三、创建STS角色，自定义授权OSS功能测试" class="headerlink" title="三、创建STS角色，自定义授权OSS功能测试"></a>三、创建STS角色，自定义授权OSS功能测试</h3><p>1）测试账号信息<br>账号：<a href="mailto:&#100;&#101;&#x76;&#111;&#x70;&#115;&#x5f;&#x74;&#x65;&#115;&#x74;&#64;&#120;&#120;&#x78;&#x2e;&#x6f;&#110;&#97;&#x6c;&#x69;&#121;&#117;&#x6e;&#46;&#x63;&#x6f;&#x6d;">&#100;&#101;&#x76;&#111;&#x70;&#115;&#x5f;&#x74;&#x65;&#115;&#x74;&#64;&#120;&#120;&#x78;&#x2e;&#x6f;&#110;&#97;&#x6c;&#x69;&#121;&#117;&#x6e;&#46;&#x63;&#x6f;&#x6d;</a><br>AK：xxxxx<br>SK：xxxxx<br>ARN：acs:ram::xxxxx:role&#x2F;xxx-sts<br>OSS Bucket名称：oss-test<br>OSS授权目录：dir111&#x2F;dir111_secondline1&#x2F;</p>
+<p>2）进行授权</p>
+<ul>
+<li>创建RAM用户（子账号），生成AK SK （此步骤忽略）</li>
+<li>测试账号添加STS权限</li>
+</ul>
+<img data-src="/posts/fdc/ram3.png" class title="img.png">
+
+<ul>
+<li>添加权限策略，使用自定义策略授权（OSS官方示例Policy：<a href="https://help.aliyun.com/document_detail/266627.html">https://help.aliyun.com/document_detail&#x2F;266627.html</a>）</li>
+</ul>
+<img data-src="/posts/fdc/ram4.png" class title="img.png">
+
+<ul>
+<li>添加RAM角色并授权Policy</li>
+</ul>
+<img data-src="/posts/fdc/ram5.png" class title="img.png">
+
+<img data-src="/posts/fdc/ram6.png" class title="img.png">
+
+<p>3）测试验证（控制台无法登录RAM账号验证权限情况下，可以使用ossutil或ossbrowser工具进行验证）</p>
+<ul>
+<li>ossutil使用：<a href="https://help.aliyun.com/document_detail/50451.html">https://help.aliyun.com/document_detail&#x2F;50451.html</a></li>
+</ul>
+<img data-src="/posts/fdc/ram7.png" class title="img.png">
+
+<ul>
+<li>ossbrowser使用：<a href="https://help.aliyun.com/document_detail/92268.html">https://help.aliyun.com/document_detail&#x2F;92268.html</a></li>
+</ul>
+<p>4）验证列举和其他相关权限无误后，将ARN信息提供研发即可</p>
+<blockquote>
+<p>权限流程：</p>
+<ol>
+<li>客户端程序&#x2F;调用端发起扮演角色，此时在进入实际要获取的角色权限前，需要通过调用AssumeRole接口返回STS凭证（调用STS接口需要<strong>AliyunSTSAssumeRoleAccess</strong>权限，因此对应RAM账号需要授权该系统策略）</li>
+<li>通过返回的STS临时凭证（临时AK+临时SK+临时token）发起相关云资源接口的调用</li>
+<li>客户端使用STS发起调用时，会验证两个部分的权限策略Policy （注意：最后的权限取这两个权限Policy的交集）</li>
+</ol>
+<ul>
+<li>STS扮演的角色本身授权的权限策略是否拥有对应云资源的权限（系统或自定义的Policy）</li>
+<li>SDK&#x2F;API调用时传入的policy_text参数值，在构造调用请求时传入（<a href="https://help.aliyun.com/document_detail/100624.html">https://help.aliyun.com/document_detail&#x2F;100624.html</a><img data-src="/posts/fdc/ram8.png" class title="img.png"></li>
+</ul>
+</blockquote>
+<h3 id="四、结合实际需求"><a href="#四、结合实际需求" class="headerlink" title="四、结合实际需求"></a>四、结合实际需求</h3><ol>
+<li><p>开发提出需求：需要某一个oss bucket的STS ARN信息</p>
+</li>
+<li><p>需要相关信息：</p>
+</li>
+</ol>
+<ul>
+<li>oss bucket具体需授权目录，必须</li>
+<li>endpoint: oss bucket所属区域，非必须</li>
+<li>bucket-name: oss bucket名称，必须</li>
+<li>调用OSS RAM账号，必须</li>
+</ul>
+<ol start="3">
+<li>通过提供信息进行创建RAM角色、Policy策略新建（注意oss 细粒度的策略）、授权策略到RAM角色中，最后将新建的RAM角色的ARN描述符信息提供给研发。</li>
+</ol>
+]]></content>
+      <tags>
         <tag>阿里云</tag>
       </tags>
   </entry>
@@ -293,249 +535,157 @@
         <category>云原生</category>
       </categories>
       <tags>
-        <tag>K8S</tag>
         <tag>阿里云</tag>
+        <tag>K8S</tag>
       </tags>
   </entry>
   <entry>
-    <title>阿里云-RAM与STS权限</title>
-    <url>/posts/fdc.html</url>
-    <content><![CDATA[<link rel="stylesheet" class="aplayer-secondary-style-marker" href="/assets/css/APlayer.min.css"><script src="/assets/js/APlayer.min.js" class="aplayer-secondary-script-marker"></script><script class="meting-secondary-script-marker" src="/assets/js/Meting.min.js"></script><h3 id="一、前言"><a href="#一、前言" class="headerlink" title="一、前言"></a>一、前言</h3><p>当通过OpenApi接口来调用云资源时（即替代控制台的操作），当前的方式有两种：</p>
-<ul>
-<li>通过 AK+SK 方式直接调用，只要该AK所属的账号有相关权限即可调用对应资源（授权分为系统策略和自定义策略）</li>
-<li>阿里云账号（RAM用户）&#x2F;阿里云服务（ECS等）&#x2F;身份提供商（SSO） 通过扮演角色获取角色的临时令牌（即通过调用AssumeRole接口），通过该临时令牌（临时令牌可设定会话时间），通过 STS接口获取到的 临时AK+临时SK+临时STSToken 进行调用对应资源</li>
-</ul>
-<h3 id="二、官方概念介绍"><a href="#二、官方概念介绍" class="headerlink" title="二、官方概念介绍"></a>二、官方概念介绍</h3><ol>
-<li>STS概念</li>
-</ol>
-<ul>
-<li>阿里云STS（Security Token Service）是阿里云提供的一种临时访问权限管理服务。RAM提供RAM用户和RAM角色两种身份。其中，RAM角色不具备永久身份凭证，而只能通过STS获取可以自定义时效和访问权限的临时身份凭证，即安全令牌（STS Token）</li>
+    <title>helm 部署应用</title>
+    <url>/posts/ce0f.html</url>
+    <content><![CDATA[<link rel="stylesheet" class="aplayer-secondary-style-marker" href="/assets/css/APlayer.min.css"><script src="/assets/js/APlayer.min.js" class="aplayer-secondary-script-marker"></script><script class="meting-secondary-script-marker" src="/assets/js/Meting.min.js"></script><h3 id="一、Helm-安装与模板"><a href="#一、Helm-安装与模板" class="headerlink" title="一、Helm 安装与模板"></a>一、Helm 安装与模板</h3><h4 id="1）Helm-安装部署"><a href="#1）Helm-安装部署" class="headerlink" title="1）Helm 安装部署"></a>1）Helm 安装部署</h4><ul>
+<li><a href="https://helm.sh/zh/docs/intro/install/">安装二进制命令</a>（本地需要连接上kubernetes 集群）</li>
 </ul>
 <span id="more"></span>
-<p>建议阅读：<a href="https://help.aliyun.com/document_detail/28756.html">https://help.aliyun.com/document_detail&#x2F;28756.html</a></p>
-<ol start="2">
-<li>RAM概念</li>
-</ol>
 <ul>
-<li>RAM用户：身份实体，可访问阿里云资源的账号或程序；创建时可选择登录场景、AccessKey场景（通过程序调用API）。</li>
-<li><strong>RAM角色</strong>：虚拟用户，向信任的RAM实体账号进行授权（根据STS令牌颁发短时有效的临时访问token）；创建角色后会生成Arn描述符（角色的描述符：每个RAM角色存在唯一值且遵循阿里云arn命名规范）。</li>
-<li>RAM权限策略：一组权限集，使用简单的Policy语法进行描述（分为系统策略和自定义策略）；权限策略是实际细分授权资源集、操作集、授权条件的描述。</li>
-</ul>
-<img data-src="/posts/fdc/ram1.png" class title="img.png">
-
+<li>安装阿里云helm 插件与操作<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line"><span class="comment"># 安装 Helm 插件</span></span><br><span class="line">helm plugin install https://github.com/AliyunContainerService/helm-acr</span><br><span class="line"></span><br><span class="line">&lt;!--more--&gt;</span><br><span class="line"><span class="comment"># 配置本地仓库映射</span></span><br><span class="line"><span class="built_in">export</span> HELM_REPO_USERNAME=<span class="string">&#x27;&lt;企业版实例访问凭证中账号&gt;&#x27;</span></span><br><span class="line"><span class="built_in">export</span> HELM_REPO_PASSWORD=<span class="string">&#x27;&lt;企业版实例访问凭证中密码&gt;&#x27;</span></span><br><span class="line">helm repo add &lt;本地仓库名称&gt; acr://registry-chart-test.cn-hangzhou.cr.aliyuncs.com/&lt;命名空间&gt;/&lt;Chart仓库名称&gt; --username <span class="variable">$&#123;HELM_REPO_USERNAME&#125;</span> --password <span class="variable">$&#123;HELM_REPO_PASSWORD&#125;</span></span><br><span class="line"><span class="comment">#export HELM_REPO_USERNAME=devops@ib_daily</span></span><br><span class="line"><span class="comment">#export HELM_REPO_PASSWORD=2RJPfCgHXroSYQga</span></span><br><span class="line"><span class="comment">#helm repo add aliyun-acr-repo acr://registry-chart-test.cn-hangzhou.cr.aliyuncs.com/chart-test/app-test --username $&#123;HELM_REPO_USERNAME&#125; --password $&#123;HELM_REPO_PASSWORD&#125;</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 推送Chart</span></span><br><span class="line"><span class="comment">#本地创建一个 Chart</span></span><br><span class="line">helm create &lt;Chart 名称&gt;</span><br><span class="line"><span class="comment">#helm create app-test</span></span><br><span class="line"><span class="comment">#推送 Chart 目录</span></span><br><span class="line">helm cm-push &lt;Chart 名称&gt; &lt;本地仓库名称&gt;</span><br><span class="line"><span class="comment">#helm cm-push app-test aliyun-acr-repo</span></span><br><span class="line"><span class="comment">#或者推送 Chart 压缩包</span></span><br><span class="line">helm cm-push &lt;Chart 名称&gt;-&lt;Chart 版本&gt;.tgz &lt;本地仓库名称&gt;</span><br><span class="line"></span><br><span class="line"><span class="comment"># 拉取Chart</span></span><br><span class="line"><span class="comment">#从线上Chart 仓库更新本地Chart 索引</span></span><br><span class="line">helm repo update</span><br><span class="line"><span class="comment">#helm repo update aliyun-acr-repo</span></span><br><span class="line"><span class="comment">#拉取Chart</span></span><br><span class="line">helm fetch &lt;本地仓库名称&gt;/&lt;Chart 名称&gt; --version &lt;Chart 版本&gt;</span><br><span class="line"><span class="comment">#helm fetch aliyun-acr-repo/app-test --version=20211228100329-daily</span></span><br><span class="line"><span class="comment">#或者直接安装Chart</span></span><br><span class="line">helm install -f values.yaml &lt;本地仓库名称&gt;/&lt;Chart 名称&gt; --version &lt;Chart 版本&gt;</span><br><span class="line"><span class="comment">#helm install app-test aliyun-acr-repo/app-test --version 20211228100329-daily --namespace daily-apps</span></span><br></pre></td></tr></table></figure>
 <blockquote>
-<p>创建RAM角色时有三种类型：</p>
+<p>helm install 操作实际执行按顺序安装资源：</p>
 <ul>
-<li><strong>阿里云账号</strong>：允许RAM用户所扮演的角色。扮演角色的RAM用户可以属于自己的阿里云账号，也可以属于其他阿里云账号。此类角色主要用来解决跨账号访问和临时授权问题</li>
-<li><strong>阿里云服务</strong>：允许云服务所扮演的角色。此类角色主要用于授权云服务代理您进行资源操作（服务又分为两种）<ul>
-<li>普通服务角色：您需要自定义角色名称，选择受信服务，并自定义权限策略</li>
-<li>服务关联角色：您只需选择受信的云服务，云服务会自带预设的角色名称和权限策略</li>
-<li>两种服务角色没太大区别，服务关联角色会多一个预设的配置（一般服务角色用户阿里云跨服务间的调用，例如ECS的授予&#x2F;收回RAM角色功能、RDS云服务调用KMS角色加密等，从某个云产品调用另一个云产品的授权）</li>
-</ul>
-</li>
+<li>Namespace</li>
+<li>NetworkPolicy</li>
+<li>ResourceQuota</li>
+<li>LimitRange</li>
+<li>PodSecurityPolicy</li>
+<li>PodDisruptionBudget</li>
+<li>ServiceAccount</li>
+<li>Secret</li>
+<li>SecretList</li>
+<li>ConfigMap</li>
+<li>StorageClass</li>
+<li>PersistentVolume</li>
+<li>PersistentVolumeClaim</li>
+<li>CustomResourceDefinition</li>
+<li>ClusterRole</li>
+<li>ClusterRoleList</li>
+<li>ClusterRoleBinding</li>
+<li>ClusterRoleBindingList</li>
+<li>Role</li>
+<li>RoleList</li>
+<li>RoleBinding</li>
+<li>RoleBindingList</li>
+<li>Service</li>
+<li>DaemonSet</li>
+<li>Pod</li>
+<li>ReplicationController</li>
+<li>ReplicaSet</li>
+<li>Deployment</li>
+<li>HorizontalPodAutoscaler</li>
+<li>StatefulSet</li>
+<li>Job</li>
+<li>CronJob</li>
+<li>Ingress</li>
+<li>APIService</li>
 </ul>
 </blockquote>
-<img data-src="/posts/fdc/ram2.png" class title="img.png">
+</li>
+</ul>
+<p><a href="https://helm.sh/zh/docs/helm/helm/">常用参数</a></p>
 <blockquote>
 <ul>
-<li><strong>身份提供商</strong>：允许可信身份提供商下的用户所扮演的角色。此类角色主要用于实现与阿里云的单点登录（SSO）</li>
-</ul>
-<p><strong>常用的RAM角色一般为创建 阿里云账号 方式（OSS官方推荐使用）</strong></p>
-<ul>
-<li>授权RAM角色介绍：<a href="https://help.aliyun.com/document_detail/116819.html">https://help.aliyun.com/document_detail&#x2F;116819.html</a></li>
-<li>OSS官方推荐使用 阿里云账号 方式：<a href="https://help.aliyun.com/document_detail/100624.html">https://help.aliyun.com/document_detail&#x2F;100624.html</a></li>
-</ul>
-</blockquote>
-<h3 id="三、创建STS角色，自定义授权OSS功能测试"><a href="#三、创建STS角色，自定义授权OSS功能测试" class="headerlink" title="三、创建STS角色，自定义授权OSS功能测试"></a>三、创建STS角色，自定义授权OSS功能测试</h3><p>1）测试账号信息<br>账号：<a href="mailto:&#x64;&#101;&#x76;&#x6f;&#x70;&#115;&#x5f;&#116;&#101;&#115;&#116;&#64;&#x78;&#120;&#x78;&#46;&#111;&#110;&#97;&#x6c;&#105;&#121;&#x75;&#x6e;&#46;&#99;&#111;&#109;">&#x64;&#101;&#x76;&#x6f;&#x70;&#115;&#x5f;&#116;&#101;&#115;&#116;&#64;&#x78;&#120;&#x78;&#46;&#111;&#110;&#97;&#x6c;&#105;&#121;&#x75;&#x6e;&#46;&#99;&#111;&#109;</a><br>AK：xxxxx<br>SK：xxxxx<br>ARN：acs:ram::xxxxx:role&#x2F;xxx-sts<br>OSS Bucket名称：oss-test<br>OSS授权目录：dir111&#x2F;dir111_secondline1&#x2F;</p>
-<p>2）进行授权</p>
-<ul>
-<li>创建RAM用户（子账号），生成AK SK （此步骤忽略）</li>
-<li>测试账号添加STS权限</li>
-</ul>
-<img data-src="/posts/fdc/ram3.png" class title="img.png">
-
-<ul>
-<li>添加权限策略，使用自定义策略授权（OSS官方示例Policy：<a href="https://help.aliyun.com/document_detail/266627.html">https://help.aliyun.com/document_detail&#x2F;266627.html</a>）</li>
-</ul>
-<img data-src="/posts/fdc/ram4.png" class title="img.png">
-
-<ul>
-<li>添加RAM角色并授权Policy</li>
-</ul>
-<img data-src="/posts/fdc/ram5.png" class title="img.png">
-
-<img data-src="/posts/fdc/ram6.png" class title="img.png">
-
-<p>3）测试验证（控制台无法登录RAM账号验证权限情况下，可以使用ossutil或ossbrowser工具进行验证）</p>
-<ul>
-<li>ossutil使用：<a href="https://help.aliyun.com/document_detail/50451.html">https://help.aliyun.com/document_detail&#x2F;50451.html</a></li>
-</ul>
-<img data-src="/posts/fdc/ram7.png" class title="img.png">
-
-<ul>
-<li>ossbrowser使用：<a href="https://help.aliyun.com/document_detail/92268.html">https://help.aliyun.com/document_detail&#x2F;92268.html</a></li>
-</ul>
-<p>4）验证列举和其他相关权限无误后，将ARN信息提供研发即可</p>
-<blockquote>
-<p>权限流程：</p>
-<ol>
-<li>客户端程序&#x2F;调用端发起扮演角色，此时在进入实际要获取的角色权限前，需要通过调用AssumeRole接口返回STS凭证（调用STS接口需要<strong>AliyunSTSAssumeRoleAccess</strong>权限，因此对应RAM账号需要授权该系统策略）</li>
-<li>通过返回的STS临时凭证（临时AK+临时SK+临时token）发起相关云资源接口的调用</li>
-<li>客户端使用STS发起调用时，会验证两个部分的权限策略Policy （注意：最后的权限取这两个权限Policy的交集）</li>
-</ol>
-<ul>
-<li>STS扮演的角色本身授权的权限策略是否拥有对应云资源的权限（系统或自定义的Policy）</li>
-<li>SDK&#x2F;API调用时传入的policy_text参数值，在构造调用请求时传入（<a href="https://help.aliyun.com/document_detail/100624.html">https://help.aliyun.com/document_detail&#x2F;100624.html</a><img data-src="/posts/fdc/ram8.png" class title="img.png"></li>
+<li>查看本地仓库：helm repo list</li>
+<li>添加&#x2F;删除仓库：helm repo add xxx &#x2F; helm repo remove xxx</li>
+<li>推送&#x2F;拉取charts：helm cm-push xxx &#x2F; helm fetch&#x2F;pull xxx</li>
+<li>安装&#x2F;卸载charts：helm install xxx &#x2F;  helm uninstall xxx</li>
+<li>升级&#x2F;回滚：helm upgrade xxx &#x2F; helm rollback xxx <revision></revision></li>
+<li>创建本地自己的charts： helm create xxx</li>
+<li>查看charts 可自定义配置项&#x2F;获取自定义配置项 ：helm show values &#x2F; helm get values</li>
 </ul>
 </blockquote>
-<h3 id="四、结合实际需求"><a href="#四、结合实际需求" class="headerlink" title="四、结合实际需求"></a>四、结合实际需求</h3><ol>
-<li><p>开发提出需求：需要某一个oss bucket的STS ARN信息</p>
-</li>
-<li><p>需要相关信息：</p>
-</li>
-</ol>
 <ul>
-<li>oss bucket具体需授权目录，必须</li>
-<li>endpoint: oss bucket所属区域，非必须</li>
-<li>bucket-name: oss bucket名称，必须</li>
-<li>调用OSS RAM账号，必须</li>
-</ul>
-<ol start="3">
-<li>通过提供信息进行创建RAM角色、Policy策略新建（注意oss 细粒度的策略）、授权策略到RAM角色中，最后将新建的RAM角色的ARN描述符信息提供给研发。</li>
-</ol>
-]]></content>
-      <tags>
-        <tag>阿里云</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>git flow 工作流理解</title>
-    <url>/posts/539.html</url>
-    <content><![CDATA[<link rel="stylesheet" class="aplayer-secondary-style-marker" href="/assets/css/APlayer.min.css"><script src="/assets/js/APlayer.min.js" class="aplayer-secondary-script-marker"></script><script class="meting-secondary-script-marker" src="/assets/js/Meting.min.js"></script><h3 id="一、gitflow：版本分支管理策略（相当于对git的包装）"><a href="#一、gitflow：版本分支管理策略（相当于对git的包装）" class="headerlink" title="一、gitflow：版本分支管理策略（相当于对git的包装）"></a>一、gitflow：版本分支管理策略（相当于对git的包装）</h3><ol>
-<li>GitFlow描述</li>
-</ol>
-<ul>
-<li>常用分支包括master、develop、feature、release、hotfix（support分支不常用）</li>
-<li>其中master、develop是远程分支，feature、release、hotfix是本地分支。<ul>
-<li>远程分支是指需要push到gitlab、github远程仓库中</li>
-<li>本地分支指开发人员的本地开发时使用的git版本控制环境</li>
-</ul>
+<li>配置跨账号ACR 拉取镜像<blockquote>
+<p>helm 部署时需要pull image 部署，因此需要配置跨账号ACR 拉取镜像。参考：<a href="https://yuque.antfin.com/kifo8h/nee5aa/wgui7o">跨账号ACR 拉取镜像配置</a></p>
+</blockquote>
 </li>
 </ul>
-<ol start="2">
-<li>GitFlow流程图及描述理解</li>
-</ol>
-<img data-src="/posts/undefined/gf1.png" class title="img.png">
-<img data-src="/posts/undefined/gf2.png" class title="img.png">
+<h4 id="2）Helm-模板与语法编写"><a href="#2）Helm-模板与语法编写" class="headerlink" title="2）Helm 模板与语法编写"></a>2）Helm 模板与语法编写</h4><blockquote>
+<p>详情参考：<a href="https://www.qikqiak.com/k8strain/helm/demo/">Charts 文件格式，模板编写</a></p>
+</blockquote>
+<ul>
+<li><p>内置对象</p>
+</li>
+<li><p>基本目录结构内容：Chart.yaml（chart 信息说明） 、Values.yaml（自定义变量） 、charts（子chart目录，依赖）</p>
+</li>
+<li><p>templates 模板（实际安装到K8S 集群中的资源定义Yaml 模板文件，如deployment、pod 等）</p>
+<ul>
+<li>资源模板：confimap.yaml、deployment.yaml 等</li>
+<li>命名模板：_helpers.tpl</li>
+</ul>
+</li>
+<li><p>函数和流水线：<a href="https://helm.sh/zh/docs/chart_template_guide/function_list/">函数列表</a>，<a href="https://helm.sh/zh/docs/chart_template_guide/control_structures/">流程控制</a></p>
+</li>
+<li><p>访问文件</p>
+</li>
+</ul>
+<h3 id="二、测试验证部署app-test"><a href="#二、测试验证部署app-test" class="headerlink" title="二、测试验证部署app-test"></a>二、测试验证部署app-test</h3><h4 id="1）本地安装helm、kubectl（连接K8S-集群）二进制命令"><a href="#1）本地安装helm、kubectl（连接K8S-集群）二进制命令" class="headerlink" title="1）本地安装helm、kubectl（连接K8S 集群）二进制命令"></a>1）本地安装helm、kubectl（连接K8S 集群）二进制命令</h4><h4 id="2）初始化配置app-test"><a href="#2）初始化配置app-test" class="headerlink" title="2）初始化配置app-test"></a>2）初始化配置app-test</h4><ul>
+<li><p>初始化应用目录：helm create app-test</p>
+</li>
+<li><p>应用app-test 目录结构</p>
+</li>
+</ul>
+<img data-src="/posts/ce0f/helm1.png" class title="img.png">
 
 <ul>
-<li>master：主干分支</li>
+<li>关键配置信息<figure class="highlight yaml"><table><tr><td class="code"><pre><span class="line"><span class="comment"># Chart.yaml</span></span><br><span class="line"><span class="attr">apiVersion:</span> <span class="string">v2</span></span><br><span class="line"><span class="attr">name:</span> <span class="string">app-test</span></span><br><span class="line"><span class="attr">description:</span> <span class="string">application</span> <span class="string">app-test</span> <span class="string">for</span> <span class="string">env</span> <span class="string">daily</span></span><br><span class="line"><span class="attr">type:</span> <span class="string">application</span></span><br><span class="line"><span class="attr">version:</span> <span class="number">20211215123042</span><span class="string">-daily</span></span><br><span class="line"><span class="attr">appVersion:</span> <span class="string">20211215123042_daily</span></span><br></pre></td></tr></table></figure>
+<figure class="highlight yaml"><table><tr><td class="code"><pre><span class="line"><span class="comment"># values.yaml</span></span><br><span class="line"><span class="attr">replicaCount:</span> <span class="number">1</span></span><br><span class="line"></span><br><span class="line"><span class="attr">image:</span></span><br><span class="line">  <span class="attr">repository:</span> <span class="string">registry-chart-test.cn-hangzhou.cr.aliyuncs.com/ib-ibos/app-test</span></span><br><span class="line">  <span class="attr">pullPolicy:</span> <span class="string">IfNotPresent</span></span><br><span class="line">  <span class="attr">tag:</span> <span class="string">&quot;&quot;</span></span><br><span class="line"></span><br><span class="line"><span class="attr">imagePullSecrets:</span> []</span><br><span class="line"><span class="attr">nameOverride:</span> <span class="string">&quot;&quot;</span></span><br><span class="line"><span class="attr">fullnameOverride:</span> <span class="string">&quot;&quot;</span></span><br><span class="line"></span><br><span class="line"><span class="attr">serviceAccount:</span></span><br><span class="line">  <span class="attr">create:</span> <span class="literal">false</span></span><br><span class="line">  <span class="attr">annotations:</span> &#123;&#125;</span><br><span class="line">  <span class="attr">name:</span> <span class="string">&quot;&quot;</span></span><br><span class="line"></span><br><span class="line"><span class="attr">podAnnotations:</span> &#123;&#125;</span><br><span class="line"></span><br><span class="line"><span class="attr">podSecurityContext:</span> &#123;&#125;</span><br><span class="line"></span><br><span class="line"><span class="attr">securityContext:</span> &#123;&#125;</span><br><span class="line"></span><br><span class="line"><span class="attr">service:</span></span><br><span class="line">  <span class="attr">type:</span> <span class="string">ClusterIP</span></span><br><span class="line">  <span class="attr">port:</span> <span class="number">8080</span></span><br><span class="line">  <span class="attr">create:</span> <span class="literal">false</span></span><br><span class="line"></span><br><span class="line"><span class="attr">ingress:</span></span><br><span class="line">  <span class="attr">enabled:</span> <span class="literal">false</span></span><br><span class="line">  <span class="attr">className:</span> <span class="string">&quot;&quot;</span></span><br><span class="line">  <span class="attr">annotations:</span> &#123;&#125;</span><br><span class="line">  <span class="attr">hosts:</span></span><br><span class="line">    <span class="bullet">-</span> <span class="attr">host:</span> <span class="string">reos.com.cn</span></span><br><span class="line">      <span class="attr">paths:</span></span><br><span class="line">        <span class="bullet">-</span> <span class="attr">path:</span> <span class="string">/</span></span><br><span class="line">          <span class="attr">pathType:</span> <span class="string">ImplementationSpecific</span></span><br><span class="line">  <span class="attr">tls:</span> []</span><br><span class="line"></span><br><span class="line"><span class="attr">resources:</span> &#123;&#125;</span><br><span class="line"></span><br><span class="line"><span class="attr">autoscaling:</span></span><br><span class="line">  <span class="attr">enabled:</span> <span class="literal">false</span></span><br><span class="line">  <span class="attr">minReplicas:</span> <span class="number">1</span></span><br><span class="line">  <span class="attr">maxReplicas:</span> <span class="number">100</span></span><br><span class="line">  <span class="attr">targetCPUUtilizationPercentage:</span> <span class="number">80</span></span><br><span class="line"></span><br><span class="line"><span class="attr">nodeSelector:</span> &#123;&#125;</span><br><span class="line"></span><br><span class="line"><span class="attr">tolerations:</span> []</span><br><span class="line"></span><br><span class="line"><span class="attr">affinity:</span> &#123;&#125;</span><br></pre></td></tr></table></figure></li>
 </ul>
-<img data-src="/posts/undefined/gf3.png" class title="img.png">
+<h4 id="3）配置镜像仓库，部署应用"><a href="#3）配置镜像仓库，部署应用" class="headerlink" title="3）配置镜像仓库，部署应用"></a>3）配置镜像仓库，部署应用</h4><ul>
+<li>配置远程ACR 企业版仓库，参考 <a href="#ht9xj">Helm安装部署</a> 部分。</li>
+</ul>
+<img data-src="/posts/ce0f/helm2.png" class title="img.png">
 
 <ul>
-<li><p>最稳定分支、功能完整、可随时发布线上环境（只读分支，只能从hotfix&#x2F;release合并 不能修改）</p>
+<li>部署应用<ul>
+<li><p>执行部署命令</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">helm install app-test aliyun-acr-repo/app-test --version 20211228100329-daily --namespace daily-apps</span><br></pre></td></tr></table></figure>
 </li>
-<li><p>在master分支上的推送应该打tag记录追溯；</p>
-</li>
-<li><p>develop：开发分支 ß</p>
-<ul>
-<li>功能最新最全的分支，基于master分支克隆（仅首次克隆）；</li>
-<li>feature分支本地自测通过后合并到develop分支然后删除；</li>
-<li>收集所有上线功能后（包含所有发布到下一个release的代码）从delevop拉去release分支进行提测；</li>
-<li>release&#x2F;hotfix分支上线完毕，合并到develop并推送；</li>
-</ul>
-</li>
-<li><p>feature：功能开发分支</p>
+<li><p>部署结果</p>
 </li>
 </ul>
-<img data-src="/posts/undefined/gf4.png" class title="img.png">
+</li>
+</ul>
+<img data-src="/posts/ce0f/helm3.png" class title="img.png">
+<img data-src="/posts/ce0f/helm4.png" class title="img.png">
 
 <ul>
-<li><p>开发某部分新功能，基于develop分支克隆，功能开发完毕且本地自测通过（编译完成且无异常）合并到develop分支；</p>
-</li>
-<li><p>可存在多个feature分支，即团队多人同时开发创建多个临时分支，功能完成后可选删除；</p>
-</li>
-<li><p>release：测试分支</p>
-</li>
+<li>更新版本<img data-src="/posts/ce0f/helm5.png" class title="img.png"></li>
 </ul>
-<img data-src="/posts/undefined/gf5.png" class title="img.png">
-
+<h3 id="三、问题点"><a href="#三、问题点" class="headerlink" title="三、问题点"></a>三、问题点</h3><ul>
+<li><p>使用helm 命令安装需本地连接K8S 集群（需提供API Server 公网EIP）</p>
+</li>
+<li><p>与阿里云Edas 产品兼容问题</p>
 <ul>
-<li><p>用于提交给测试人员进行功能测试，基于feature分支合并到develop之后，从develop分支克隆；</p>
-</li>
-<li><p>测试过程发现BUG在本分支进行修复，修复时创建修复分支bugfix-*，修复完所有bug上线后一次性合并到develop&#x2F;master分支并推送（完成功能），推送master分支时打tag；</p>
-</li>
-<li><p>临时分支，功能上线后可选删除（开启release测试后，不允许develop分支新功能继续合并到release分支，新功能需放到下一个release测试及发布）；</p>
-</li>
-<li><p>hotfix：补丁分支</p>
-</li>
+<li>使用helm 部署的应用与Edas 不共通，因此使用helm 部署的无法从Edas 上查看应用的相关信息</li>
+<li>Edas 支持将手动部署的Deployment 手动导入，参考：<a href="https://help.aliyun.com/document_detail/202036.html">https://help.aliyun.com/document_detail&#x2F;202036.html</a>（自行部署导入Edas 的应用暂未确定是否能完整导入Edas 组件注入的变量）</li>
 </ul>
-<img data-src="/posts/undefined/gf6.png" class title="img.png">
-
+</li>
+<li><p>版本控制与镜像拉取</p>
 <ul>
-<li>基于master分支克隆，主要用于线上版本进行BUG修复；</li>
-<li>修复bug后合并到develop&#x2F;master分支并推送（所有hotfix分支的修改会进入到下一个release），推送master分支时打tag；</li>
-<li>临时分支，修复bug后可选删除</li>
-</ul>
-<ol start="3">
-<li>开发准则与约定</li>
-</ol>
-<ul>
-<li>准则<ul>
-<li>除了源码相关的东西之外，其他build产生的东西（如：maven的target文件夹，.idea文件夹等），均不能提交进入源码仓库，添加到.gitignore文件中忽略掉</li>
-<li>开发人员要严格按照我们约定的gitflow版本分支管理流程切换到指定分支，开发相应的功能</li>
-<li>任务完成后需要根据测试用例经过严格的自测才能推送develop，严禁将编译不通过，提交不完全的代码推送到远程分支</li>
+<li>helm 通过配置values 变量值写入或更新 image-&gt;repository 的值进行pull 镜像更新，并通过 helm push 推送pull 的镜像配置到私有仓库中。</li>
+<li>helm 通过upgrade 与rollback 命令进行已部署应用的升级与回滚功能。</li>
 </ul>
 </li>
-<li>约定：<ul>
-<li>主分支名称：master    主开发分支：develop</li>
-<li>标签（tag）名称：v*. release，其中“*” 为版本号，“release” 小写，如：v1.0.0. release</li>
-<li>新功能开发分支名称：feature-<em>，其中“</em>” 为对应jira（Aone）上的任务编号</li>
-<li>发布分支名称：release-<em>，其中“</em>” 为版本号，“release”小写，如：release-1.0.0，release分支上修复bug的分支名称为bugfix-*</li>
-<li>master的bug修复分支名称：hotfix-<em>，其中“</em>” 为对应jira（Aone）上的任务编号</li>
+<li><p>与原有CI&#x2F;CD 配置使用问题</p>
+<ul>
+<li>helm 部署只能通过本地更新配置并执行，无法与现有的 CI&#x2F;CD 流水线进行配合使用，需要进行调整。</li>
 </ul>
 </li>
 </ul>
-<h3 id="二、测试部分"><a href="#二、测试部分" class="headerlink" title="二、测试部分"></a>二、测试部分</h3><ul>
-<li>本地git flow init 初始化仓库，提交develop分支</li>
-</ul>
-<img data-src="/posts/undefined/gf7.png" class title="img.png">
-<img data-src="/posts/undefined/gf8.png" class title="img.png">
-
-<ul>
-<li>提交到远程测试用github仓库（使用ssh公钥认证方式），可以看到develop分支已有第一次提交</li>
-</ul>
-<img data-src="/posts/undefined/gf9.png" class title="img.png">
-
-<ul>
-<li>到tmp目录下新建工作目录，并clone下远程仓库到本地（模拟本地开发）</li>
-</ul>
-<img data-src="/posts/undefined/gf10.png" class title="img.png">
-
-<ul>
-<li>初始化仓库后，拉取develop分支到本地进行开发。此时可以切出feature分支进行功能开发</li>
-</ul>
-<img data-src="/posts/undefined/gf11.png" class title="img.png">
-<img data-src="/posts/undefined/gf12.png" class title="img.png">
-
-<ul>
-<li>开发功能提交后进行提交到远程仓库并track远程分支。后续可以git push持续提交</li>
-</ul>
-<img data-src="/posts/undefined/gf13.png" class title="img.png">
-<img data-src="/posts/undefined/gf14.png" class title="img.png">
-
-<ul>
-<li>功能开发完成后，将分支合并到develop分支并删除本地feature分支（加上-F参数可以同时删除远程分支）</li>
-</ul>
-<img data-src="/posts/undefined/gf15.png" class title="img.png">
-<p>finish提交后即将新功能合并到develop分支，完成新功能开发。后续即执行release发布操作，步骤类似</p>
 ]]></content>
       <categories>
-        <category>Linux</category>
+        <category>云原生</category>
       </categories>
       <tags>
-        <tag>git</tag>
+        <tag>阿里云</tag>
       </tags>
   </entry>
 </search>
