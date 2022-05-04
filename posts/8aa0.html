@@ -1,0 +1,694 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 6.1.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+<link rel="stylesheet" href="https://fonts.loli.net/css?family=Noto Serif SC:300,300italic,400,400italic,700,700italic&display=swap&subset=latin,latin-ext">
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.css">
+  <link rel="stylesheet" href="/lib/pace/pace-theme-minimal.min.css">
+  <script src="/lib/pace/pace.min.js"></script>
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"359sun.top","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"left","always":true,"display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":true,"show_result":true,"style":"mac"},"back2top":{"enable":true,"sidebar":true,"scrollpercent":true},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":true,"mediumzoom":false,"lazyload":true,"pangu":false,"comments":{"style":"tabs","active":"gitalk","storage":true,"lazyload":false,"nav":{"gitalk":{"order":-2}},"activeClass":"gitalk"},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+  <meta name="description" content="一、背景 一次对当前业务使用ACK 集群的业务调研与改造：针对NetworkPolicy 策略的调研，主要用于新建ACK 集群的网络规划与网络隔离  1）当前云环境ACK 集群使用现状和痛点 UAT&#x2F;线上 环境应用较多，且应用没有做集群内隔离，所有应用全部都在ACK 集群的default namespace 中。没有做到逻辑网络隔离。  集群通过暴露公网SLB 方式进行集群调用，存在浪费">
+<meta property="og:type" content="article">
+<meta property="og:title" content="NetworkPolicy隔离策略">
+<meta property="og:url" content="https://359sun.top/posts/8aa0.html">
+<meta property="og:site_name" content="Yakir Blog">
+<meta property="og:description" content="一、背景 一次对当前业务使用ACK 集群的业务调研与改造：针对NetworkPolicy 策略的调研，主要用于新建ACK 集群的网络规划与网络隔离  1）当前云环境ACK 集群使用现状和痛点 UAT&#x2F;线上 环境应用较多，且应用没有做集群内隔离，所有应用全部都在ACK 集群的default namespace 中。没有做到逻辑网络隔离。  集群通过暴露公网SLB 方式进行集群调用，存在浪费">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://359sun.top/posts/8aa0/7b70de99e5f7.png">
+<meta property="og:image" content="https://359sun.top/posts/8aa0/2afdc3d69fa9.png">
+<meta property="og:image" content="https://359sun.top/posts/8aa0/6bbe6aab7201.png">
+<meta property="article:published_time" content="2022-03-07T14:01:06.000Z">
+<meta property="article:modified_time" content="2022-05-03T13:20:22.250Z">
+<meta property="article:author" content="Yakir">
+<meta property="article:tag" content="阿里云">
+<meta property="article:tag" content="K8S">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://359sun.top/posts/8aa0/7b70de99e5f7.png">
+
+<link rel="canonical" href="https://359sun.top/posts/8aa0.html">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>NetworkPolicy隔离策略 | Yakir Blog</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+<link rel="alternate" href="/atom.xml" title="Yakir Blog" type="application/atom+xml">
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">Yakir Blog</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+        <li class="menu-item menu-item-musiclist">
+
+    <a href="/musiclist/" rel="section"><i class="fa fa-music fa-fw"></i>歌单</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="reading-progress-bar"></div>
+
+  <a href="https://github.com/yakir3" class="github-corner" title="Follow me on GitHub" aria-label="Follow me on GitHub" rel="noopener" target="_blank"><svg width="80" height="80" viewBox="0 0 250 250" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path></svg></a>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://359sun.top/posts/8aa0.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.jpg">
+      <meta itemprop="name" content="Yakir">
+      <meta itemprop="description" content="Yakir Blog">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Yakir Blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          NetworkPolicy隔离策略
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2022-03-07 22:01:06" itemprop="dateCreated datePublished" datetime="2022-03-07T22:01:06+08:00">2022-03-07</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2022-05-03 21:20:22" itemprop="dateModified" datetime="2022-05-03T21:20:22+08:00">2022-05-03</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E4%BA%91%E5%8E%9F%E7%94%9F/" itemprop="url" rel="index"><span itemprop="name">云原生</span></a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span><br>
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+                <span class="post-meta-item-text">本文字数：</span>
+              <span>3.1k</span>
+            </span>
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+                <span class="post-meta-item-text">阅读时长 &asymp;</span>
+              <span>3 分钟</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h3 id="一、背景"><a href="#一、背景" class="headerlink" title="一、背景"></a>一、背景</h3><blockquote>
+<p>一次对当前业务使用ACK 集群的业务调研与改造：针对NetworkPolicy 策略的调研，主要用于新建ACK 集群的网络规划与网络隔离</p>
+</blockquote>
+<h4 id="1）当前云环境ACK-集群使用现状和痛点"><a href="#1）当前云环境ACK-集群使用现状和痛点" class="headerlink" title="1）当前云环境ACK 集群使用现状和痛点"></a>1）当前云环境ACK 集群使用现状和痛点</h4><ol>
+<li><p>UAT&#x2F;线上 环境应用较多，且应用没有做集群内隔离，所有应用全部都在ACK 集群的default namespace 中。没有做到逻辑网络隔离。</p>
+</li>
+<li><p>集群通过暴露公网SLB 方式进行集群调用，存在浪费资源、管理混乱、安全风险等问题。通过namespace 隔离 + NetworkPolicy 策略通信的方式可以实现集群内部应用自行调用，和VPC 打通之后使用NetworkPolicy 的IP 块策略还可实现跨集群的应用内网调用。</p>
+</li>
+</ol>
+<h4 id="2）实现隔离策略价值"><a href="#2）实现隔离策略价值" class="headerlink" title="2）实现隔离策略价值"></a>2）实现隔离策略价值</h4><ol>
+<li><p>降低成本：可以通过网络逻辑隔离的方式将应用已namespace 方式进行隔离，减少冗余的物理设备降低成本。</p>
+</li>
+<li><p>增加效能：避免复杂且多余的网络设计，使应用之间的调用简单且易于排查。</p>
+</li>
+</ol>
+<span id="more"></span>
+<p>问题点：</p>
+<ul>
+<li>应用SLB 暴露公网方式，白名单管理方式存在多人修改不同步且随意添加白名单带来风险问题。多个SLB 带来的白名单、监听等也存在管理记录困难问题。</li>
+<li>通过namespace 隔离，网络规划便于设计（同一VPC 下天然可以通信）。应用间调用完全可以通过集群内部策略实现通信，减少因为网络造成的应用通信异常。</li>
+</ul>
+<img data-src="/posts/8aa0/7b70de99e5f7.png" class title="img.png">
+
+<h3 id="二、概念理解"><a href="#二、概念理解" class="headerlink" title="二、概念理解"></a>二、概念理解</h3><h4 id="1）CNI-插件"><a href="#1）CNI-插件" class="headerlink" title="1）CNI 插件"></a>1）CNI 插件</h4><p>k8s 本身没有对容器之间的通信网络进行实现，而是通过 CNI 定义了容器网络的接口的形式，让其他组件实现CNI来实现容器间的网络通信，CNI主要解决什么问题？</p>
+<ul>
+<li>第一，如何保证每个Pod拥有一个集群内唯一的IP地址？</li>
+<li>第二，如何保证不同节点的IP地址划分不会重复？</li>
+<li>第三，如何保证跨节点的Pod可以互相通信？</li>
+<li>第四，如何保证不同节点的Pod可以与跨节点的主机互相通信？</li>
+</ul>
+<p>常见的CNI 插件：Calico、Flannel、Terway、Weave Net、 以及 Contiv</p>
+<h4 id="2）Terway与Flannel对比"><a href="#2）Terway与Flannel对比" class="headerlink" title="2）Terway与Flannel对比"></a>2）Terway与Flannel对比</h4><p>在创建集群时，ACK提供Terway和Flannel两种网络插件：</p>
+<ul>
+<li>Terway：是阿里云容器服务ACK自研的网络插件。Terway将阿里云的弹性网卡分配给容器，支持基于Kubernetes标准的网络策略来定义容器间的访问策略，支持对单个容器做带宽的限流。Terway拥有更为灵活的IPAM（容器地址分配）策略，避免地址浪费。如果您不需要使用网络策略（Network Policy），可以选择Flannel，其他情况建议选择Terway。</li>
+<li>Flannel：使用的是简单稳定的社区Flannel CNI插件。配合阿里云的VPC的高速网络，能给集群高性能和稳定的容器网络体验。Flannel功能偏简单，支持的特性少。例如，不支持基于Kubernetes标准的网络策略（Network Policy）。更多信息，请参见<a target="_blank" rel="noopener" href="https://github.com/coreos/flannel">Flannel</a>。</li>
+</ul>
+<h4 id="3）NetworkPolicy-实现方式"><a href="#3）NetworkPolicy-实现方式" class="headerlink" title="3）NetworkPolicy 实现方式"></a>3）NetworkPolicy 实现方式</h4><ol>
+<li>前置条件：集群安装 CNI（container network interface）插件，阿里云支持两种插件：Flannel（不支持NetworkPolicy）、Terway</li>
+<li>ACK 集群开启NetworkPolicy 方式：</li>
+</ol>
+<ul>
+<li>控制台方式操作（简易操作）：需通过阿里云提工单申请</li>
+<li>命令行方式操作（kubectl 方式）：无需申请可直接操作。开启方式：<ul>
+<li><p>创建Terway集群时可选中** NetworkPolicy支持** 直接开启</p>
+<img data-src="/posts/8aa0/2afdc3d69fa9.png" class title="img.png">
+</li>
+<li><p>通过修改ConfigMap –&gt; eni-config 文件开启</p>
+</li>
+</ul>
+</li>
+</ul>
+<img data-src="/posts/8aa0/6bbe6aab7201.png" class title="img.png">
+
+
+<ol start="3">
+<li>具体实现</li>
+</ol>
+<ul>
+<li><p>NetworkPolicy 支持三种方式进行网络隔离：namespace、ipBlock（CIDR）、Pods</p>
+</li>
+<li><p>默认情况下非隔离接受任何流量。使用NetworkPolicy 资源配置选中Pod 进入隔离状态（白名单规则），隔离规则有入站（ingress）和出站（egress）规则指定（与iptables概念类似，但不同的是 网络策略是并集累积的规则）</p>
+</li>
+<li><p>示例配置：</p>
+<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">apiVersion:</span> <span class="string">networking.k8s.io/v1</span></span><br><span class="line"><span class="attr">kind:</span> <span class="string">NetworkPolicy</span></span><br><span class="line"><span class="attr">metadata:</span></span><br><span class="line">  <span class="attr">name:</span> <span class="string">test-network-policy</span></span><br><span class="line">  <span class="comment"># 为namespace 为data的应用设置策略，默认隔离所有流量</span></span><br><span class="line">  <span class="attr">namespace:</span> <span class="string">data</span></span><br><span class="line"><span class="attr">spec:</span></span><br><span class="line">  <span class="comment"># pod选择器-必需</span></span><br><span class="line">  <span class="attr">podSelector:</span></span><br><span class="line">    <span class="attr">matchLabels:</span></span><br><span class="line">      <span class="attr">role:</span> <span class="string">&quot;data_centerevent&quot;</span></span><br><span class="line">      <span class="comment"># role: &quot;&quot;  role分组标签配置为空时表示匹配当前namespace所有pod</span></span><br><span class="line">  <span class="attr">policyTypes:</span></span><br><span class="line">  <span class="bullet">-</span> <span class="string">Ingress</span></span><br><span class="line">  <span class="bullet">-</span> <span class="string">Egress</span></span><br><span class="line">  <span class="attr">ingress:</span></span><br><span class="line">  <span class="bullet">-</span> <span class="attr">from:</span></span><br><span class="line">    <span class="comment"># 允许 172.17.0.0/16网段，排除 172.17.1.0/24</span></span><br><span class="line">    <span class="bullet">-</span> <span class="attr">ipBlock:</span></span><br><span class="line">        <span class="attr">cidr:</span> <span class="number">172.17</span><span class="number">.0</span><span class="number">.0</span><span class="string">/16</span></span><br><span class="line">        <span class="attr">except:</span></span><br><span class="line">        <span class="bullet">-</span> <span class="number">172.17</span><span class="number">.1</span><span class="number">.0</span><span class="string">/24</span></span><br><span class="line">    <span class="comment"># 允许所有namespace带有&quot;project=apps_project&quot; 标签的所有namesapce Pod流量</span></span><br><span class="line">    <span class="bullet">-</span> <span class="attr">namespaceSelector:</span></span><br><span class="line">        <span class="attr">matchLabels:</span></span><br><span class="line">          <span class="attr">project:</span> <span class="string">apps_project</span></span><br><span class="line">    <span class="comment"># 允许data这个namespace下带有&quot;role=apps&quot; 标签的所有Pod流量</span></span><br><span class="line">    <span class="bullet">-</span> <span class="attr">podSelector:</span></span><br><span class="line">        <span class="attr">matchLabels:</span></span><br><span class="line">          <span class="attr">role:</span> <span class="string">apps</span></span><br><span class="line">    <span class="attr">ports:</span></span><br><span class="line">    <span class="bullet">-</span> <span class="attr">protocol:</span> <span class="string">TCP</span></span><br><span class="line">      <span class="attr">port:</span> <span class="number">8080</span></span><br><span class="line">  <span class="attr">egress:</span></span><br><span class="line">  <span class="comment"># 允许data这个namespace下，带有&quot;role=data_centerevent&quot;的所有Pod到以下CIDR的流出流量</span></span><br><span class="line">  <span class="bullet">-</span> <span class="attr">to:</span></span><br><span class="line">    <span class="bullet">-</span> <span class="attr">ipBlock:</span></span><br><span class="line">        <span class="attr">cidr:</span> <span class="number">10.0</span><span class="number">.0</span><span class="number">.0</span><span class="string">/24</span></span><br><span class="line">    <span class="attr">ports:</span></span><br><span class="line">    <span class="bullet">-</span> <span class="attr">protocol:</span> <span class="string">TCP</span></span><br><span class="line">      <span class="attr">port:</span> <span class="number">6379</span></span><br></pre></td></tr></table></figure></li>
+</ul>
+<h3 id="三、实现方案与难点"><a href="#三、实现方案与难点" class="headerlink" title="三、实现方案与难点"></a>三、实现方案与难点</h3><h4 id="实现难点"><a href="#实现难点" class="headerlink" title="实现难点"></a>实现难点</h4><ul>
+<li>ACK 集群都为托管版，无法通过自行修改配置更改CNI 插件。且更改CNI 插件可能会导致当前网络模型变动造成未知异常</li>
+<li>阿里云ACK 集群有两种CNI 网络插件：Flannel、Terway。阿里云的ACK 集群上面只有Terway 集群支持NetworkPolicy。</li>
+<li>已有网络插件无法平滑进行切换，只能通过删除集群重建物理层的方式重新改为 Terway 集群。</li>
+</ul>
+<h4 id="迁移可行性方案思考"><a href="#迁移可行性方案思考" class="headerlink" title="迁移可行性方案思考"></a>迁移可行性方案思考</h4><ul>
+<li>由于当前集群网络规划冲突且复杂，建议使用重建集群方式。新建一个全新规划的集群然后将应用进行迁移：<ul>
+<li>无状态应用且无外部调用需求类应用，直接进行部署迁移</li>
+<li>部分无依赖&#x2F;弱依赖 应用，使用打包应用群组的方式在新集群进行部署，且新建全新SLB接入新集群应用，通过切换域名解析&#x2F;修改IP 方式将流量切入新集群应用。</li>
+</ul>
+</li>
+</ul>
+<h4 id="参考："><a href="#参考：" class="headerlink" title="参考："></a>参考：</h4><ol>
+<li>Kubernetes 官网：<a target="_blank" rel="noopener" href="https://kubernetes.io/zh/docs/concepts/services-networking/network-policies/">https://kubernetes.io/zh/docs/concepts/services-networking/network-policies/</a></li>
+<li>阿里云官网：<a target="_blank" rel="noopener" href="https://help.aliyun.com/document_detail/97621.html">https://help.aliyun.com/document_detail&#x2F;97621.html</a></li>
+<li>NetworkPolicy 支持的CNI 插件：<a target="_blank" rel="noopener" href="https://www.qikqiak.com/k8strain/network/networkpolicy/">https://www.qikqiak.com/k8strain/network/networkpolicy/</a></li>
+<li>阿里云官网（Terway 集群网络规划策略）：<a target="_blank" rel="noopener" href="https://help.aliyun.com/document_detail/86500.html">https://help.aliyun.com/document_detail&#x2F;86500.html</a></li>
+</ol>
+
+    </div>
+
+    
+    
+    
+        
+
+<div>
+<ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>本文作者： </strong>Yakir
+  </li>
+  <li class="post-copyright-link">
+    <strong>本文链接：</strong>
+    <a href="https://359sun.top/posts/8aa0.html" title="NetworkPolicy隔离策略">https://359sun.top/posts/8aa0.html</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" rel="noopener" target="_blank"><i class="fab fa-fw fa-creative-commons"></i>BY-NC-SA</a> 许可协议。转载请注明出处！
+  </li>
+</ul>
+</div>
+
+        
+
+  <div class="followme">
+    <p>欢迎关注我的其它发布渠道</p>
+
+    <div class="social-list">
+
+        <div class="social-item">
+          <a target="_blank" class="social-link" href="/atom.xml">
+            <span class="icon">
+              <i class="fa fa-rss"></i>
+            </span>
+
+            <span class="label">RSS</span>
+          </a>
+        </div>
+    </div>
+  </div>
+
+
+      <footer class="post-footer">
+          
+          <div class="post-tags">
+              <!-- <a href="/tags/%E9%98%BF%E9%87%8C%E4%BA%91/" rel="tag"><i class="fa fa-tag"></i> 阿里云</a> -->
+              <a href="/tags/%E9%98%BF%E9%87%8C%E4%BA%91/" rel="tag"><i class="fa fa-tag"></i> 阿里云</a>
+              <!-- <a href="/tags/k8s/" rel="tag"><i class="fa fa-tag"></i> K8S</a> -->
+              <a href="/tags/k8s/" rel="tag"><i class="fa fa-tag"></i> K8S</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/posts/fa45.html" rel="prev" title="K8S-RBAC权限控制">
+      <i class="fa fa-chevron-left"></i> K8S-RBAC权限控制
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/posts/9a8h.html" rel="next" title="promotheus组件-grafana大盘配置监控大盘与告警通知">
+      promotheus组件-grafana大盘配置监控大盘与告警通知 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+    <div class="comments" id="gitalk-container"></div>
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%B8%80%E3%80%81%E8%83%8C%E6%99%AF"><span class="nav-text">一、背景</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#1%EF%BC%89%E5%BD%93%E5%89%8D%E4%BA%91%E7%8E%AF%E5%A2%83ACK-%E9%9B%86%E7%BE%A4%E4%BD%BF%E7%94%A8%E7%8E%B0%E7%8A%B6%E5%92%8C%E7%97%9B%E7%82%B9"><span class="nav-text">1）当前云环境ACK 集群使用现状和痛点</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2%EF%BC%89%E5%AE%9E%E7%8E%B0%E9%9A%94%E7%A6%BB%E7%AD%96%E7%95%A5%E4%BB%B7%E5%80%BC"><span class="nav-text">2）实现隔离策略价值</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BA%8C%E3%80%81%E6%A6%82%E5%BF%B5%E7%90%86%E8%A7%A3"><span class="nav-text">二、概念理解</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#1%EF%BC%89CNI-%E6%8F%92%E4%BB%B6"><span class="nav-text">1）CNI 插件</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2%EF%BC%89Terway%E4%B8%8EFlannel%E5%AF%B9%E6%AF%94"><span class="nav-text">2）Terway与Flannel对比</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#3%EF%BC%89NetworkPolicy-%E5%AE%9E%E7%8E%B0%E6%96%B9%E5%BC%8F"><span class="nav-text">3）NetworkPolicy 实现方式</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%B8%89%E3%80%81%E5%AE%9E%E7%8E%B0%E6%96%B9%E6%A1%88%E4%B8%8E%E9%9A%BE%E7%82%B9"><span class="nav-text">三、实现方案与难点</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%AE%9E%E7%8E%B0%E9%9A%BE%E7%82%B9"><span class="nav-text">实现难点</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E8%BF%81%E7%A7%BB%E5%8F%AF%E8%A1%8C%E6%80%A7%E6%96%B9%E6%A1%88%E6%80%9D%E8%80%83"><span class="nav-text">迁移可行性方案思考</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%8F%82%E8%80%83%EF%BC%9A"><span class="nav-text">参考：</span></a></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Yakir"
+      src="/images/avatar.jpg">
+  <p class="site-author-name" itemprop="name">Yakir</p>
+  <div class="site-description" itemprop="description">Yakir Blog</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">6</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">2</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">3</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/yakir3" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;yakir3" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="/atom.xml" title="RSS → &#x2F;atom.xml"><i class="fa fa-rss fa-fw"></i>RSS</a>
+      </span>
+  </div>
+
+
+
+  <div class="links-of-blogroll motion-element links-of-blogroll-block">
+    <div class="links-of-blogroll-title">
+      <!-- modify icon to fire by szw -->
+      <i class="fa fa-history fa-" aria-hidden="true"></i>
+      近期文章
+    </div>
+    <ul class="links-of-blogroll-list">
+      
+      
+        <li class="recent_posts_li">
+          <!--<a href="/" title="" target="_blank"></a>-->
+        </li>
+      
+        <li class="recent_posts_li">
+          <!--<a href="/" title="" target="_blank"></a>-->
+        </li>
+      
+        <li class="recent_posts_li">
+          <!--<a href="/" title="" target="_blank"></a>-->
+        </li>
+      
+    </ul>
+  </div>
+
+
+
+
+      </div>
+        <div class="back-to-top motion-element">
+          <i class="fa fa-arrow-up"></i>
+          <span>0%</span>
+        </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2022</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Yakir</span>
+</div>
+  <div class="powered-by">Powered by Hexo Next
+  </div>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/jquery@3/dist/jquery.min.js"></script>
+  <script src="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/lozad@1/dist/lozad.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+<link rel="stylesheet" href="//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.css">
+
+<script>
+NexT.utils.loadComments(document.querySelector('#gitalk-container'), () => {
+  NexT.utils.getScript('//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.js', () => {
+    var gitalk = new Gitalk({
+      clientID    : 'dc69ab400b19bd3a1bab',
+      clientSecret: '5a20b4b4faa303672257572d4df0be83b97061cb',
+      repo        : 'yakir3.github.io',
+      owner       : 'yakir3',
+      admin       : ['yakir3'],
+      id          : 'e199843e3187936e6e4265783956dc4a',
+        language: 'zh-CN',
+      distractionFreeMode: true
+    });
+    gitalk.render('gitalk-container');
+  }, window.Gitalk);
+});
+</script>
+
+</body>
+</html>
