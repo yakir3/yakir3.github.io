@@ -6,7 +6,7 @@
   <link href="https://359sun.top/atom.xml" rel="self"/>
   
   <link href="https://359sun.top/"/>
-  <updated>2022-03-26T03:23:39.591Z</updated>
+  <updated>2022-05-04T13:33:35.013Z</updated>
   <id>https://359sun.top/</id>
   
   <author>
@@ -15,6 +15,31 @@
   </author>
   
   <generator uri="https://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>git flow 工作流理解</title>
+    <link href="https://359sun.top/posts/539.html"/>
+    <id>https://359sun.top/posts/539.html</id>
+    <published>2022-05-04T13:14:23.000Z</published>
+    <updated>2022-05-04T13:33:35.013Z</updated>
+    
+    
+      
+      
+        
+        
+    <summary type="html">&lt;link rel=&quot;stylesheet&quot; class=&quot;aplayer-secondary-style-marker&quot; href=&quot;/assets/css/APlayer.min.css&quot;&gt;&lt;script src=&quot;/assets/js/APlayer.min.js&quot;</summary>
+        
+      
+    
+    
+    
+    <category term="Linux" scheme="https://359sun.top/categories/linux/"/>
+    
+    
+    <category term="git" scheme="https://359sun.top/tags/git/"/>
+    
+  </entry>
   
   <entry>
     <title>阿里云-RAM与STS权限</title>
