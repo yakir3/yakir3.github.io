@@ -198,6 +198,110 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://359sun.top/posts/64a8.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.jpg">
+      <meta itemprop="name" content="Yakir">
+      <meta itemprop="description" content="Yakir Blog">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Yakir Blog">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/posts/64a8.html" class="post-title-link" itemprop="url">VPC 网络规划案例</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2022-05-04 22:17:00" itemprop="dateCreated datePublished" datetime="2022-05-04T22:17:00+08:00">2022-05-04</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2022-05-05 22:30:04" itemprop="dateModified" datetime="2022-05-05T22:30:04+08:00">2022-05-05</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E7%BD%91%E7%BB%9C/" itemprop="url" rel="index"><span itemprop="name">网络</span></a>
+                </span>
+            </span>
+
+          <br>
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+                <span class="post-meta-item-text">本文字数：</span>
+              <span>1.4k</span>
+            </span>
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+                <span class="post-meta-item-text">阅读时长 &asymp;</span>
+              <span>1 分钟</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h3 id="网段规划概述"><a href="#网段规划概述" class="headerlink" title="网段规划概述"></a>网段规划概述</h3><h4 id="1）规划网段的目的"><a href="#1）规划网段的目的" class="headerlink" title="1）规划网段的目的"></a>1）规划网段的目的</h4><ul>
+<li>方便查看管理，相当于对某一个&#x2F;多个IDC 机房的IP 规划，根据IP 地址可以一目了然的判断出归属。</li>
+<li>便于同集群&#x2F;VPC 内网段判断网络、路由走向、以及网络隔离策略（白名单）。</li>
+<li>区分多VPC&#x2F;网络 环境，方便在打通网络时区分子网网段。</li>
+</ul>
+<h4 id="2）规范化设计的方式"><a href="#2）规范化设计的方式" class="headerlink" title="2）规范化设计的方式"></a>2）规范化设计的方式</h4><p>首先需要分清两类，是否有ACK 等集群类资源单独规划：</p>
+<ol>
+<li>如无集群资源（即只有RDS、ECS 等常规资源），按正常内网网段定义VPC与交换机即可</li>
+<li>有集群资源，最好划分单独交换机部署常规资源，<strong>独立交换机</strong>部署集群资源。</li>
+</ol>
+          <!--noindex-->
+            <div class="post-button">
+              <a class="btn" href="/posts/64a8.html#more" rel="contents">
+                阅读全文 &raquo;
+              </a>
+            </div>
+          <!--/noindex-->
+        
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
     <link itemprop="mainEntityOfPage" href="https://359sun.top/posts/ce0f.html">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -221,10 +325,16 @@
                 <i class="far fa-calendar"></i>
               </span>
               <span class="post-meta-item-text">发表于</span>
-              
 
-              <time title="创建时间：2022-05-04 21:46:04 / 修改时间：21:57:27" itemprop="dateCreated datePublished" datetime="2022-05-04T21:46:04+08:00">2022-05-04</time>
+              <time title="创建时间：2022-05-04 21:46:04" itemprop="dateCreated datePublished" datetime="2022-05-04T21:46:04+08:00">2022-05-04</time>
             </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2022-05-05 22:30:50" itemprop="dateModified" datetime="2022-05-05T22:30:50+08:00">2022-05-05</time>
+              </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
                 <i class="far fa-folder"></i>
@@ -312,10 +422,16 @@
                 <i class="far fa-calendar"></i>
               </span>
               <span class="post-meta-item-text">发表于</span>
-              
 
-              <time title="创建时间：2022-05-04 21:14:23 / 修改时间：21:47:38" itemprop="dateCreated datePublished" datetime="2022-05-04T21:14:23+08:00">2022-05-04</time>
+              <time title="创建时间：2022-05-04 21:14:23" itemprop="dateCreated datePublished" datetime="2022-05-04T21:14:23+08:00">2022-05-04</time>
             </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2022-05-05 22:30:35" itemprop="dateModified" datetime="2022-05-05T22:30:35+08:00">2022-05-05</time>
+              </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
                 <i class="far fa-folder"></i>
@@ -419,7 +535,7 @@
                   <i class="far fa-calendar-check"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2022-05-03 21:20:22" itemprop="dateModified" datetime="2022-05-03T21:20:22+08:00">2022-05-03</time>
+                <time title="修改时间：2022-05-05 22:32:18" itemprop="dateModified" datetime="2022-05-05T22:32:18+08:00">2022-05-05</time>
               </span>
 
           <br>
@@ -515,7 +631,7 @@
                   <i class="far fa-calendar-check"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2022-05-03 21:20:22" itemprop="dateModified" datetime="2022-05-03T21:20:22+08:00">2022-05-03</time>
+                <time title="修改时间：2022-05-05 22:31:56" itemprop="dateModified" datetime="2022-05-05T22:31:56+08:00">2022-05-05</time>
               </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -560,7 +676,7 @@
 </li>
 </ul>
 <h3 id="二、操作过程"><a href="#二、操作过程" class="headerlink" title="二、操作过程"></a>二、操作过程</h3><h4 id="1）接入Prometheus-组件监控，获取数据指标"><a href="#1）接入Prometheus-组件监控，获取数据指标" class="headerlink" title="1）接入Prometheus 组件监控，获取数据指标"></a>1）接入Prometheus 组件监控，获取数据指标</h4><ul>
-<li>进入云产品 <strong>Prometheus监控服务</strong>，选择对应集群。（ACK集群需要先安装Prometheus 监控组件，安装参考：<a target="_blank" rel="noopener" href="https://help.aliyun.com/document_detail/161304.html">ARMS Prometheus监控</a>）<img data-src="/posts/9a8h/1.png" class title="img.png"></li>
+<li>进入云产品 <strong>Prometheus监控服务</strong>，选择对应集群。（ACK集群需要先安装Prometheus 监控组件，安装参考：<a target="_blank" rel="noopener" href="https://help.aliyun.com/document_detail/161304.html">ARMS Prometheus监控</a>）<img data-src="/posts/9a8h/1.png" class></li>
 </ul>
           <!--noindex-->
             <div class="post-button">
@@ -619,7 +735,7 @@
                   <i class="far fa-calendar-check"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2022-05-03 21:20:22" itemprop="dateModified" datetime="2022-05-03T21:20:22+08:00">2022-05-03</time>
+                <time title="修改时间：2022-05-05 22:31:43" itemprop="dateModified" datetime="2022-05-05T22:31:43+08:00">2022-05-05</time>
               </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -728,7 +844,7 @@
                   <i class="far fa-calendar-check"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2022-05-03 21:20:22" itemprop="dateModified" datetime="2022-05-03T21:20:22+08:00">2022-05-03</time>
+                <time title="修改时间：2022-05-05 22:31:22" itemprop="dateModified" datetime="2022-05-05T22:31:22+08:00">2022-05-05</time>
               </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -765,7 +881,7 @@
     <div class="post-body" itemprop="articleBody">
 
       
-          <h3 id="一、RBAC简易概述"><a href="#一、RBAC简易概述" class="headerlink" title="一、RBAC简易概述"></a>一、RBAC简易概述</h3><img data-src="/posts/fa45/gaisu.png" class title="概述">
+          <h3 id="一、RBAC简易概述"><a href="#一、RBAC简易概述" class="headerlink" title="一、RBAC简易概述"></a>一、RBAC简易概述</h3><img data-src="/posts/fa45/gaisu.png" class>
 <h4 id="1-RBAC-四种-API-对象"><a href="#1-RBAC-四种-API-对象" class="headerlink" title="1) RBAC 四种 API 对象"></a>1) RBAC 四种 API 对象</h4><ul>
 <li>Role：一组权限的集合，在一个命名空间中，可以用其来定义一个角色，只能对命名空间内的资源进行授权。如果是集群级别的资源，则需要使用ClusterRole。例如：定义一个角色用来读取Pod的权限</li>
 <li>ClusterRole：具有和角色一致的命名空间资源的管理能力，还可用于以下特殊元素的授权<ul>
@@ -959,14 +1075,14 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">7</span>
+          <span class="site-state-item-count">8</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
       <div class="site-state-item site-state-categories">
             <a href="/categories/">
           
-        <span class="site-state-item-count">2</span>
+        <span class="site-state-item-count">3</span>
         <span class="site-state-item-name">分类</span></a>
       </div>
       <div class="site-state-item site-state-tags">

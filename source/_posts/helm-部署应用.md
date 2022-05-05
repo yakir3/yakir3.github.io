@@ -124,7 +124,7 @@ helm install -f values.yaml <本地仓库名称>/<Chart 名称> --version <Chart
 
 - 应用app-test 目录结构
 
-{% asset_img helm1.png img.png %}
+{% asset_img helm1.png %}
 
 - 关键配置信息
 ```yaml
@@ -195,7 +195,7 @@ affinity: {}
 
 - 配置远程ACR 企业版仓库，参考 [Helm安装部署](#ht9xj) 部分。
 
-{% asset_img helm2.png img.png %}
+{% asset_img helm2.png %}
 
 - 部署应用
    - 执行部署命令
@@ -204,11 +204,11 @@ helm install app-test aliyun-acr-repo/app-test --version 20211228100329-daily --
 ```
 
    - 部署结果
-{% asset_img helm3.png img.png %}
-{% asset_img helm4.png img.png %}
+{% asset_img helm3.png %}
+{% asset_img helm4.png %}
 
 - 更新版本
-{% asset_img helm5.png img.png %}
+{% asset_img helm5.png %}
 
 ### 三、问题点
 

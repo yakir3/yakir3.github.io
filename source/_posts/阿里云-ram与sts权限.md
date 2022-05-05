@@ -25,7 +25,7 @@ categories:
 - **RAM角色**：虚拟用户，向信任的RAM实体账号进行授权（根据STS令牌颁发短时有效的临时访问token）；创建角色后会生成Arn描述符（角色的描述符：每个RAM角色存在唯一值且遵循阿里云arn命名规范）。
 - RAM权限策略：一组权限集，使用简单的Policy语法进行描述（分为系统策略和自定义策略）；权限策略是实际细分授权资源集、操作集、授权条件的描述。
 
-{% asset_img ram1.png img.png %}
+{% asset_img ram1.png %}
 
 > 创建RAM角色时有三种类型：
 > - **阿里云账号**：允许RAM用户所扮演的角色。扮演角色的RAM用户可以属于自己的阿里云账号，也可以属于其他阿里云账号。此类角色主要用来解决跨账号访问和临时授权问题
@@ -34,7 +34,7 @@ categories:
 >    - 服务关联角色：您只需选择受信的云服务，云服务会自带预设的角色名称和权限策略
 >    - 两种服务角色没太大区别，服务关联角色会多一个预设的配置（一般服务角色用户阿里云跨服务间的调用，例如ECS的授予/收回RAM角色功能、RDS云服务调用KMS角色加密等，从某个云产品调用另一个云产品的授权）
 > 
-{% asset_img ram2.png img.png %}
+{% asset_img ram2.png %}
 > - **身份提供商**：允许可信身份提供商下的用户所扮演的角色。此类角色主要用于实现与阿里云的单点登录（SSO）
 > 
 > **常用的RAM角色一般为创建 阿里云账号 方式（OSS官方推荐使用）**
@@ -56,23 +56,23 @@ OSS授权目录：dir111/dir111_secondline1/
 - 创建RAM用户（子账号），生成AK SK （此步骤忽略）
 - 测试账号添加STS权限
 
-{% asset_img ram3.png img.png %}
+{% asset_img ram3.png %}
 
 - 添加权限策略，使用自定义策略授权（OSS官方示例Policy：[https://help.aliyun.com/document_detail/266627.html](https://help.aliyun.com/document_detail/266627.html)）
 
-{% asset_img ram4.png img.png %}
+{% asset_img ram4.png %}
 
 - 添加RAM角色并授权Policy
 
-{% asset_img ram5.png img.png %}
+{% asset_img ram5.png %}
 
-{% asset_img ram6.png img.png %}
+{% asset_img ram6.png %}
 
 3）测试验证（控制台无法登录RAM账号验证权限情况下，可以使用ossutil或ossbrowser工具进行验证）
 
 - ossutil使用：[https://help.aliyun.com/document_detail/50451.html](https://help.aliyun.com/document_detail/50451.html)
 
-{% asset_img ram7.png img.png %}
+{% asset_img ram7.png %}
 
 - ossbrowser使用：[https://help.aliyun.com/document_detail/92268.html](https://help.aliyun.com/document_detail/92268.html)
 
@@ -85,7 +85,7 @@ OSS授权目录：dir111/dir111_secondline1/
 > 1. 客户端使用STS发起调用时，会验证两个部分的权限策略Policy （注意：最后的权限取这两个权限Policy的交集）
 > - STS扮演的角色本身授权的权限策略是否拥有对应云资源的权限（系统或自定义的Policy）
 > - SDK/API调用时传入的policy_text参数值，在构造调用请求时传入（[https://help.aliyun.com/document_detail/100624.html](https://help.aliyun.com/document_detail/100624.html)
-> {% asset_img ram8.png img.png %}
+> {% asset_img ram8.png %}
 
 
 ### 四、结合实际需求

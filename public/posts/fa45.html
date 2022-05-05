@@ -41,7 +41,7 @@
 <meta property="og:image" content="https://359sun.top/posts/fa45/de4222775e67.png">
 <meta property="og:image" content="https://359sun.top/posts/fa45/ab8f20ce2acc.png">
 <meta property="article:published_time" content="2022-03-01T15:55:02.000Z">
-<meta property="article:modified_time" content="2022-05-03T13:20:22.236Z">
+<meta property="article:modified_time" content="2022-05-05T14:31:22.725Z">
 <meta property="article:author" content="Yakir">
 <meta property="article:tag" content="阿里云">
 <meta property="article:tag" content="K8S">
@@ -244,7 +244,7 @@
                   <i class="far fa-calendar-check"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2022-05-03 21:20:22" itemprop="dateModified" datetime="2022-05-03T21:20:22+08:00">2022-05-03</time>
+                <time title="修改时间：2022-05-05 22:31:22" itemprop="dateModified" datetime="2022-05-05T22:31:22+08:00">2022-05-05</time>
               </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -288,7 +288,7 @@
     <div class="post-body" itemprop="articleBody">
 
       
-        <h3 id="一、RBAC简易概述"><a href="#一、RBAC简易概述" class="headerlink" title="一、RBAC简易概述"></a>一、RBAC简易概述</h3><img data-src="/posts/fa45/gaisu.png" class title="概述">
+        <h3 id="一、RBAC简易概述"><a href="#一、RBAC简易概述" class="headerlink" title="一、RBAC简易概述"></a>一、RBAC简易概述</h3><img data-src="/posts/fa45/gaisu.png" class>
 <h4 id="1-RBAC-四种-API-对象"><a href="#1-RBAC-四种-API-对象" class="headerlink" title="1) RBAC 四种 API 对象"></a>1) RBAC 四种 API 对象</h4><ul>
 <li>Role：一组权限的集合，在一个命名空间中，可以用其来定义一个角色，只能对命名空间内的资源进行授权。如果是集群级别的资源，则需要使用ClusterRole。例如：定义一个角色用来读取Pod的权限</li>
 <li>ClusterRole：具有和角色一致的命名空间资源的管理能力，还可用于以下特殊元素的授权<ul>
@@ -349,7 +349,7 @@
 </li>
 </ul>
 <p>可通过 kubectl get –raw &#x2F;apis&#x2F;rbac.authorization.k8s.io&#x2F;v1 可以获取到 RBAC 四个 API 资源对象的相关信息，如下图：</p>
-<img data-src="/posts/fa45/c31775e8bbe3.png" class title="img.png">
+<img data-src="/posts/fa45/c31775e8bbe3.png" class>
 
 <blockquote>
 <p>创建资源&#x2F;信息的方式</p>
@@ -360,18 +360,18 @@
 </blockquote>
 <h3 id="二、ServiceAccount-测试"><a href="#二、ServiceAccount-测试" class="headerlink" title="二、ServiceAccount 测试"></a>二、ServiceAccount 测试</h3><h4 id="1-创建-serviceaccount-账户并进行对应授权"><a href="#1-创建-serviceaccount-账户并进行对应授权" class="headerlink" title="1) 创建 serviceaccount 账户并进行对应授权"></a>1) 创建 serviceaccount 账户并进行对应授权</h4><ol>
 <li><p>创建 serviceaccount 账户 camel-sva （只需defalut namespace）<br>执行命令：kubectl create serviceaccount camel-sva -n default</p>
-<img data-src="/posts/fa45/634be995b5bc.png" class title="img.png">
+<img data-src="/posts/fa45/634be995b5bc.png" class>
 </li>
 <li><p>创建 role 角色 （授权Integration、Kamelet、KameletBinding 3种资源的 curd 权限）<br>执行命令：kubectl create role camel-sva-role –verb&#x3D;* –resource&#x3D;integrations,kamelets,kameletbindings </p>
-<img data-src="/posts/fa45/21812e1bbfad.png" class title="img.png">
+<img data-src="/posts/fa45/21812e1bbfad.png" class>
 </li>
 <li><p>绑定集群权限<br>命令：kubectl create rolebinding camel-sva-rolebinding –role&#x3D;camel-sva-role –serviceaccount&#x3D;default:camel-sva</p>
-<img data-src="/posts/fa45/7528aa1bf3da.png" class title="img.png">
+<img data-src="/posts/fa45/7528aa1bf3da.png" class>
 </li>
 <li><p>查看账号 secret 信息<br>命令：kubectl get secret&#x2F;camel-sva-token-mdt28 -oyaml</p>
-<img data-src="/posts/fa45/de3ebdd4f016.png" class title="img.png">
+<img data-src="/posts/fa45/de3ebdd4f016.png" class>
 <p>将获取到的 token 值进行 base64 解码后即可用来调用 apiserver 接口，如下图（接口可通过 kubectl get –raw &#x2F;apis&#x2F; 进行获取）：</p>
-<img data-src="/posts/fa45/1572c2ebc891.png" class title="img.png"></li>
+<img data-src="/posts/fa45/1572c2ebc891.png" class></li>
 </ol>
 <h4 id="2-创建用户认证的-kubeconfig-文件"><a href="#2-创建用户认证的-kubeconfig-文件" class="headerlink" title="2) 创建用户认证的 kubeconfig 文件"></a>2) 创建用户认证的 kubeconfig 文件</h4><ol>
 <li><p>创建集群配置文件<br>命令：kubectl config set-cluster kubernetes –certificate-authority&#x3D;&#x2F;etc&#x2F;kubernetes&#x2F;pki&#x2F;ca.crt –server&#x3D;”<a href="https://10.0.0.142:6443&quot;">https://10.0.0.142:6443&quot;</a> –embed-certs&#x3D;true –kubeconfig&#x3D;.&#x2F;camel-sva.conf</p>
@@ -386,11 +386,11 @@
 </li>
 </ol>
 <p>执行完上述命令后即在当前目录生成配置文件：camel-sva.conf，可 copy 到 kubeconfig对应目录，进行操作。</p>
-<img data-src="/posts/fa45/d6da8c845c41.png" class title="img.png">
+<img data-src="/posts/fa45/d6da8c845c41.png" class>
 <p>使用该配置文件进行 kubectl 命令操作，即可验证用户只拥有对应资源的操作权限。</p>
-<img data-src="/posts/fa45/de4222775e67.png" class title="img.png">
+<img data-src="/posts/fa45/de4222775e67.png" class>
 
-<h4 id="3-API-对象结构"><a href="#3-API-对象结构" class="headerlink" title="3) API 对象结构"></a>3) API 对象结构</h4><img data-src="/posts/fa45/ab8f20ce2acc.png" class title="img.png">
+<h4 id="3-API-对象结构"><a href="#3-API-对象结构" class="headerlink" title="3) API 对象结构"></a>3) API 对象结构</h4><img data-src="/posts/fa45/ab8f20ce2acc.png" class>
 
 
 <h3 id="三、参考学习"><a href="#三、参考学习" class="headerlink" title="三、参考学习"></a>三、参考学习</h3><ol>
@@ -538,14 +538,14 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">7</span>
+          <span class="site-state-item-count">8</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
       <div class="site-state-item site-state-categories">
             <a href="/categories/">
           
-        <span class="site-state-item-count">2</span>
+        <span class="site-state-item-count">3</span>
         <span class="site-state-item-name">分类</span></a>
       </div>
       <div class="site-state-item site-state-tags">

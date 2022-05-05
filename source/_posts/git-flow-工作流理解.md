@@ -17,12 +17,12 @@ date: 2022-05-04 21:14:23
 <!--more-->
 2. GitFlow流程图及描述理解
 
-{% asset_img gf1.png img.png %}
-{% asset_img gf2.png img.png %}
+{% asset_img gf1.png %}
+{% asset_img gf2.png %}
 
 - master：主干分支 
 
-{% asset_img gf3.png img.png %}
+{% asset_img gf3.png %}
 
    - 最稳定分支、功能完整、可随时发布线上环境（只读分支，只能从hotfix/release合并 不能修改）
    - 在master分支上的推送应该打tag记录追溯；
@@ -35,14 +35,14 @@ date: 2022-05-04 21:14:23
 
 - feature：功能开发分支 
 
-{% asset_img gf4.png img.png %}
+{% asset_img gf4.png %}
 
    - 开发某部分新功能，基于develop分支克隆，功能开发完毕且本地自测通过（编译完成且无异常）合并到develop分支；
    - 可存在多个feature分支，即团队多人同时开发创建多个临时分支，功能完成后可选删除；
 
 - release：测试分支 
 
-{% asset_img gf5.png img.png %}
+{% asset_img gf5.png %}
 
    - 用于提交给测试人员进行功能测试，基于feature分支合并到develop之后，从develop分支克隆；
    - 测试过程发现BUG在本分支进行修复，修复时创建修复分支bugfix-*，修复完所有bug上线后一次性合并到develop/master分支并推送（完成功能），推送master分支时打tag；
@@ -50,7 +50,7 @@ date: 2022-05-04 21:14:23
 
 - hotfix：补丁分支 
 
-{% asset_img gf6.png img.png %}
+{% asset_img gf6.png %}
 
    - 基于master分支克隆，主要用于线上版本进行BUG修复；
    - 修复bug后合并到develop/master分支并推送（所有hotfix分支的修改会进入到下一个release），推送master分支时打tag；
@@ -72,29 +72,29 @@ date: 2022-05-04 21:14:23
 
 - 本地git flow init 初始化仓库，提交develop分支
 
-{% asset_img gf7.png img.png %}
-{% asset_img gf8.png img.png %}
+{% asset_img gf7.png %}
+{% asset_img gf8.png %}
 
 - 提交到远程测试用github仓库（使用ssh公钥认证方式），可以看到develop分支已有第一次提交
 
-{% asset_img gf9.png img.png %}
+{% asset_img gf9.png %}
 
 - 到tmp目录下新建工作目录，并clone下远程仓库到本地（模拟本地开发）
 
-{% asset_img gf10.png img.png %}
+{% asset_img gf10.png %}
 
 - 初始化仓库后，拉取develop分支到本地进行开发。此时可以切出feature分支进行功能开发
 
-{% asset_img gf11.png img.png %}
-{% asset_img gf12.png img.png %}
+{% asset_img gf11.png %}
+{% asset_img gf12.png %}
 
 - 开发功能提交后进行提交到远程仓库并track远程分支。后续可以git push持续提交
 
-{% asset_img gf13.png img.png %}
-{% asset_img gf14.png img.png %}
+{% asset_img gf13.png %}
+{% asset_img gf14.png %}
 
 - 功能开发完成后，将分支合并到develop分支并删除本地feature分支（加上-F参数可以同时删除远程分支）
 
-{% asset_img gf15.png img.png %}
+{% asset_img gf15.png %}
 finish提交后即将新功能合并到develop分支，完成新功能开发。后续即执行release发布操作，步骤类似
 

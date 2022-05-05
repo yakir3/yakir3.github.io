@@ -9,7 +9,7 @@ abbrlink: fa45
 date: 2022-03-01 23:55:02
 ---
 ### 一、RBAC简易概述
-{% asset_img gaisu.png 概述 %}
+{% asset_img gaisu.png %}
 #### 1) RBAC 四种 API 对象
 
 - Role：一组权限的集合，在一个命名空间中，可以用其来定义一个角色，只能对命名空间内的资源进行授权。如果是集群级别的资源，则需要使用ClusterRole。例如：定义一个角色用来读取Pod的权限
@@ -74,7 +74,7 @@ rules:
 > 
 
 可通过 kubectl get --raw /apis/rbac.authorization.k8s.io/v1 可以获取到 RBAC 四个 API 资源对象的相关信息，如下图：
-{% asset_img c31775e8bbe3.png img.png %}
+{% asset_img c31775e8bbe3.png %}
 
 > 创建资源/信息的方式
 > - 方式一：kubectl create -f xxx.yaml       -->   文件方式创建
@@ -85,21 +85,21 @@ rules:
 #### 1) 创建 serviceaccount 账户并进行对应授权
 1. 创建 serviceaccount 账户 camel-sva （只需defalut namespace）
 执行命令：kubectl create serviceaccount camel-sva -n default
-{% asset_img 634be995b5bc.png img.png %}
+{% asset_img 634be995b5bc.png %}
 
 2. 创建 role 角色 （授权Integration、Kamelet、KameletBinding 3种资源的 curd 权限）
 执行命令：kubectl create role camel-sva-role --verb=\* --resource=integrations,kamelets,kameletbindings 
-{% asset_img 21812e1bbfad.png img.png %}
+{% asset_img 21812e1bbfad.png %}
 
 3. 绑定集群权限
 命令：kubectl create rolebinding camel-sva-rolebinding --role=camel-sva-role --serviceaccount=default:camel-sva
-{% asset_img 7528aa1bf3da.png img.png %}
+{% asset_img 7528aa1bf3da.png %}
 
 4. 查看账号 secret 信息
 命令：kubectl get secret/camel-sva-token-mdt28 -oyaml
-{% asset_img de3ebdd4f016.png img.png %}
+{% asset_img de3ebdd4f016.png %}
 将获取到的 token 值进行 base64 解码后即可用来调用 apiserver 接口，如下图（接口可通过 kubectl get --raw /apis/ 进行获取）：
-{% asset_img 1572c2ebc891.png img.png %}
+{% asset_img 1572c2ebc891.png %}
 
 #### 2) 创建用户认证的 kubeconfig 文件
 1. 创建集群配置文件
@@ -118,12 +118,12 @@ kubectl config set-context camel-sva@kubernetes --cluster=kubernetes --user=came
 命令：kubectl config use-context camel-sva@kubernetes --kubeconfig=./camel-sva.conf
 
 执行完上述命令后即在当前目录生成配置文件：camel-sva.conf，可 copy 到 kubeconfig对应目录，进行操作。
-{% asset_img d6da8c845c41.png img.png %}
+{% asset_img d6da8c845c41.png %}
 使用该配置文件进行 kubectl 命令操作，即可验证用户只拥有对应资源的操作权限。
-{% asset_img de4222775e67.png img.png %}
+{% asset_img de4222775e67.png %}
 
 #### 3) API 对象结构
-{% asset_img ab8f20ce2acc.png img.png %}
+{% asset_img ab8f20ce2acc.png %}
 
 
 ### 三、参考学习
