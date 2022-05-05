@@ -26,13 +26,13 @@
 <ol start="2">
 <li>GitFlow流程图及描述理解</li>
 </ol>
-<img data-src="/posts/539/gf1.png" class title="img.png">
-<img data-src="/posts/539/gf2.png" class title="img.png">
+<img data-src="/posts/539/gf1.png" class>
+<img data-src="/posts/539/gf2.png" class>
 
 <ul>
 <li>master：主干分支</li>
 </ul>
-<img data-src="/posts/539/gf3.png" class title="img.png">
+<img data-src="/posts/539/gf3.png" class>
 
 <ul>
 <li><p>最稳定分支、功能完整、可随时发布线上环境（只读分支，只能从hotfix&#x2F;release合并 不能修改）</p>
@@ -50,7 +50,7 @@
 <li><p>feature：功能开发分支</p>
 </li>
 </ul>
-<img data-src="/posts/539/gf4.png" class title="img.png">
+<img data-src="/posts/539/gf4.png" class>
 
 <ul>
 <li><p>开发某部分新功能，基于develop分支克隆，功能开发完毕且本地自测通过（编译完成且无异常）合并到develop分支；</p>
@@ -60,7 +60,7 @@
 <li><p>release：测试分支</p>
 </li>
 </ul>
-<img data-src="/posts/539/gf5.png" class title="img.png">
+<img data-src="/posts/539/gf5.png" class>
 
 <ul>
 <li><p>用于提交给测试人员进行功能测试，基于feature分支合并到develop之后，从develop分支克隆；</p>
@@ -72,7 +72,7 @@
 <li><p>hotfix：补丁分支</p>
 </li>
 </ul>
-<img data-src="/posts/539/gf6.png" class title="img.png">
+<img data-src="/posts/539/gf6.png" class>
 
 <ul>
 <li>基于master分支克隆，主要用于线上版本进行BUG修复；</li>
@@ -101,35 +101,35 @@
 <h3 id="二、测试部分"><a href="#二、测试部分" class="headerlink" title="二、测试部分"></a>二、测试部分</h3><ul>
 <li>本地git flow init 初始化仓库，提交develop分支</li>
 </ul>
-<img data-src="/posts/539/gf7.png" class title="img.png">
-<img data-src="/posts/539/gf8.png" class title="img.png">
+<img data-src="/posts/539/gf7.png" class>
+<img data-src="/posts/539/gf8.png" class>
 
 <ul>
 <li>提交到远程测试用github仓库（使用ssh公钥认证方式），可以看到develop分支已有第一次提交</li>
 </ul>
-<img data-src="/posts/539/gf9.png" class title="img.png">
+<img data-src="/posts/539/gf9.png" class>
 
 <ul>
 <li>到tmp目录下新建工作目录，并clone下远程仓库到本地（模拟本地开发）</li>
 </ul>
-<img data-src="/posts/539/gf10.png" class title="img.png">
+<img data-src="/posts/539/gf10.png" class>
 
 <ul>
 <li>初始化仓库后，拉取develop分支到本地进行开发。此时可以切出feature分支进行功能开发</li>
 </ul>
-<img data-src="/posts/539/gf11.png" class title="img.png">
-<img data-src="/posts/539/gf12.png" class title="img.png">
+<img data-src="/posts/539/gf11.png" class>
+<img data-src="/posts/539/gf12.png" class>
 
 <ul>
 <li>开发功能提交后进行提交到远程仓库并track远程分支。后续可以git push持续提交</li>
 </ul>
-<img data-src="/posts/539/gf13.png" class title="img.png">
-<img data-src="/posts/539/gf14.png" class title="img.png">
+<img data-src="/posts/539/gf13.png" class>
+<img data-src="/posts/539/gf14.png" class>
 
 <ul>
 <li>功能开发完成后，将分支合并到develop分支并删除本地feature分支（加上-F参数可以同时删除远程分支）</li>
 </ul>
-<img data-src="/posts/539/gf15.png" class title="img.png">
+<img data-src="/posts/539/gf15.png" class>
 <p>finish提交后即将新功能合并到develop分支，完成新功能开发。后续即执行release发布操作，步骤类似</p>
 ]]></content>
       <categories>
@@ -142,7 +142,7 @@
   <entry>
     <title>K8S-RBAC权限控制</title>
     <url>/posts/fa45.html</url>
-    <content><![CDATA[<link rel="stylesheet" class="aplayer-secondary-style-marker" href="/assets/css/APlayer.min.css"><script src="/assets/js/APlayer.min.js" class="aplayer-secondary-script-marker"></script><script class="meting-secondary-script-marker" src="/assets/js/Meting.min.js"></script><h3 id="一、RBAC简易概述"><a href="#一、RBAC简易概述" class="headerlink" title="一、RBAC简易概述"></a>一、RBAC简易概述</h3><img data-src="/posts/fa45/gaisu.png" class title="概述">
+    <content><![CDATA[<link rel="stylesheet" class="aplayer-secondary-style-marker" href="/assets/css/APlayer.min.css"><script src="/assets/js/APlayer.min.js" class="aplayer-secondary-script-marker"></script><script class="meting-secondary-script-marker" src="/assets/js/Meting.min.js"></script><h3 id="一、RBAC简易概述"><a href="#一、RBAC简易概述" class="headerlink" title="一、RBAC简易概述"></a>一、RBAC简易概述</h3><img data-src="/posts/fa45/gaisu.png" class>
 <h4 id="1-RBAC-四种-API-对象"><a href="#1-RBAC-四种-API-对象" class="headerlink" title="1) RBAC 四种 API 对象"></a>1) RBAC 四种 API 对象</h4><ul>
 <li>Role：一组权限的集合，在一个命名空间中，可以用其来定义一个角色，只能对命名空间内的资源进行授权。如果是集群级别的资源，则需要使用ClusterRole。例如：定义一个角色用来读取Pod的权限</li>
 <li>ClusterRole：具有和角色一致的命名空间资源的管理能力，还可用于以下特殊元素的授权<ul>
@@ -203,7 +203,7 @@
 </li>
 </ul>
 <p>可通过 kubectl get –raw &#x2F;apis&#x2F;rbac.authorization.k8s.io&#x2F;v1 可以获取到 RBAC 四个 API 资源对象的相关信息，如下图：</p>
-<img data-src="/posts/fa45/c31775e8bbe3.png" class title="img.png">
+<img data-src="/posts/fa45/c31775e8bbe3.png" class>
 
 <blockquote>
 <p>创建资源&#x2F;信息的方式</p>
@@ -214,18 +214,18 @@
 </blockquote>
 <h3 id="二、ServiceAccount-测试"><a href="#二、ServiceAccount-测试" class="headerlink" title="二、ServiceAccount 测试"></a>二、ServiceAccount 测试</h3><h4 id="1-创建-serviceaccount-账户并进行对应授权"><a href="#1-创建-serviceaccount-账户并进行对应授权" class="headerlink" title="1) 创建 serviceaccount 账户并进行对应授权"></a>1) 创建 serviceaccount 账户并进行对应授权</h4><ol>
 <li><p>创建 serviceaccount 账户 camel-sva （只需defalut namespace）<br>执行命令：kubectl create serviceaccount camel-sva -n default</p>
-<img data-src="/posts/fa45/634be995b5bc.png" class title="img.png">
+<img data-src="/posts/fa45/634be995b5bc.png" class>
 </li>
 <li><p>创建 role 角色 （授权Integration、Kamelet、KameletBinding 3种资源的 curd 权限）<br>执行命令：kubectl create role camel-sva-role –verb&#x3D;* –resource&#x3D;integrations,kamelets,kameletbindings </p>
-<img data-src="/posts/fa45/21812e1bbfad.png" class title="img.png">
+<img data-src="/posts/fa45/21812e1bbfad.png" class>
 </li>
 <li><p>绑定集群权限<br>命令：kubectl create rolebinding camel-sva-rolebinding –role&#x3D;camel-sva-role –serviceaccount&#x3D;default:camel-sva</p>
-<img data-src="/posts/fa45/7528aa1bf3da.png" class title="img.png">
+<img data-src="/posts/fa45/7528aa1bf3da.png" class>
 </li>
 <li><p>查看账号 secret 信息<br>命令：kubectl get secret&#x2F;camel-sva-token-mdt28 -oyaml</p>
-<img data-src="/posts/fa45/de3ebdd4f016.png" class title="img.png">
+<img data-src="/posts/fa45/de3ebdd4f016.png" class>
 <p>将获取到的 token 值进行 base64 解码后即可用来调用 apiserver 接口，如下图（接口可通过 kubectl get –raw &#x2F;apis&#x2F; 进行获取）：</p>
-<img data-src="/posts/fa45/1572c2ebc891.png" class title="img.png"></li>
+<img data-src="/posts/fa45/1572c2ebc891.png" class></li>
 </ol>
 <h4 id="2-创建用户认证的-kubeconfig-文件"><a href="#2-创建用户认证的-kubeconfig-文件" class="headerlink" title="2) 创建用户认证的 kubeconfig 文件"></a>2) 创建用户认证的 kubeconfig 文件</h4><ol>
 <li><p>创建集群配置文件<br>命令：kubectl config set-cluster kubernetes –certificate-authority&#x3D;&#x2F;etc&#x2F;kubernetes&#x2F;pki&#x2F;ca.crt –server&#x3D;”<a href="https://10.0.0.142:6443&quot;">https://10.0.0.142:6443&quot;</a> –embed-certs&#x3D;true –kubeconfig&#x3D;.&#x2F;camel-sva.conf</p>
@@ -240,11 +240,11 @@
 </li>
 </ol>
 <p>执行完上述命令后即在当前目录生成配置文件：camel-sva.conf，可 copy 到 kubeconfig对应目录，进行操作。</p>
-<img data-src="/posts/fa45/d6da8c845c41.png" class title="img.png">
+<img data-src="/posts/fa45/d6da8c845c41.png" class>
 <p>使用该配置文件进行 kubectl 命令操作，即可验证用户只拥有对应资源的操作权限。</p>
-<img data-src="/posts/fa45/de4222775e67.png" class title="img.png">
+<img data-src="/posts/fa45/de4222775e67.png" class>
 
-<h4 id="3-API-对象结构"><a href="#3-API-对象结构" class="headerlink" title="3) API 对象结构"></a>3) API 对象结构</h4><img data-src="/posts/fa45/ab8f20ce2acc.png" class title="img.png">
+<h4 id="3-API-对象结构"><a href="#3-API-对象结构" class="headerlink" title="3) API 对象结构"></a>3) API 对象结构</h4><img data-src="/posts/fa45/ab8f20ce2acc.png" class>
 
 
 <h3 id="三、参考学习"><a href="#三、参考学习" class="headerlink" title="三、参考学习"></a>三、参考学习</h3><ol>
@@ -285,7 +285,7 @@
 <li>应用SLB 暴露公网方式，白名单管理方式存在多人修改不同步且随意添加白名单带来风险问题。多个SLB 带来的白名单、监听等也存在管理记录困难问题。</li>
 <li>通过namespace 隔离，网络规划便于设计（同一VPC 下天然可以通信）。应用间调用完全可以通过集群内部策略实现通信，减少因为网络造成的应用通信异常。</li>
 </ul>
-<img data-src="/posts/8aa0/7b70de99e5f7.png" class title="img.png">
+<img data-src="/posts/8aa0/7b70de99e5f7.png" class>
 
 <h3 id="二、概念理解"><a href="#二、概念理解" class="headerlink" title="二、概念理解"></a>二、概念理解</h3><h4 id="1）CNI-插件"><a href="#1）CNI-插件" class="headerlink" title="1）CNI 插件"></a>1）CNI 插件</h4><p>k8s 本身没有对容器之间的通信网络进行实现，而是通过 CNI 定义了容器网络的接口的形式，让其他组件实现CNI来实现容器间的网络通信，CNI主要解决什么问题？</p>
 <ul>
@@ -308,14 +308,14 @@
 <li>控制台方式操作（简易操作）：需通过阿里云提工单申请</li>
 <li>命令行方式操作（kubectl 方式）：无需申请可直接操作。开启方式：<ul>
 <li><p>创建Terway集群时可选中** NetworkPolicy支持** 直接开启</p>
-<img data-src="/posts/8aa0/2afdc3d69fa9.png" class title="img.png">
+<img data-src="/posts/8aa0/2afdc3d69fa9.png" class>
 </li>
 <li><p>通过修改ConfigMap –&gt; eni-config 文件开启</p>
 </li>
 </ul>
 </li>
 </ul>
-<img data-src="/posts/8aa0/6bbe6aab7201.png" class title="img.png">
+<img data-src="/posts/8aa0/6bbe6aab7201.png" class>
 
 
 <ol start="3">
@@ -380,7 +380,7 @@
 <li><strong>RAM角色</strong>：虚拟用户，向信任的RAM实体账号进行授权（根据STS令牌颁发短时有效的临时访问token）；创建角色后会生成Arn描述符（角色的描述符：每个RAM角色存在唯一值且遵循阿里云arn命名规范）。</li>
 <li>RAM权限策略：一组权限集，使用简单的Policy语法进行描述（分为系统策略和自定义策略）；权限策略是实际细分授权资源集、操作集、授权条件的描述。</li>
 </ul>
-<img data-src="/posts/fdc/ram1.png" class title="img.png">
+<img data-src="/posts/fdc/ram1.png" class>
 
 <blockquote>
 <p>创建RAM角色时有三种类型：</p>
@@ -394,7 +394,7 @@
 </li>
 </ul>
 </blockquote>
-<img data-src="/posts/fdc/ram2.png" class title="img.png">
+<img data-src="/posts/fdc/ram2.png" class>
 <blockquote>
 <ul>
 <li><strong>身份提供商</strong>：允许可信身份提供商下的用户所扮演的角色。此类角色主要用于实现与阿里云的单点登录（SSO）</li>
@@ -405,31 +405,31 @@
 <li>OSS官方推荐使用 阿里云账号 方式：<a href="https://help.aliyun.com/document_detail/100624.html">https://help.aliyun.com/document_detail&#x2F;100624.html</a></li>
 </ul>
 </blockquote>
-<h3 id="三、创建STS角色，自定义授权OSS功能测试"><a href="#三、创建STS角色，自定义授权OSS功能测试" class="headerlink" title="三、创建STS角色，自定义授权OSS功能测试"></a>三、创建STS角色，自定义授权OSS功能测试</h3><p>1）测试账号信息<br>账号：<a href="mailto:&#100;&#101;&#x76;&#111;&#x70;&#115;&#x5f;&#x74;&#x65;&#115;&#x74;&#64;&#120;&#120;&#x78;&#x2e;&#x6f;&#110;&#97;&#x6c;&#x69;&#121;&#117;&#x6e;&#46;&#x63;&#x6f;&#x6d;">&#100;&#101;&#x76;&#111;&#x70;&#115;&#x5f;&#x74;&#x65;&#115;&#x74;&#64;&#120;&#120;&#x78;&#x2e;&#x6f;&#110;&#97;&#x6c;&#x69;&#121;&#117;&#x6e;&#46;&#x63;&#x6f;&#x6d;</a><br>AK：xxxxx<br>SK：xxxxx<br>ARN：acs:ram::xxxxx:role&#x2F;xxx-sts<br>OSS Bucket名称：oss-test<br>OSS授权目录：dir111&#x2F;dir111_secondline1&#x2F;</p>
+<h3 id="三、创建STS角色，自定义授权OSS功能测试"><a href="#三、创建STS角色，自定义授权OSS功能测试" class="headerlink" title="三、创建STS角色，自定义授权OSS功能测试"></a>三、创建STS角色，自定义授权OSS功能测试</h3><p>1）测试账号信息<br>账号：<a href="mailto:&#x64;&#x65;&#x76;&#x6f;&#112;&#115;&#95;&#116;&#101;&#x73;&#x74;&#x40;&#x78;&#120;&#x78;&#46;&#x6f;&#110;&#97;&#x6c;&#105;&#x79;&#x75;&#x6e;&#46;&#x63;&#x6f;&#x6d;">&#x64;&#x65;&#x76;&#x6f;&#112;&#115;&#95;&#116;&#101;&#x73;&#x74;&#x40;&#x78;&#120;&#x78;&#46;&#x6f;&#110;&#97;&#x6c;&#105;&#x79;&#x75;&#x6e;&#46;&#x63;&#x6f;&#x6d;</a><br>AK：xxxxx<br>SK：xxxxx<br>ARN：acs:ram::xxxxx:role&#x2F;xxx-sts<br>OSS Bucket名称：oss-test<br>OSS授权目录：dir111&#x2F;dir111_secondline1&#x2F;</p>
 <p>2）进行授权</p>
 <ul>
 <li>创建RAM用户（子账号），生成AK SK （此步骤忽略）</li>
 <li>测试账号添加STS权限</li>
 </ul>
-<img data-src="/posts/fdc/ram3.png" class title="img.png">
+<img data-src="/posts/fdc/ram3.png" class>
 
 <ul>
 <li>添加权限策略，使用自定义策略授权（OSS官方示例Policy：<a href="https://help.aliyun.com/document_detail/266627.html">https://help.aliyun.com/document_detail&#x2F;266627.html</a>）</li>
 </ul>
-<img data-src="/posts/fdc/ram4.png" class title="img.png">
+<img data-src="/posts/fdc/ram4.png" class>
 
 <ul>
 <li>添加RAM角色并授权Policy</li>
 </ul>
-<img data-src="/posts/fdc/ram5.png" class title="img.png">
+<img data-src="/posts/fdc/ram5.png" class>
 
-<img data-src="/posts/fdc/ram6.png" class title="img.png">
+<img data-src="/posts/fdc/ram6.png" class>
 
 <p>3）测试验证（控制台无法登录RAM账号验证权限情况下，可以使用ossutil或ossbrowser工具进行验证）</p>
 <ul>
 <li>ossutil使用：<a href="https://help.aliyun.com/document_detail/50451.html">https://help.aliyun.com/document_detail&#x2F;50451.html</a></li>
 </ul>
-<img data-src="/posts/fdc/ram7.png" class title="img.png">
+<img data-src="/posts/fdc/ram7.png" class>
 
 <ul>
 <li>ossbrowser使用：<a href="https://help.aliyun.com/document_detail/92268.html">https://help.aliyun.com/document_detail&#x2F;92268.html</a></li>
@@ -444,7 +444,7 @@
 </ol>
 <ul>
 <li>STS扮演的角色本身授权的权限策略是否拥有对应云资源的权限（系统或自定义的Policy）</li>
-<li>SDK&#x2F;API调用时传入的policy_text参数值，在构造调用请求时传入（<a href="https://help.aliyun.com/document_detail/100624.html">https://help.aliyun.com/document_detail&#x2F;100624.html</a><img data-src="/posts/fdc/ram8.png" class title="img.png"></li>
+<li>SDK&#x2F;API调用时传入的policy_text参数值，在构造调用请求时传入（<a href="https://help.aliyun.com/document_detail/100624.html">https://help.aliyun.com/document_detail&#x2F;100624.html</a><img data-src="/posts/fdc/ram8.png" class></li>
 </ul>
 </blockquote>
 <h3 id="四、结合实际需求"><a href="#四、结合实际需求" class="headerlink" title="四、结合实际需求"></a>四、结合实际需求</h3><ol>
@@ -478,42 +478,42 @@
 </li>
 </ul>
 <h3 id="二、操作过程"><a href="#二、操作过程" class="headerlink" title="二、操作过程"></a>二、操作过程</h3><h4 id="1）接入Prometheus-组件监控，获取数据指标"><a href="#1）接入Prometheus-组件监控，获取数据指标" class="headerlink" title="1）接入Prometheus 组件监控，获取数据指标"></a>1）接入Prometheus 组件监控，获取数据指标</h4><ul>
-<li>进入云产品 <strong>Prometheus监控服务</strong>，选择对应集群。（ACK集群需要先安装Prometheus 监控组件，安装参考：<a href="https://help.aliyun.com/document_detail/161304.html">ARMS Prometheus监控</a>）<img data-src="/posts/9a8h/1.png" class title="img.png"></li>
+<li>进入云产品 <strong>Prometheus监控服务</strong>，选择对应集群。（ACK集群需要先安装Prometheus 监控组件，安装参考：<a href="https://help.aliyun.com/document_detail/161304.html">ARMS Prometheus监控</a>）<img data-src="/posts/9a8h/1.png" class></li>
 </ul>
 <span id="more"></span>
 <ul>
 <li><p>选择 组件监控 ，点击添加组件监控，选择要添加的组件。（本次示例为RabbitMQ）</p>
-<img data-src="/posts/9a8h/2.png" class title="img.png">
-<img data-src="/posts/9a8h/3.png" class title="img.png">
+<img data-src="/posts/9a8h/2.png" class>
+<img data-src="/posts/9a8h/3.png" class>
 </li>
 <li><p>添加后即可进入grafana 大盘查看指标数据。验证数据方式可以通过 **curl  xxx:9419&#x2F;metrics ** 获取指标数据，如图:</p>
-<img data-src="/posts/9a8h/4.png" class title="img.png"></li>
+<img data-src="/posts/9a8h/4.png" class></li>
 </ul>
 <h4 id="2）grafana-接入数据展示"><a href="#2）grafana-接入数据展示" class="headerlink" title="2）grafana 接入数据展示"></a>2）grafana 接入数据展示</h4><ul>
 <li><p>从Pometheus 控制台，点击对应生成的大盘，进入grafana 数据展示界面</p>
-<img data-src="/posts/9a8h/5.png" class title="img.png">
+<img data-src="/posts/9a8h/5.png" class>
 </li>
 <li><p>进入grafana Dashboard界面后，需要新增一个panel。操作如下：</p>
-<img data-src="/posts/9a8h/6.png" class title="img.png">
-<img data-src="/posts/9a8h/7.png" class title="img.png">
-<img data-src="/posts/9a8h/8.png" class title="img.png">
+<img data-src="/posts/9a8h/6.png" class>
+<img data-src="/posts/9a8h/7.png" class>
+<img data-src="/posts/9a8h/8.png" class>
 </li>
 <li><p>在ACK集群查看展示组件相关监控数据：在对应ACK 集群中，选择 <strong>运维管理 – Prometheus监控 –Cloud RABBITMQ</strong> ，即可查看大盘数据。</p>
-<img data-src="/posts/9a8h/9.png" class title="img.png"></li>
+<img data-src="/posts/9a8h/9.png" class></li>
 </ul>
 <h4 id="3）创建告警阈值与通知"><a href="#3）创建告警阈值与通知" class="headerlink" title="3）创建告警阈值与通知"></a>3）创建告警阈值与通知</h4><ul>
 <li><p>创建钉钉群，并生成钉钉机器人webhook地址。参考：<a href="https://help.aliyun.com/document_detail/251838.html">https://help.aliyun.com/document_detail&#x2F;251838.html</a></p>
 </li>
 <li><p>在云产品 <strong>Prometheus监控服务</strong> 中，将钉钉机器人添加到告警联系人，使用IM机器人方式。</p>
-<img data-src="/posts/9a8h/10.png" class title="img.png">
+<img data-src="/posts/9a8h/10.png" class>
 </li>
 <li><p>在云产品 <strong>应用实时监控服务ARMS – Prometheus监控 – Prometheus告警规则</strong> 中，点击<strong>创建Prometheus告警规则</strong> ，创建告警规则。告警规则详细如图：</p>
-<img data-src="/posts/9a8h/11.png" class title="img.png">
-<img data-src="/posts/9a8h/12.png" class title="img.png">
+<img data-src="/posts/9a8h/11.png" class>
+<img data-src="/posts/9a8h/12.png" class>
 </li>
 <li><p>在云产品 <strong>应用实时监控服务ARMS – 告警管理 – 通知策略</strong> 中，点击<strong>创建通知策略</strong> ，创建告警通知策略。策略配置详细如图：</p>
-<img data-src="/posts/9a8h/13.png" class title="img.png">
-<img data-src="/posts/9a8h/14.png" class title="img.png"></li>
+<img data-src="/posts/9a8h/13.png" class>
+<img data-src="/posts/9a8h/14.png" class></li>
 </ul>
 <h4 id="4）验证告警"><a href="#4）验证告警" class="headerlink" title="4）验证告警"></a>4）验证告警</h4><ul>
 <li>将告警规则中PromQL 语句暂时配置为：sum by (queue)(rabbitmq_queue_messages_unacknowledged{app&#x3D;”rabbi-exporter”}) &gt;&#x3D; 0</li>
@@ -521,11 +521,11 @@
 <p>来产生告警</p>
 <ul>
 <li><p>在云产品 <strong>应用实时监控服务ARMS – 告警管理 – 告警发送历史&#x2F;告警事件历史</strong> 中，搜索告警事件与发送结果：</p>
-<img data-src="/posts/9a8h/15.png" class title="img.png">
-<img data-src="/posts/9a8h/16.png" class title="img.png">
+<img data-src="/posts/9a8h/15.png" class>
+<img data-src="/posts/9a8h/16.png" class>
 </li>
 <li><p>可以看到钉钉群已正常接收告警通知（告警恢复自动发送恢复通知并停止发送告警消息）</p>
-<img data-src="/posts/9a8h/17.png" class title="img.png"></li>
+<img data-src="/posts/9a8h/17.png" class></li>
 </ul>
 <h3 id="三、注意事项"><a href="#三、注意事项" class="headerlink" title="三、注意事项"></a>三、注意事项</h3><ul>
 <li>ACK 集群 RabbitMQ应用告警是创建的临时告警群。后续如需添加其他人或告警通知发布到正式群组按情况进行调整。</li>
@@ -632,7 +632,7 @@
 <li><p>应用app-test 目录结构</p>
 </li>
 </ul>
-<img data-src="/posts/ce0f/helm1.png" class title="img.png">
+<img data-src="/posts/ce0f/helm1.png" class>
 
 <ul>
 <li>关键配置信息<figure class="highlight yaml"><table><tr><td class="code"><pre><span class="line"><span class="comment"># Chart.yaml</span></span><br><span class="line"><span class="attr">apiVersion:</span> <span class="string">v2</span></span><br><span class="line"><span class="attr">name:</span> <span class="string">app-test</span></span><br><span class="line"><span class="attr">description:</span> <span class="string">application</span> <span class="string">app-test</span> <span class="string">for</span> <span class="string">env</span> <span class="string">daily</span></span><br><span class="line"><span class="attr">type:</span> <span class="string">application</span></span><br><span class="line"><span class="attr">version:</span> <span class="number">20211215123042</span><span class="string">-daily</span></span><br><span class="line"><span class="attr">appVersion:</span> <span class="string">20211215123042_daily</span></span><br></pre></td></tr></table></figure>
@@ -641,7 +641,7 @@
 <h4 id="3）配置镜像仓库，部署应用"><a href="#3）配置镜像仓库，部署应用" class="headerlink" title="3）配置镜像仓库，部署应用"></a>3）配置镜像仓库，部署应用</h4><ul>
 <li>配置远程ACR 企业版仓库，参考 <a href="#ht9xj">Helm安装部署</a> 部分。</li>
 </ul>
-<img data-src="/posts/ce0f/helm2.png" class title="img.png">
+<img data-src="/posts/ce0f/helm2.png" class>
 
 <ul>
 <li>部署应用<ul>
@@ -653,11 +653,11 @@
 </ul>
 </li>
 </ul>
-<img data-src="/posts/ce0f/helm3.png" class title="img.png">
-<img data-src="/posts/ce0f/helm4.png" class title="img.png">
+<img data-src="/posts/ce0f/helm3.png" class>
+<img data-src="/posts/ce0f/helm4.png" class>
 
 <ul>
-<li>更新版本<img data-src="/posts/ce0f/helm5.png" class title="img.png"></li>
+<li>更新版本<img data-src="/posts/ce0f/helm5.png" class></li>
 </ul>
 <h3 id="三、问题点"><a href="#三、问题点" class="headerlink" title="三、问题点"></a>三、问题点</h3><ul>
 <li><p>使用helm 命令安装需本地连接K8S 集群（需提供API Server 公网EIP）</p>
@@ -683,6 +683,118 @@
 ]]></content>
       <categories>
         <category>云原生</category>
+      </categories>
+      <tags>
+        <tag>阿里云</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>VPC 网络规划案例</title>
+    <url>/posts/64a8.html</url>
+    <content><![CDATA[<link rel="stylesheet" class="aplayer-secondary-style-marker" href="/assets/css/APlayer.min.css"><script src="/assets/js/APlayer.min.js" class="aplayer-secondary-script-marker"></script><script class="meting-secondary-script-marker" src="/assets/js/Meting.min.js"></script><h3 id="网段规划概述"><a href="#网段规划概述" class="headerlink" title="网段规划概述"></a>网段规划概述</h3><h4 id="1）规划网段的目的"><a href="#1）规划网段的目的" class="headerlink" title="1）规划网段的目的"></a>1）规划网段的目的</h4><ul>
+<li>方便查看管理，相当于对某一个&#x2F;多个IDC 机房的IP 规划，根据IP 地址可以一目了然的判断出归属。</li>
+<li>便于同集群&#x2F;VPC 内网段判断网络、路由走向、以及网络隔离策略（白名单）。</li>
+<li>区分多VPC&#x2F;网络 环境，方便在打通网络时区分子网网段。</li>
+</ul>
+<h4 id="2）规范化设计的方式"><a href="#2）规范化设计的方式" class="headerlink" title="2）规范化设计的方式"></a>2）规范化设计的方式</h4><p>首先需要分清两类，是否有ACK 等集群类资源单独规划：</p>
+<ol>
+<li>如无集群资源（即只有RDS、ECS 等常规资源），按正常内网网段定义VPC与交换机即可</li>
+<li>有集群资源，最好划分单独交换机部署常规资源，<strong>独立交换机</strong>部署集群资源。</li>
+</ol>
+<span id="more"></span>
+
+<p>由于线上部署，或者未来趋势 基本云上都会已集群方式存在，因此只讨论第二种方式。<br>网段设计规范：</p>
+<ul>
+<li>VPC可使用的私网网段：192.168.0.0&#x2F;16、10.0.0.0&#x2F;8、172.16.0.0&#x2F;12及其子网，每个专有网络只能指定一个网段。</li>
+<li>交换机可使用的网段：需要&lt;&#x3D; VPC网段（子集）</li>
+</ul>
+<img data-src="/posts/64a8/vpc1.png" class>
+
+<ul>
+<li>VPC数量：创建多个VPC 时尽量使用不同网段</li>
+<li>集群数量：同账号下部署多集群时尽量使用不同网段</li>
+<li>如有ACK 集群资源时，需判断集群网络插件模式<ul>
+<li>非Terway 插件时，需要三个私网网段，如：10.1.0.0&#x2F;16（VPC-vswitch）、192.168.0.0&#x2F;24（Pod 使用）、192.168.10.0&#x2F;24（Service 使用）</li>
+<li>使用Terway 插件时，需要两个私网网段，如：10.16.0.0&#x2F;8（VPC-vswitch + Pod）、192.168.0.0&#x2F;24（Service 使用）</li>
+</ul>
+</li>
+</ul>
+<h4 id="个人建议"><a href="#个人建议" class="headerlink" title="**个人建议"></a>**个人建议</h4><ul>
+<li><p>同账号下（同环境）选择 192.168.0.0&#x2F;16、10.0.0.0&#x2F;0、172.16.0.0&#x2F;12 进行VPC 创建组网。</p>
+<ul>
+<li>不同集群与云产品资源之间使用子交换机分割。</li>
+<li>使用云产品白名单或其他网络插件做网络隔离策略。</li>
+</ul>
+</li>
+<li><p>不同账号（如日常、线上）可复用同网段进行组网（一般不存在跨环境调用）。</p>
+</li>
+<li><p>当前环境网络组网信息（建议后续都使用Terway 插件）：</p>
+<ul>
+<li><p>日常环境网络架构</p>
+<img data-src="/posts/64a8/vpc2.png" class>
+</li>
+<li><p>线上网络架构（集群与集群、集群与云产品，通过私网的交换机网段进行隔离）</p>
+</li>
+</ul>
+</li>
+</ul>
+<img data-src="/posts/64a8/vpc3.png" class>
+
+
+<h3 id="线上实际案例"><a href="#线上实际案例" class="headerlink" title="线上实际案例"></a>线上实际案例</h3><h4 id="1）案例1"><a href="#1）案例1" class="headerlink" title="1）案例1"></a>1）案例1</h4><img data-src="/posts/64a8/vpc4.png" class>
+
+<ul>
+<li>VPC：10.0.0.0&#x2F;8 （复用线上VPC）</li>
+<li>交换机：新建4 台交换机<ul>
+<li>test-swc-10_200_0_0_20  （可用区 1）</li>
+<li>test-swc-10_200_16_0_20 （可用区 2）</li>
+<li>test-swc-10_200_64_0_19 （可用区 1）</li>
+<li>test-swc-10_200_96_0_19 （可用区 2）</li>
+</ul>
+</li>
+<li>集群CIDR规划<ul>
+<li>Node CIDR：<ul>
+<li>10.200.0.0&#x2F;20</li>
+<li>10.200.16.0&#x2F;20</li>
+</ul>
+</li>
+<li>Pod CIDR：<ul>
+<li>10.200.64.0&#x2F;19</li>
+<li>10.200.96.0&#x2F;19</li>
+</ul>
+</li>
+<li>Service CIDR：<ul>
+<li>172.31.0.0&#x2F;16<blockquote>
+<p>注意：</p>
+<ul>
+<li>Node 和Pod 交换机如要高可用选择不同可用区时，需要每个可用区都有Node 和Pod 可使用的交换机。</li>
+<li>Service 网段不能与VPC 网段 及VPC 内已有Kubernetes 集群使用的网段重复。</li>
+</ul>
+</blockquote>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<h4 id="2）相关文档与工具"><a href="#2）相关文档与工具" class="headerlink" title="2）相关文档与工具"></a>2）相关文档与工具</h4><ul>
+<li><p><a href="https://help.aliyun.com/document_detail/189596.html">云企业网工作原理与操作</a></p>
+</li>
+<li><p>VPN网关原理与操作：</p>
+<ul>
+<li><a href="https://cloud.tencent.com/developer/article/1824924">IPSec VPN 技术原理</a></li>
+<li><a href="https://help.aliyun.com/document_detail/65072.html">阿里云官方操作文档</a></li>
+</ul>
+</li>
+<li><p><a href="https://www.bejson.com/convert/subnetmask/">子网计算在线工具</a></p>
+</li>
+<li><p>架构图</p>
+</li>
+</ul>
+<p><img data-src="https://intranetproxy.alipay.com/skylark/lark/0/2022/png/21956377/1646207048171-c0f5a83d-b982-4e85-ab78-f724882be069.png#clientId=ufadced67-c1c1-4&from=ui&id=u1dc1cab7&margin=%5Bobject%20Object%5D&name=%E6%80%BB%E4%BD%93%E7%BD%91%E7%BB%9C%E6%9E%B6%E6%9E%84.png&originHeight=1993&originWidth=4131&originalType=binary&ratio=1&size=515776&status=done&style=none&taskId=uffed0b55-26c9-4f1d-b577-67c4f6f81ec" alt="总体网络架构.png"></p>
+]]></content>
+      <categories>
+        <category>网络</category>
       </categories>
       <tags>
         <tag>阿里云</tag>

@@ -23,29 +23,26 @@
     var CONFIG = {"hostname":"359sun.top","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"left","always":true,"display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":true,"show_result":true,"style":"mac"},"back2top":{"enable":true,"sidebar":true,"scrollpercent":true},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":true,"mediumzoom":false,"lazyload":true,"pangu":false,"comments":{"style":"tabs","active":"gitalk","storage":true,"lazyload":false,"nav":{"gitalk":{"order":-2}},"activeClass":"gitalk"},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
   </script>
 
-  <meta name="description" content="一、前言当通过OpenApi接口来调用云资源时（即替代控制台的操作），当前的方式有两种：  通过 AK+SK 方式直接调用，只要该AK所属的账号有相关权限即可调用对应资源（授权分为系统策略和自定义策略） 阿里云账号（RAM用户）&#x2F;阿里云服务（ECS等）&#x2F;身份提供商（SSO） 通过扮演角色获取角色的临时令牌（即通过调用AssumeRole接口），通过该临时令牌（临时令牌可设定会话">
+  <meta name="description" content="网段规划概述1）规划网段的目的 方便查看管理，相当于对某一个&#x2F;多个IDC 机房的IP 规划，根据IP 地址可以一目了然的判断出归属。 便于同集群&#x2F;VPC 内网段判断网络、路由走向、以及网络隔离策略（白名单）。 区分多VPC&#x2F;网络 环境，方便在打通网络时区分子网网段。  2）规范化设计的方式首先需要分清两类，是否有ACK 等集群类资源单独规划：  如无集群资源（即只有R">
 <meta property="og:type" content="article">
-<meta property="og:title" content="阿里云-RAM与STS权限">
-<meta property="og:url" content="https://359sun.top/posts/fdc.html">
+<meta property="og:title" content="VPC 网络规划案例">
+<meta property="og:url" content="https://359sun.top/posts/64a8.html">
 <meta property="og:site_name" content="Yakir Blog">
-<meta property="og:description" content="一、前言当通过OpenApi接口来调用云资源时（即替代控制台的操作），当前的方式有两种：  通过 AK+SK 方式直接调用，只要该AK所属的账号有相关权限即可调用对应资源（授权分为系统策略和自定义策略） 阿里云账号（RAM用户）&#x2F;阿里云服务（ECS等）&#x2F;身份提供商（SSO） 通过扮演角色获取角色的临时令牌（即通过调用AssumeRole接口），通过该临时令牌（临时令牌可设定会话">
+<meta property="og:description" content="网段规划概述1）规划网段的目的 方便查看管理，相当于对某一个&#x2F;多个IDC 机房的IP 规划，根据IP 地址可以一目了然的判断出归属。 便于同集群&#x2F;VPC 内网段判断网络、路由走向、以及网络隔离策略（白名单）。 区分多VPC&#x2F;网络 环境，方便在打通网络时区分子网网段。  2）规范化设计的方式首先需要分清两类，是否有ACK 等集群类资源单独规划：  如无集群资源（即只有R">
 <meta property="og:locale" content="zh_CN">
-<meta property="og:image" content="https://359sun.top/posts/fdc/ram1.png">
-<meta property="og:image" content="https://359sun.top/posts/fdc/ram2.png">
-<meta property="og:image" content="https://359sun.top/posts/fdc/ram3.png">
-<meta property="og:image" content="https://359sun.top/posts/fdc/ram4.png">
-<meta property="og:image" content="https://359sun.top/posts/fdc/ram5.png">
-<meta property="og:image" content="https://359sun.top/posts/fdc/ram6.png">
-<meta property="og:image" content="https://359sun.top/posts/fdc/ram7.png">
-<meta property="og:image" content="https://359sun.top/posts/fdc/ram8.png">
-<meta property="article:published_time" content="2022-03-20T15:37:32.000Z">
-<meta property="article:modified_time" content="2022-05-05T14:32:18.242Z">
+<meta property="og:image" content="https://359sun.top/posts/64a8/vpc1.png">
+<meta property="og:image" content="https://359sun.top/posts/64a8/vpc2.png">
+<meta property="og:image" content="https://359sun.top/posts/64a8/vpc3.png">
+<meta property="og:image" content="https://359sun.top/posts/64a8/vpc4.png">
+<meta property="og:image" content="https://intranetproxy.alipay.com/skylark/lark/0/2022/png/21956377/1646207048171-c0f5a83d-b982-4e85-ab78-f724882be069.png#clientId=ufadced67-c1c1-4&from=ui&id=u1dc1cab7&margin=%5Bobject%20Object%5D&name=%E6%80%BB%E4%BD%93%E7%BD%91%E7%BB%9C%E6%9E%B6%E6%9E%84.png&originHeight=1993&originWidth=4131&originalType=binary&ratio=1&size=515776&status=done&style=none&taskId=uffed0b55-26c9-4f1d-b577-67c4f6f81ec">
+<meta property="article:published_time" content="2022-05-04T14:17:00.000Z">
+<meta property="article:modified_time" content="2022-05-05T14:30:04.058Z">
 <meta property="article:author" content="Yakir">
 <meta property="article:tag" content="阿里云">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:image" content="https://359sun.top/posts/fdc/ram1.png">
+<meta name="twitter:image" content="https://359sun.top/posts/64a8/vpc1.png">
 
-<link rel="canonical" href="https://359sun.top/posts/fdc.html">
+<link rel="canonical" href="https://359sun.top/posts/64a8.html">
 
 
 <script id="page-configurations">
@@ -58,7 +55,7 @@
   };
 </script>
 
-  <title>阿里云-RAM与STS权限 | Yakir Blog</title>
+  <title>VPC 网络规划案例 | Yakir Blog</title>
   
 
 
@@ -211,7 +208,7 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://359sun.top/posts/fdc.html">
+    <link itemprop="mainEntityOfPage" href="https://359sun.top/posts/64a8.html">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/images/avatar.jpg">
@@ -224,7 +221,7 @@
     </span>
       <header class="post-header">
         <h1 class="post-title" itemprop="name headline">
-          阿里云-RAM与STS权限
+          VPC 网络规划案例
         </h1>
 
         <div class="post-meta">
@@ -234,15 +231,24 @@
               </span>
               <span class="post-meta-item-text">发表于</span>
 
-              <time title="创建时间：2022-03-20 23:37:32" itemprop="dateCreated datePublished" datetime="2022-03-20T23:37:32+08:00">2022-03-20</time>
+              <time title="创建时间：2022-05-04 22:17:00" itemprop="dateCreated datePublished" datetime="2022-05-04T22:17:00+08:00">2022-05-04</time>
             </span>
               <span class="post-meta-item">
                 <span class="post-meta-item-icon">
                   <i class="far fa-calendar-check"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2022-05-05 22:32:18" itemprop="dateModified" datetime="2022-05-05T22:32:18+08:00">2022-05-05</time>
+                <time title="修改时间：2022-05-05 22:30:04" itemprop="dateModified" datetime="2022-05-05T22:30:04+08:00">2022-05-05</time>
               </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E7%BD%91%E7%BB%9C/" itemprop="url" rel="index"><span itemprop="name">网络</span></a>
+                </span>
+            </span>
 
           
             <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv" style="display: none;">
@@ -257,14 +263,14 @@
                 <i class="far fa-file-word"></i>
               </span>
                 <span class="post-meta-item-text">本文字数：</span>
-              <span>2.5k</span>
+              <span>1.4k</span>
             </span>
             <span class="post-meta-item" title="阅读时长">
               <span class="post-meta-item-icon">
                 <i class="far fa-clock"></i>
               </span>
                 <span class="post-meta-item-text">阅读时长 &asymp;</span>
-              <span>2 分钟</span>
+              <span>1 分钟</span>
             </span>
 
         </div>
@@ -276,109 +282,107 @@
     <div class="post-body" itemprop="articleBody">
 
       
-        <h3 id="一、前言"><a href="#一、前言" class="headerlink" title="一、前言"></a>一、前言</h3><p>当通过OpenApi接口来调用云资源时（即替代控制台的操作），当前的方式有两种：</p>
-<ul>
-<li>通过 AK+SK 方式直接调用，只要该AK所属的账号有相关权限即可调用对应资源（授权分为系统策略和自定义策略）</li>
-<li>阿里云账号（RAM用户）&#x2F;阿里云服务（ECS等）&#x2F;身份提供商（SSO） 通过扮演角色获取角色的临时令牌（即通过调用AssumeRole接口），通过该临时令牌（临时令牌可设定会话时间），通过 STS接口获取到的 临时AK+临时SK+临时STSToken 进行调用对应资源</li>
+        <h3 id="网段规划概述"><a href="#网段规划概述" class="headerlink" title="网段规划概述"></a>网段规划概述</h3><h4 id="1）规划网段的目的"><a href="#1）规划网段的目的" class="headerlink" title="1）规划网段的目的"></a>1）规划网段的目的</h4><ul>
+<li>方便查看管理，相当于对某一个&#x2F;多个IDC 机房的IP 规划，根据IP 地址可以一目了然的判断出归属。</li>
+<li>便于同集群&#x2F;VPC 内网段判断网络、路由走向、以及网络隔离策略（白名单）。</li>
+<li>区分多VPC&#x2F;网络 环境，方便在打通网络时区分子网网段。</li>
 </ul>
-<h3 id="二、官方概念介绍"><a href="#二、官方概念介绍" class="headerlink" title="二、官方概念介绍"></a>二、官方概念介绍</h3><ol>
-<li>STS概念</li>
-</ol>
-<ul>
-<li>阿里云STS（Security Token Service）是阿里云提供的一种临时访问权限管理服务。RAM提供RAM用户和RAM角色两种身份。其中，RAM角色不具备永久身份凭证，而只能通过STS获取可以自定义时效和访问权限的临时身份凭证，即安全令牌（STS Token）</li>
-</ul>
-<span id="more"></span>
-<p>建议阅读：<a target="_blank" rel="noopener" href="https://help.aliyun.com/document_detail/28756.html">https://help.aliyun.com/document_detail&#x2F;28756.html</a></p>
-<ol start="2">
-<li>RAM概念</li>
-</ol>
-<ul>
-<li>RAM用户：身份实体，可访问阿里云资源的账号或程序；创建时可选择登录场景、AccessKey场景（通过程序调用API）。</li>
-<li><strong>RAM角色</strong>：虚拟用户，向信任的RAM实体账号进行授权（根据STS令牌颁发短时有效的临时访问token）；创建角色后会生成Arn描述符（角色的描述符：每个RAM角色存在唯一值且遵循阿里云arn命名规范）。</li>
-<li>RAM权限策略：一组权限集，使用简单的Policy语法进行描述（分为系统策略和自定义策略）；权限策略是实际细分授权资源集、操作集、授权条件的描述。</li>
-</ul>
-<img data-src="/posts/fdc/ram1.png" class>
-
-<blockquote>
-<p>创建RAM角色时有三种类型：</p>
-<ul>
-<li><strong>阿里云账号</strong>：允许RAM用户所扮演的角色。扮演角色的RAM用户可以属于自己的阿里云账号，也可以属于其他阿里云账号。此类角色主要用来解决跨账号访问和临时授权问题</li>
-<li><strong>阿里云服务</strong>：允许云服务所扮演的角色。此类角色主要用于授权云服务代理您进行资源操作（服务又分为两种）<ul>
-<li>普通服务角色：您需要自定义角色名称，选择受信服务，并自定义权限策略</li>
-<li>服务关联角色：您只需选择受信的云服务，云服务会自带预设的角色名称和权限策略</li>
-<li>两种服务角色没太大区别，服务关联角色会多一个预设的配置（一般服务角色用户阿里云跨服务间的调用，例如ECS的授予&#x2F;收回RAM角色功能、RDS云服务调用KMS角色加密等，从某个云产品调用另一个云产品的授权）</li>
-</ul>
-</li>
-</ul>
-</blockquote>
-<img data-src="/posts/fdc/ram2.png" class>
-<blockquote>
-<ul>
-<li><strong>身份提供商</strong>：允许可信身份提供商下的用户所扮演的角色。此类角色主要用于实现与阿里云的单点登录（SSO）</li>
-</ul>
-<p><strong>常用的RAM角色一般为创建 阿里云账号 方式（OSS官方推荐使用）</strong></p>
-<ul>
-<li>授权RAM角色介绍：<a target="_blank" rel="noopener" href="https://help.aliyun.com/document_detail/116819.html">https://help.aliyun.com/document_detail&#x2F;116819.html</a></li>
-<li>OSS官方推荐使用 阿里云账号 方式：<a target="_blank" rel="noopener" href="https://help.aliyun.com/document_detail/100624.html">https://help.aliyun.com/document_detail&#x2F;100624.html</a></li>
-</ul>
-</blockquote>
-<h3 id="三、创建STS角色，自定义授权OSS功能测试"><a href="#三、创建STS角色，自定义授权OSS功能测试" class="headerlink" title="三、创建STS角色，自定义授权OSS功能测试"></a>三、创建STS角色，自定义授权OSS功能测试</h3><p>1）测试账号信息<br>账号：<a href="mailto:&#x64;&#x65;&#x76;&#x6f;&#112;&#115;&#95;&#116;&#101;&#x73;&#x74;&#x40;&#x78;&#120;&#x78;&#46;&#x6f;&#110;&#97;&#x6c;&#105;&#x79;&#x75;&#x6e;&#46;&#x63;&#x6f;&#x6d;">&#x64;&#x65;&#x76;&#x6f;&#112;&#115;&#95;&#116;&#101;&#x73;&#x74;&#x40;&#x78;&#120;&#x78;&#46;&#x6f;&#110;&#97;&#x6c;&#105;&#x79;&#x75;&#x6e;&#46;&#x63;&#x6f;&#x6d;</a><br>AK：xxxxx<br>SK：xxxxx<br>ARN：acs:ram::xxxxx:role&#x2F;xxx-sts<br>OSS Bucket名称：oss-test<br>OSS授权目录：dir111&#x2F;dir111_secondline1&#x2F;</p>
-<p>2）进行授权</p>
-<ul>
-<li>创建RAM用户（子账号），生成AK SK （此步骤忽略）</li>
-<li>测试账号添加STS权限</li>
-</ul>
-<img data-src="/posts/fdc/ram3.png" class>
-
-<ul>
-<li>添加权限策略，使用自定义策略授权（OSS官方示例Policy：<a target="_blank" rel="noopener" href="https://help.aliyun.com/document_detail/266627.html">https://help.aliyun.com/document_detail&#x2F;266627.html</a>）</li>
-</ul>
-<img data-src="/posts/fdc/ram4.png" class>
-
-<ul>
-<li>添加RAM角色并授权Policy</li>
-</ul>
-<img data-src="/posts/fdc/ram5.png" class>
-
-<img data-src="/posts/fdc/ram6.png" class>
-
-<p>3）测试验证（控制台无法登录RAM账号验证权限情况下，可以使用ossutil或ossbrowser工具进行验证）</p>
-<ul>
-<li>ossutil使用：<a target="_blank" rel="noopener" href="https://help.aliyun.com/document_detail/50451.html">https://help.aliyun.com/document_detail&#x2F;50451.html</a></li>
-</ul>
-<img data-src="/posts/fdc/ram7.png" class>
-
-<ul>
-<li>ossbrowser使用：<a target="_blank" rel="noopener" href="https://help.aliyun.com/document_detail/92268.html">https://help.aliyun.com/document_detail&#x2F;92268.html</a></li>
-</ul>
-<p>4）验证列举和其他相关权限无误后，将ARN信息提供研发即可</p>
-<blockquote>
-<p>权限流程：</p>
+<h4 id="2）规范化设计的方式"><a href="#2）规范化设计的方式" class="headerlink" title="2）规范化设计的方式"></a>2）规范化设计的方式</h4><p>首先需要分清两类，是否有ACK 等集群类资源单独规划：</p>
 <ol>
-<li>客户端程序&#x2F;调用端发起扮演角色，此时在进入实际要获取的角色权限前，需要通过调用AssumeRole接口返回STS凭证（调用STS接口需要<strong>AliyunSTSAssumeRoleAccess</strong>权限，因此对应RAM账号需要授权该系统策略）</li>
-<li>通过返回的STS临时凭证（临时AK+临时SK+临时token）发起相关云资源接口的调用</li>
-<li>客户端使用STS发起调用时，会验证两个部分的权限策略Policy （注意：最后的权限取这两个权限Policy的交集）</li>
+<li>如无集群资源（即只有RDS、ECS 等常规资源），按正常内网网段定义VPC与交换机即可</li>
+<li>有集群资源，最好划分单独交换机部署常规资源，<strong>独立交换机</strong>部署集群资源。</li>
 </ol>
+<span id="more"></span>
+
+<p>由于线上部署，或者未来趋势 基本云上都会已集群方式存在，因此只讨论第二种方式。<br>网段设计规范：</p>
 <ul>
-<li>STS扮演的角色本身授权的权限策略是否拥有对应云资源的权限（系统或自定义的Policy）</li>
-<li>SDK&#x2F;API调用时传入的policy_text参数值，在构造调用请求时传入（<a target="_blank" rel="noopener" href="https://help.aliyun.com/document_detail/100624.html">https://help.aliyun.com/document_detail&#x2F;100624.html</a><img data-src="/posts/fdc/ram8.png" class></li>
+<li>VPC可使用的私网网段：192.168.0.0&#x2F;16、10.0.0.0&#x2F;8、172.16.0.0&#x2F;12及其子网，每个专有网络只能指定一个网段。</li>
+<li>交换机可使用的网段：需要&lt;&#x3D; VPC网段（子集）</li>
+</ul>
+<img data-src="/posts/64a8/vpc1.png" class>
+
+<ul>
+<li>VPC数量：创建多个VPC 时尽量使用不同网段</li>
+<li>集群数量：同账号下部署多集群时尽量使用不同网段</li>
+<li>如有ACK 集群资源时，需判断集群网络插件模式<ul>
+<li>非Terway 插件时，需要三个私网网段，如：10.1.0.0&#x2F;16（VPC-vswitch）、192.168.0.0&#x2F;24（Pod 使用）、192.168.10.0&#x2F;24（Service 使用）</li>
+<li>使用Terway 插件时，需要两个私网网段，如：10.16.0.0&#x2F;8（VPC-vswitch + Pod）、192.168.0.0&#x2F;24（Service 使用）</li>
+</ul>
+</li>
+</ul>
+<h4 id="个人建议"><a href="#个人建议" class="headerlink" title="**个人建议"></a>**个人建议</h4><ul>
+<li><p>同账号下（同环境）选择 192.168.0.0&#x2F;16、10.0.0.0&#x2F;0、172.16.0.0&#x2F;12 进行VPC 创建组网。</p>
+<ul>
+<li>不同集群与云产品资源之间使用子交换机分割。</li>
+<li>使用云产品白名单或其他网络插件做网络隔离策略。</li>
+</ul>
+</li>
+<li><p>不同账号（如日常、线上）可复用同网段进行组网（一般不存在跨环境调用）。</p>
+</li>
+<li><p>当前环境网络组网信息（建议后续都使用Terway 插件）：</p>
+<ul>
+<li><p>日常环境网络架构</p>
+<img data-src="/posts/64a8/vpc2.png" class>
+</li>
+<li><p>线上网络架构（集群与集群、集群与云产品，通过私网的交换机网段进行隔离）</p>
+</li>
+</ul>
+</li>
+</ul>
+<img data-src="/posts/64a8/vpc3.png" class>
+
+
+<h3 id="线上实际案例"><a href="#线上实际案例" class="headerlink" title="线上实际案例"></a>线上实际案例</h3><h4 id="1）案例1"><a href="#1）案例1" class="headerlink" title="1）案例1"></a>1）案例1</h4><img data-src="/posts/64a8/vpc4.png" class>
+
+<ul>
+<li>VPC：10.0.0.0&#x2F;8 （复用线上VPC）</li>
+<li>交换机：新建4 台交换机<ul>
+<li>test-swc-10_200_0_0_20  （可用区 1）</li>
+<li>test-swc-10_200_16_0_20 （可用区 2）</li>
+<li>test-swc-10_200_64_0_19 （可用区 1）</li>
+<li>test-swc-10_200_96_0_19 （可用区 2）</li>
+</ul>
+</li>
+<li>集群CIDR规划<ul>
+<li>Node CIDR：<ul>
+<li>10.200.0.0&#x2F;20</li>
+<li>10.200.16.0&#x2F;20</li>
+</ul>
+</li>
+<li>Pod CIDR：<ul>
+<li>10.200.64.0&#x2F;19</li>
+<li>10.200.96.0&#x2F;19</li>
+</ul>
+</li>
+<li>Service CIDR：<ul>
+<li>172.31.0.0&#x2F;16<blockquote>
+<p>注意：</p>
+<ul>
+<li>Node 和Pod 交换机如要高可用选择不同可用区时，需要每个可用区都有Node 和Pod 可使用的交换机。</li>
+<li>Service 网段不能与VPC 网段 及VPC 内已有Kubernetes 集群使用的网段重复。</li>
 </ul>
 </blockquote>
-<h3 id="四、结合实际需求"><a href="#四、结合实际需求" class="headerlink" title="四、结合实际需求"></a>四、结合实际需求</h3><ol>
-<li><p>开发提出需求：需要某一个oss bucket的STS ARN信息</p>
 </li>
-<li><p>需要相关信息：</p>
-</li>
-</ol>
-<ul>
-<li>oss bucket具体需授权目录，必须</li>
-<li>endpoint: oss bucket所属区域，非必须</li>
-<li>bucket-name: oss bucket名称，必须</li>
-<li>调用OSS RAM账号，必须</li>
 </ul>
-<ol start="3">
-<li>通过提供信息进行创建RAM角色、Policy策略新建（注意oss 细粒度的策略）、授权策略到RAM角色中，最后将新建的RAM角色的ARN描述符信息提供给研发。</li>
-</ol>
+</li>
+</ul>
+</li>
+</ul>
+<h4 id="2）相关文档与工具"><a href="#2）相关文档与工具" class="headerlink" title="2）相关文档与工具"></a>2）相关文档与工具</h4><ul>
+<li><p><a target="_blank" rel="noopener" href="https://help.aliyun.com/document_detail/189596.html">云企业网工作原理与操作</a></p>
+</li>
+<li><p>VPN网关原理与操作：</p>
+<ul>
+<li><a target="_blank" rel="noopener" href="https://cloud.tencent.com/developer/article/1824924">IPSec VPN 技术原理</a></li>
+<li><a target="_blank" rel="noopener" href="https://help.aliyun.com/document_detail/65072.html">阿里云官方操作文档</a></li>
+</ul>
+</li>
+<li><p><a target="_blank" rel="noopener" href="https://www.bejson.com/convert/subnetmask/">子网计算在线工具</a></p>
+</li>
+<li><p>架构图</p>
+</li>
+</ul>
+<p><img data-src="https://intranetproxy.alipay.com/skylark/lark/0/2022/png/21956377/1646207048171-c0f5a83d-b982-4e85-ab78-f724882be069.png#clientId=ufadced67-c1c1-4&from=ui&id=u1dc1cab7&margin=%5Bobject%20Object%5D&name=%E6%80%BB%E4%BD%93%E7%BD%91%E7%BB%9C%E6%9E%B6%E6%9E%84.png&originHeight=1993&originWidth=4131&originalType=binary&ratio=1&size=515776&status=done&style=none&taskId=uffed0b55-26c9-4f1d-b577-67c4f6f81ec" alt="总体网络架构.png"></p>
 
     </div>
 
@@ -394,7 +398,7 @@
   </li>
   <li class="post-copyright-link">
     <strong>本文链接：</strong>
-    <a href="https://359sun.top/posts/fdc.html" title="阿里云-RAM与STS权限">https://359sun.top/posts/fdc.html</a>
+    <a href="https://359sun.top/posts/64a8.html" title="VPC 网络规划案例">https://359sun.top/posts/64a8.html</a>
   </li>
   <li class="post-copyright-license">
     <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" rel="noopener" target="_blank"><i class="fab fa-fw fa-creative-commons"></i>BY-NC-SA</a> 许可协议。转载请注明出处！
@@ -435,13 +439,10 @@
         
     <div class="post-nav">
       <div class="post-nav-item">
-    <a href="/posts/9a8h.html" rel="prev" title="promotheus组件-grafana大盘配置监控大盘与告警通知">
-      <i class="fa fa-chevron-left"></i> promotheus组件-grafana大盘配置监控大盘与告警通知
+    <a href="/posts/ce0f.html" rel="prev" title="helm 部署应用">
+      <i class="fa fa-chevron-left"></i> helm 部署应用
     </a></div>
-      <div class="post-nav-item">
-    <a href="/posts/539.html" rel="next" title="git flow 工作流理解">
-      git flow 工作流理解 <i class="fa fa-chevron-right"></i>
-    </a></div>
+      <div class="post-nav-item"></div>
     </div>
       </footer>
     
@@ -501,7 +502,7 @@
 
       <!--noindex-->
       <div class="post-toc-wrap sidebar-panel">
-          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%B8%80%E3%80%81%E5%89%8D%E8%A8%80"><span class="nav-text">一、前言</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BA%8C%E3%80%81%E5%AE%98%E6%96%B9%E6%A6%82%E5%BF%B5%E4%BB%8B%E7%BB%8D"><span class="nav-text">二、官方概念介绍</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%B8%89%E3%80%81%E5%88%9B%E5%BB%BASTS%E8%A7%92%E8%89%B2%EF%BC%8C%E8%87%AA%E5%AE%9A%E4%B9%89%E6%8E%88%E6%9D%83OSS%E5%8A%9F%E8%83%BD%E6%B5%8B%E8%AF%95"><span class="nav-text">三、创建STS角色，自定义授权OSS功能测试</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%9B%9B%E3%80%81%E7%BB%93%E5%90%88%E5%AE%9E%E9%99%85%E9%9C%80%E6%B1%82"><span class="nav-text">四、结合实际需求</span></a></li></ol></div>
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%BD%91%E6%AE%B5%E8%A7%84%E5%88%92%E6%A6%82%E8%BF%B0"><span class="nav-text">网段规划概述</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#1%EF%BC%89%E8%A7%84%E5%88%92%E7%BD%91%E6%AE%B5%E7%9A%84%E7%9B%AE%E7%9A%84"><span class="nav-text">1）规划网段的目的</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2%EF%BC%89%E8%A7%84%E8%8C%83%E5%8C%96%E8%AE%BE%E8%AE%A1%E7%9A%84%E6%96%B9%E5%BC%8F"><span class="nav-text">2）规范化设计的方式</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E4%B8%AA%E4%BA%BA%E5%BB%BA%E8%AE%AE"><span class="nav-text">**个人建议</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%BA%BF%E4%B8%8A%E5%AE%9E%E9%99%85%E6%A1%88%E4%BE%8B"><span class="nav-text">线上实际案例</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#1%EF%BC%89%E6%A1%88%E4%BE%8B1"><span class="nav-text">1）案例1</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2%EF%BC%89%E7%9B%B8%E5%85%B3%E6%96%87%E6%A1%A3%E4%B8%8E%E5%B7%A5%E5%85%B7"><span class="nav-text">2）相关文档与工具</span></a></li></ol></li></ol></div>
       </div>
       <!--/noindex-->
 
@@ -694,7 +695,7 @@ NexT.utils.loadComments(document.querySelector('#gitalk-container'), () => {
       repo        : 'yakir3.github.io',
       owner       : 'yakir3',
       admin       : ['yakir3'],
-      id          : '28571ef898d9cbec8bb9943aa9e19470',
+      id          : 'a14c1a1c80d6ac22ff06cd4acde5f1d3',
         language: 'zh-CN',
       distractionFreeMode: true
     });

@@ -46,7 +46,7 @@
 <meta property="og:image" content="https://359sun.top/posts/539/gf14.png">
 <meta property="og:image" content="https://359sun.top/posts/539/gf15.png">
 <meta property="article:published_time" content="2022-05-04T13:14:23.000Z">
-<meta property="article:modified_time" content="2022-05-04T13:47:38.242Z">
+<meta property="article:modified_time" content="2022-05-05T14:30:35.542Z">
 <meta property="article:author" content="Yakir">
 <meta property="article:tag" content="git">
 <meta name="twitter:card" content="summary">
@@ -240,10 +240,16 @@
                 <i class="far fa-calendar"></i>
               </span>
               <span class="post-meta-item-text">发表于</span>
-              
 
-              <time title="创建时间：2022-05-04 21:14:23 / 修改时间：21:47:38" itemprop="dateCreated datePublished" datetime="2022-05-04T21:14:23+08:00">2022-05-04</time>
+              <time title="创建时间：2022-05-04 21:14:23" itemprop="dateCreated datePublished" datetime="2022-05-04T21:14:23+08:00">2022-05-04</time>
             </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2022-05-05 22:30:35" itemprop="dateModified" datetime="2022-05-05T22:30:35+08:00">2022-05-05</time>
+              </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
                 <i class="far fa-folder"></i>
@@ -301,13 +307,13 @@
 <ol start="2">
 <li>GitFlow流程图及描述理解</li>
 </ol>
-<img data-src="/posts/539/gf1.png" class title="img.png">
-<img data-src="/posts/539/gf2.png" class title="img.png">
+<img data-src="/posts/539/gf1.png" class>
+<img data-src="/posts/539/gf2.png" class>
 
 <ul>
 <li>master：主干分支</li>
 </ul>
-<img data-src="/posts/539/gf3.png" class title="img.png">
+<img data-src="/posts/539/gf3.png" class>
 
 <ul>
 <li><p>最稳定分支、功能完整、可随时发布线上环境（只读分支，只能从hotfix&#x2F;release合并 不能修改）</p>
@@ -325,7 +331,7 @@
 <li><p>feature：功能开发分支</p>
 </li>
 </ul>
-<img data-src="/posts/539/gf4.png" class title="img.png">
+<img data-src="/posts/539/gf4.png" class>
 
 <ul>
 <li><p>开发某部分新功能，基于develop分支克隆，功能开发完毕且本地自测通过（编译完成且无异常）合并到develop分支；</p>
@@ -335,7 +341,7 @@
 <li><p>release：测试分支</p>
 </li>
 </ul>
-<img data-src="/posts/539/gf5.png" class title="img.png">
+<img data-src="/posts/539/gf5.png" class>
 
 <ul>
 <li><p>用于提交给测试人员进行功能测试，基于feature分支合并到develop之后，从develop分支克隆；</p>
@@ -347,7 +353,7 @@
 <li><p>hotfix：补丁分支</p>
 </li>
 </ul>
-<img data-src="/posts/539/gf6.png" class title="img.png">
+<img data-src="/posts/539/gf6.png" class>
 
 <ul>
 <li>基于master分支克隆，主要用于线上版本进行BUG修复；</li>
@@ -376,35 +382,35 @@
 <h3 id="二、测试部分"><a href="#二、测试部分" class="headerlink" title="二、测试部分"></a>二、测试部分</h3><ul>
 <li>本地git flow init 初始化仓库，提交develop分支</li>
 </ul>
-<img data-src="/posts/539/gf7.png" class title="img.png">
-<img data-src="/posts/539/gf8.png" class title="img.png">
+<img data-src="/posts/539/gf7.png" class>
+<img data-src="/posts/539/gf8.png" class>
 
 <ul>
 <li>提交到远程测试用github仓库（使用ssh公钥认证方式），可以看到develop分支已有第一次提交</li>
 </ul>
-<img data-src="/posts/539/gf9.png" class title="img.png">
+<img data-src="/posts/539/gf9.png" class>
 
 <ul>
 <li>到tmp目录下新建工作目录，并clone下远程仓库到本地（模拟本地开发）</li>
 </ul>
-<img data-src="/posts/539/gf10.png" class title="img.png">
+<img data-src="/posts/539/gf10.png" class>
 
 <ul>
 <li>初始化仓库后，拉取develop分支到本地进行开发。此时可以切出feature分支进行功能开发</li>
 </ul>
-<img data-src="/posts/539/gf11.png" class title="img.png">
-<img data-src="/posts/539/gf12.png" class title="img.png">
+<img data-src="/posts/539/gf11.png" class>
+<img data-src="/posts/539/gf12.png" class>
 
 <ul>
 <li>开发功能提交后进行提交到远程仓库并track远程分支。后续可以git push持续提交</li>
 </ul>
-<img data-src="/posts/539/gf13.png" class title="img.png">
-<img data-src="/posts/539/gf14.png" class title="img.png">
+<img data-src="/posts/539/gf13.png" class>
+<img data-src="/posts/539/gf14.png" class>
 
 <ul>
 <li>功能开发完成后，将分支合并到develop分支并删除本地feature分支（加上-F参数可以同时删除远程分支）</li>
 </ul>
-<img data-src="/posts/539/gf15.png" class title="img.png">
+<img data-src="/posts/539/gf15.png" class>
 <p>finish提交后即将新功能合并到develop分支，完成新功能开发。后续即执行release发布操作，步骤类似</p>
 
     </div>
@@ -544,14 +550,14 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">7</span>
+          <span class="site-state-item-count">8</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
       <div class="site-state-item site-state-categories">
             <a href="/categories/">
           
-        <span class="site-state-item-count">2</span>
+        <span class="site-state-item-count">3</span>
         <span class="site-state-item-name">分类</span></a>
       </div>
       <div class="site-state-item site-state-tags">

@@ -48,7 +48,7 @@
 <meta property="og:image" content="https://359sun.top/posts/9a8h/16.png">
 <meta property="og:image" content="https://359sun.top/posts/9a8h/17.png">
 <meta property="article:published_time" content="2022-03-16T15:21:06.000Z">
-<meta property="article:modified_time" content="2022-05-03T13:20:22.255Z">
+<meta property="article:modified_time" content="2022-05-05T14:31:56.958Z">
 <meta property="article:author" content="Yakir">
 <meta property="article:tag" content="阿里云">
 <meta property="article:tag" content="K8S">
@@ -251,7 +251,7 @@
                   <i class="far fa-calendar-check"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2022-05-03 21:20:22" itemprop="dateModified" datetime="2022-05-03T21:20:22+08:00">2022-05-03</time>
+                <time title="修改时间：2022-05-05 22:31:56" itemprop="dateModified" datetime="2022-05-05T22:31:56+08:00">2022-05-05</time>
               </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -303,42 +303,42 @@
 </li>
 </ul>
 <h3 id="二、操作过程"><a href="#二、操作过程" class="headerlink" title="二、操作过程"></a>二、操作过程</h3><h4 id="1）接入Prometheus-组件监控，获取数据指标"><a href="#1）接入Prometheus-组件监控，获取数据指标" class="headerlink" title="1）接入Prometheus 组件监控，获取数据指标"></a>1）接入Prometheus 组件监控，获取数据指标</h4><ul>
-<li>进入云产品 <strong>Prometheus监控服务</strong>，选择对应集群。（ACK集群需要先安装Prometheus 监控组件，安装参考：<a target="_blank" rel="noopener" href="https://help.aliyun.com/document_detail/161304.html">ARMS Prometheus监控</a>）<img data-src="/posts/9a8h/1.png" class title="img.png"></li>
+<li>进入云产品 <strong>Prometheus监控服务</strong>，选择对应集群。（ACK集群需要先安装Prometheus 监控组件，安装参考：<a target="_blank" rel="noopener" href="https://help.aliyun.com/document_detail/161304.html">ARMS Prometheus监控</a>）<img data-src="/posts/9a8h/1.png" class></li>
 </ul>
 <span id="more"></span>
 <ul>
 <li><p>选择 组件监控 ，点击添加组件监控，选择要添加的组件。（本次示例为RabbitMQ）</p>
-<img data-src="/posts/9a8h/2.png" class title="img.png">
-<img data-src="/posts/9a8h/3.png" class title="img.png">
+<img data-src="/posts/9a8h/2.png" class>
+<img data-src="/posts/9a8h/3.png" class>
 </li>
 <li><p>添加后即可进入grafana 大盘查看指标数据。验证数据方式可以通过 **curl  xxx:9419&#x2F;metrics ** 获取指标数据，如图:</p>
-<img data-src="/posts/9a8h/4.png" class title="img.png"></li>
+<img data-src="/posts/9a8h/4.png" class></li>
 </ul>
 <h4 id="2）grafana-接入数据展示"><a href="#2）grafana-接入数据展示" class="headerlink" title="2）grafana 接入数据展示"></a>2）grafana 接入数据展示</h4><ul>
 <li><p>从Pometheus 控制台，点击对应生成的大盘，进入grafana 数据展示界面</p>
-<img data-src="/posts/9a8h/5.png" class title="img.png">
+<img data-src="/posts/9a8h/5.png" class>
 </li>
 <li><p>进入grafana Dashboard界面后，需要新增一个panel。操作如下：</p>
-<img data-src="/posts/9a8h/6.png" class title="img.png">
-<img data-src="/posts/9a8h/7.png" class title="img.png">
-<img data-src="/posts/9a8h/8.png" class title="img.png">
+<img data-src="/posts/9a8h/6.png" class>
+<img data-src="/posts/9a8h/7.png" class>
+<img data-src="/posts/9a8h/8.png" class>
 </li>
 <li><p>在ACK集群查看展示组件相关监控数据：在对应ACK 集群中，选择 <strong>运维管理 – Prometheus监控 –Cloud RABBITMQ</strong> ，即可查看大盘数据。</p>
-<img data-src="/posts/9a8h/9.png" class title="img.png"></li>
+<img data-src="/posts/9a8h/9.png" class></li>
 </ul>
 <h4 id="3）创建告警阈值与通知"><a href="#3）创建告警阈值与通知" class="headerlink" title="3）创建告警阈值与通知"></a>3）创建告警阈值与通知</h4><ul>
 <li><p>创建钉钉群，并生成钉钉机器人webhook地址。参考：<a target="_blank" rel="noopener" href="https://help.aliyun.com/document_detail/251838.html">https://help.aliyun.com/document_detail&#x2F;251838.html</a></p>
 </li>
 <li><p>在云产品 <strong>Prometheus监控服务</strong> 中，将钉钉机器人添加到告警联系人，使用IM机器人方式。</p>
-<img data-src="/posts/9a8h/10.png" class title="img.png">
+<img data-src="/posts/9a8h/10.png" class>
 </li>
 <li><p>在云产品 <strong>应用实时监控服务ARMS – Prometheus监控 – Prometheus告警规则</strong> 中，点击<strong>创建Prometheus告警规则</strong> ，创建告警规则。告警规则详细如图：</p>
-<img data-src="/posts/9a8h/11.png" class title="img.png">
-<img data-src="/posts/9a8h/12.png" class title="img.png">
+<img data-src="/posts/9a8h/11.png" class>
+<img data-src="/posts/9a8h/12.png" class>
 </li>
 <li><p>在云产品 <strong>应用实时监控服务ARMS – 告警管理 – 通知策略</strong> 中，点击<strong>创建通知策略</strong> ，创建告警通知策略。策略配置详细如图：</p>
-<img data-src="/posts/9a8h/13.png" class title="img.png">
-<img data-src="/posts/9a8h/14.png" class title="img.png"></li>
+<img data-src="/posts/9a8h/13.png" class>
+<img data-src="/posts/9a8h/14.png" class></li>
 </ul>
 <h4 id="4）验证告警"><a href="#4）验证告警" class="headerlink" title="4）验证告警"></a>4）验证告警</h4><ul>
 <li>将告警规则中PromQL 语句暂时配置为：sum by (queue)(rabbitmq_queue_messages_unacknowledged{app&#x3D;”rabbi-exporter”}) &gt;&#x3D; 0</li>
@@ -346,11 +346,11 @@
 <p>来产生告警</p>
 <ul>
 <li><p>在云产品 <strong>应用实时监控服务ARMS – 告警管理 – 告警发送历史&#x2F;告警事件历史</strong> 中，搜索告警事件与发送结果：</p>
-<img data-src="/posts/9a8h/15.png" class title="img.png">
-<img data-src="/posts/9a8h/16.png" class title="img.png">
+<img data-src="/posts/9a8h/15.png" class>
+<img data-src="/posts/9a8h/16.png" class>
 </li>
 <li><p>可以看到钉钉群已正常接收告警通知（告警恢复自动发送恢复通知并停止发送告警消息）</p>
-<img data-src="/posts/9a8h/17.png" class title="img.png"></li>
+<img data-src="/posts/9a8h/17.png" class></li>
 </ul>
 <h3 id="三、注意事项"><a href="#三、注意事项" class="headerlink" title="三、注意事项"></a>三、注意事项</h3><ul>
 <li>ACK 集群 RabbitMQ应用告警是创建的临时告警群。后续如需添加其他人或告警通知发布到正式群组按情况进行调整。</li>
@@ -495,14 +495,14 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">7</span>
+          <span class="site-state-item-count">8</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
       <div class="site-state-item site-state-categories">
             <a href="/categories/">
           
-        <span class="site-state-item-count">2</span>
+        <span class="site-state-item-count">3</span>
         <span class="site-state-item-name">分类</span></a>
       </div>
       <div class="site-state-item site-state-tags">
