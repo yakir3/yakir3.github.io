@@ -6,7 +6,7 @@
   <link href="https://359sun.top/atom.xml" rel="self"/>
   
   <link href="https://359sun.top/"/>
-  <updated>2022-05-05T14:30:04.058Z</updated>
+  <updated>2022-05-31T15:29:56.471Z</updated>
   <id>https://359sun.top/</id>
   
   <author>
@@ -15,6 +15,72 @@
   </author>
   
   <generator uri="https://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>ACK-K8S学习记录</title>
+    <link href="https://359sun.top/posts/754e.html"/>
+    <id>https://359sun.top/posts/754e.html</id>
+    <published>2022-05-31T15:04:28.000Z</published>
+    <updated>2022-05-31T15:29:56.471Z</updated>
+    
+    
+    <summary type="html">&lt;h3 id=&quot;一、ACK集群网络规划&quot;&gt;&lt;a href=&quot;#一、ACK集群网络规划&quot; class=&quot;headerlink&quot; title=&quot;一、ACK集群网络规划&quot;&gt;&lt;/a&gt;一、ACK集群网络规划&lt;/h3&gt;&lt;p&gt;&lt;a href=&quot;https://help.aliyun.com/document_detail/86500.html&quot;&gt;https://help.aliyun.com/document_detail&amp;#x2F;86500.html&lt;/a&gt;&lt;/p&gt;
+&lt;h3 id=&quot;二、RBAC授权&quot;&gt;&lt;a href=&quot;#二、RBAC授权&quot; class=&quot;headerlink&quot; title=&quot;二、RBAC授权&quot;&gt;&lt;/a&gt;二、RBAC授权&lt;/h3&gt;&lt;p&gt;&lt;a href=&quot;https://yuque.antfin.com/kifo8h/nee5aa/mvx5t5&quot;&gt;https://yuque.antfin.com/kifo8h/nee5aa/mvx5t5&lt;/a&gt;&lt;/p&gt;
+&lt;h3 id=&quot;三、网络&quot;&gt;&lt;a href=&quot;#三、网络&quot; class=&quot;headerlink&quot; title=&quot;三、网络&quot;&gt;&lt;/a&gt;三、网络&lt;/h3&gt;&lt;h4 id=&quot;容器网络CNI&quot;&gt;&lt;a href=&quot;#容器网络CNI&quot; class=&quot;headerlink&quot; title=&quot;容器网络CNI&quot;&gt;&lt;/a&gt;容器网络CNI&lt;/h4&gt;&lt;p&gt;&lt;a href=&quot;https://help.aliyun.com/document_detail/195424.html&quot;&gt;https://help.aliyun.com/document_detail&amp;#x2F;195424.html&lt;/a&gt;&lt;/p&gt;</summary>
+    
+    
+    
+    <category term="云原生" scheme="https://359sun.top/categories/%E4%BA%91%E5%8E%9F%E7%94%9F/"/>
+    
+    
+    <category term="阿里云" scheme="https://359sun.top/tags/%E9%98%BF%E9%87%8C%E4%BA%91/"/>
+    
+    <category term="K8S" scheme="https://359sun.top/tags/k8s/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>Docker学习记录</title>
+    <link href="https://359sun.top/posts/c06e.html"/>
+    <id>https://359sun.top/posts/c06e.html</id>
+    <published>2022-05-31T15:00:45.000Z</published>
+    <updated>2022-05-31T15:28:45.107Z</updated>
+    
+    
+    <summary type="html">&lt;h3 id=&quot;一、Docker-基本原理&quot;&gt;&lt;a href=&quot;#一、Docker-基本原理&quot; class=&quot;headerlink&quot; title=&quot;一、Docker 基本原理&quot;&gt;&lt;/a&gt;一、Docker 基本原理&lt;/h3&gt;&lt;h4 id=&quot;1-docker-基本概念&quot;&gt;&lt;a href=&quot;#1-docker-基本概念&quot; class=&quot;headerlink&quot; title=&quot;1.docker 基本概念&quot;&gt;&lt;/a&gt;1.docker 基本概念&lt;/h4&gt;&lt;p&gt;Docker Client： 客户端&lt;br&gt;Docker Daemon：服务端&lt;br&gt;Docker Images：镜像（只读 CD）&lt;br&gt;Docker Registry： 镜像仓库&lt;br&gt;Docker Container：实际运行服务的容器，通过 Images 启动（可以认为 Container 提供硬件环境，使用 Images 提供好的系统盘，加上项目代码，即可运行服务）&lt;/p&gt;</summary>
+    
+    
+    
+    <category term="云原生" scheme="https://359sun.top/categories/%E4%BA%91%E5%8E%9F%E7%94%9F/"/>
+    
+    
+    <category term="Docker" scheme="https://359sun.top/tags/docker/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>ACK集群日志接入SLS</title>
+    <link href="https://359sun.top/posts/4a2a.html"/>
+    <id>https://359sun.top/posts/4a2a.html</id>
+    <published>2022-05-31T14:38:39.000Z</published>
+    <updated>2022-05-31T15:25:19.866Z</updated>
+    
+    
+    <summary type="html">&lt;h2 id=&quot;一、接入前提&quot;&gt;&lt;a href=&quot;#一、接入前提&quot; class=&quot;headerlink&quot; title=&quot;一、接入前提&quot;&gt;&lt;/a&gt;一、接入前提&lt;/h2&gt;&lt;p&gt;&lt;strong&gt;ACK 集群开启日志服务组件Logtail&lt;/strong&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;创建集群时启用Logtail（初始化ACK 集群时操作，新集群建议开启）&lt;img data-src=&quot;/posts/4a2a/acksls1.png&quot; class&gt;&lt;/li&gt;
+&lt;/ul&gt;</summary>
+    
+    
+    
+    <category term="云原生" scheme="https://359sun.top/categories/%E4%BA%91%E5%8E%9F%E7%94%9F/"/>
+    
+    
+    <category term="阿里云" scheme="https://359sun.top/tags/%E9%98%BF%E9%87%8C%E4%BA%91/"/>
+    
+    <category term="K8S" scheme="https://359sun.top/tags/k8s/"/>
+    
+  </entry>
   
   <entry>
     <title>VPC 网络规划案例</title>

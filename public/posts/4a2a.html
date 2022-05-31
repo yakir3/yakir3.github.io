@@ -1,0 +1,728 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 6.2.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+<link rel="stylesheet" href="https://fonts.loli.net/css?family=Noto Serif SC:300,300italic,400,400italic,700,700italic&display=swap&subset=latin,latin-ext">
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.css">
+  <link rel="stylesheet" href="/lib/pace/pace-theme-minimal.min.css">
+  <script src="/lib/pace/pace.min.js"></script>
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"359sun.top","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"left","always":true,"display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":true,"show_result":true,"style":"mac"},"back2top":{"enable":true,"sidebar":true,"scrollpercent":true},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":true,"mediumzoom":false,"lazyload":true,"pangu":false,"comments":{"style":"tabs","active":"gitalk","storage":true,"lazyload":false,"nav":{"gitalk":{"order":-2}},"activeClass":"gitalk"},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+  <meta name="description" content="一、接入前提ACK 集群开启日志服务组件Logtail  创建集群时启用Logtail（初始化ACK 集群时操作，新集群建议开启）">
+<meta property="og:type" content="article">
+<meta property="og:title" content="ACK集群日志接入SLS">
+<meta property="og:url" content="https://359sun.top/posts/4a2a.html">
+<meta property="og:site_name" content="Yakir Blog">
+<meta property="og:description" content="一、接入前提ACK 集群开启日志服务组件Logtail  创建集群时启用Logtail（初始化ACK 集群时操作，新集群建议开启）">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://359sun.top/posts/4a2a/acksls1.png">
+<meta property="og:image" content="https://359sun.top/posts/4a2a/acksls2.png">
+<meta property="og:image" content="https://359sun.top/posts/4a2a/acksls3.png">
+<meta property="og:image" content="https://359sun.top/posts/4a2a/acksls4.png">
+<meta property="og:image" content="https://359sun.top/posts/4a2a/acksls5.png">
+<meta property="og:image" content="https://359sun.top/posts/4a2a/acksls6.png">
+<meta property="og:image" content="https://359sun.top/posts/4a2a/acksls7.png">
+<meta property="og:image" content="https://359sun.top/posts/4a2a/acksls8.png">
+<meta property="og:image" content="https://359sun.top/posts/4a2a/acksls9.png">
+<meta property="og:image" content="https://359sun.top/posts/4a2a/acksls10.png">
+<meta property="og:image" content="https://359sun.top/posts/4a2a/acksls11.png">
+<meta property="og:image" content="https://359sun.top/posts/4a2a/acksls12.png">
+<meta property="og:image" content="https://359sun.top/posts/4a2a/acksls13.png">
+<meta property="og:image" content="https://359sun.top/posts/4a2a/acksls14.png">
+<meta property="og:image" content="https://359sun.top/posts/4a2a/acksls15.png">
+<meta property="og:image" content="https://359sun.top/posts/4a2a/acksls16.png">
+<meta property="article:published_time" content="2022-05-31T14:38:39.000Z">
+<meta property="article:modified_time" content="2022-05-31T15:25:19.866Z">
+<meta property="article:author" content="Yakir">
+<meta property="article:tag" content="阿里云">
+<meta property="article:tag" content="K8S">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://359sun.top/posts/4a2a/acksls1.png">
+
+<link rel="canonical" href="https://359sun.top/posts/4a2a.html">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>ACK集群日志接入SLS | Yakir Blog</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+<link rel="alternate" href="/atom.xml" title="Yakir Blog" type="application/atom+xml">
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">Yakir Blog</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+        <li class="menu-item menu-item-musiclist">
+
+    <a href="/musiclist/" rel="section"><i class="fa fa-music fa-fw"></i>歌单</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="reading-progress-bar"></div>
+
+  <a href="https://github.com/yakir3" class="github-corner" title="Follow me on GitHub" aria-label="Follow me on GitHub" rel="noopener" target="_blank"><svg width="80" height="80" viewBox="0 0 250 250" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path></svg></a>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://359sun.top/posts/4a2a.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.jpg">
+      <meta itemprop="name" content="Yakir">
+      <meta itemprop="description" content="Yakir Blog">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Yakir Blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          ACK集群日志接入SLS
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+              
+
+              <time title="创建时间：2022-05-31 22:38:39 / 修改时间：23:25:19" itemprop="dateCreated datePublished" datetime="2022-05-31T22:38:39+08:00">2022-05-31</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E4%BA%91%E5%8E%9F%E7%94%9F/" itemprop="url" rel="index"><span itemprop="name">云原生</span></a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span><br>
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+                <span class="post-meta-item-text">本文字数：</span>
+              <span>2.4k</span>
+            </span>
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+                <span class="post-meta-item-text">阅读时长 &asymp;</span>
+              <span>2 分钟</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h2 id="一、接入前提"><a href="#一、接入前提" class="headerlink" title="一、接入前提"></a>一、接入前提</h2><p><strong>ACK 集群开启日志服务组件Logtail</strong></p>
+<ul>
+<li>创建集群时启用Logtail（初始化ACK 集群时操作，新集群建议开启）<img data-src="/posts/4a2a/acksls1.png" class></li>
+</ul>
+<span id="more"></span>
+<ul>
+<li><p>为已有集群启用Logtail：在ACK控制台–&gt; 进入对应集群管理界面 –&gt; 运维管理 –&gt; 组件管理，找到logtail-ds 组件并点击安装即可。</p>
+<img data-src="/posts/4a2a/acksls2.png" class>
+</li>
+<li><p>创建成功后即可在SLS 控制台搜索到相关集群Project</p>
+</li>
+</ul>
+<img data-src="/posts/4a2a/acksls3.png" class>
+
+
+<h2 id="二、接入日志方式"><a href="#二、接入日志方式" class="headerlink" title="二、接入日志方式"></a>二、接入日志方式</h2><h3 id="2-1-ACK-集群手动接入"><a href="#2-1-ACK-集群手动接入" class="headerlink" title="2.1 ACK 集群手动接入"></a>2.1 ACK 集群手动接入</h3><blockquote>
+<p>本次接入应用标准输出日志，如需接入文件日志，还需创建对应volumeMounts和volumes 配置，规则逻辑类似。</p>
+</blockquote>
+<h4 id="1）通过控制台配置"><a href="#1）通过控制台配置" class="headerlink" title="1）通过控制台配置"></a>1）通过控制台配置</h4><ul>
+<li>进入应用详情页</li>
+</ul>
+<img data-src="/posts/4a2a/acksls4.png" class>
+
+<ul>
+<li>点击应用编辑按钮，添加相关日志采集配置。</li>
+</ul>
+<img data-src="/posts/4a2a/acksls5.png" class>
+<img data-src="/posts/4a2a/acksls6.png" class>
+
+<h4 id="2）通过YAML-模板创建（Deployment-x2F-Pod）"><a href="#2）通过YAML-模板创建（Deployment-x2F-Pod）" class="headerlink" title="2）通过YAML 模板创建（Deployment &#x2F; Pod）"></a>2）通过YAML 模板创建（Deployment &#x2F; Pod）</h4><ul>
+<li><p>采集规则</p>
+<blockquote>
+<ul>
+<li>name: aliyun_logs_{Logstore名称}<br> value: {日志采集路径}</li>
+</ul>
+</blockquote>
+</li>
+<li><p>模板关键配置示例</p>
+</li>
+</ul>
+<p>Pod 示例部分：</p>
+<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">apiVersion:</span> <span class="string">v1</span></span><br><span class="line"><span class="attr">kind:</span> <span class="string">Pod</span></span><br><span class="line"><span class="attr">spec:</span></span><br><span class="line">  <span class="attr">containers:</span></span><br><span class="line">  <span class="bullet">-</span> <span class="attr">name:</span> <span class="string">my-demo-app</span></span><br><span class="line">    <span class="attr">env:</span></span><br><span class="line">    <span class="comment">######### 配置 环境变量 ###########</span></span><br><span class="line">    <span class="bullet">-</span> <span class="attr">name:</span> <span class="string">aliyun_logs_log-stdout</span></span><br><span class="line">      <span class="attr">value:</span> <span class="string">stdout</span></span><br><span class="line">    <span class="bullet">-</span> <span class="attr">name:</span> <span class="string">aliyun_logs_log-varlog</span></span><br><span class="line">      <span class="attr">value:</span> <span class="string">/var/log/*.log</span></span><br><span class="line">    <span class="bullet">-</span> <span class="attr">name:</span> <span class="string">aliyun_logs_mytag1_tags</span></span><br><span class="line">      <span class="attr">value:</span> <span class="string">tag1=v1</span></span><br><span class="line">    <span class="comment">###############################</span></span><br><span class="line">    <span class="comment">######### 配置volume mount ###########</span></span><br><span class="line">    <span class="attr">volumeMounts:</span></span><br><span class="line">    <span class="bullet">-</span> <span class="attr">name:</span> <span class="string">volumn-sls-mydemo</span></span><br><span class="line">      <span class="attr">mountPath:</span> <span class="string">/var/log</span></span><br><span class="line">  <span class="attr">volumes:</span></span><br><span class="line">  <span class="bullet">-</span> <span class="attr">name:</span> <span class="string">volumn-sls-mydemo</span></span><br><span class="line">    <span class="attr">emptyDir:</span> &#123;&#125;</span><br><span class="line">  <span class="comment">###############################</span></span><br></pre></td></tr></table></figure>
+<p>deployment 示例部分：</p>
+<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">apiVersion:</span> <span class="string">apps/v1</span></span><br><span class="line"><span class="attr">kind:</span> <span class="string">Deployment</span></span><br><span class="line"><span class="attr">spec:</span></span><br><span class="line">  <span class="attr">template:</span></span><br><span class="line">    <span class="attr">spec:</span></span><br><span class="line">      <span class="attr">containers:</span></span><br><span class="line">        <span class="bullet">-</span> <span class="attr">args:</span> <span class="string">xxx-args</span></span><br><span class="line">          <span class="attr">env:</span></span><br><span class="line">            <span class="bullet">-</span> <span class="attr">name:</span> <span class="string">aliyun_logs_app-110760134-domain-event-center</span></span><br><span class="line">              <span class="attr">value:</span> <span class="string">stdout</span></span><br><span class="line">          <span class="attr">image:</span> <span class="string">xxx-image</span></span><br></pre></td></tr></table></figure>
+<p>多个应用收集到同一个logstore 示例：</p>
+<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#应用A 配置：</span></span><br><span class="line"><span class="comment">######### 配置 环境变量 ###########</span></span><br><span class="line">    <span class="bullet">-</span> <span class="attr">name:</span> <span class="string">aliyun_logs_app1-stdout</span></span><br><span class="line">      <span class="attr">value:</span> <span class="string">stdout</span></span><br><span class="line">    <span class="bullet">-</span> <span class="attr">name:</span> <span class="string">aliyun_logs_app1-stdout_logstore</span></span><br><span class="line">      <span class="attr">value:</span> <span class="string">stdout-logstore</span></span><br><span class="line">      </span><br><span class="line">      </span><br><span class="line"><span class="comment">#应用B 配置：</span></span><br><span class="line"><span class="comment">######### 配置 环境变量 ###########</span></span><br><span class="line">    <span class="bullet">-</span> <span class="attr">name:</span> <span class="string">aliyun_logs_app2-stdout</span></span><br><span class="line">      <span class="attr">value:</span> <span class="string">stdout</span></span><br><span class="line">    <span class="bullet">-</span> <span class="attr">name:</span> <span class="string">aliyun_logs_app2-stdout_logstore</span></span><br><span class="line">      <span class="attr">value:</span> <span class="string">stdout-logstore</span></span><br></pre></td></tr></table></figure>
+
+<h4 id="3）验证查看日志"><a href="#3）验证查看日志" class="headerlink" title="3）验证查看日志"></a>3）验证查看日志</h4><ul>
+<li>登录SLS 控制台，进入对应集群Project</li>
+</ul>
+<img data-src="/posts/4a2a/acksls7.png" class>
+
+<ul>
+<li>查询分析</li>
+</ul>
+<img data-src="/posts/4a2a/acksls8.png" class>
+
+<h4 id="4）其他"><a href="#4）其他" class="headerlink" title="4）其他"></a>4）其他</h4><ul>
+<li>注意事项<blockquote>
+<p><strong>注意：</strong><br>**    当多个不同namespace 的同名应用配置为同一个logstore 时，可通过__tag__ 过滤条件，搜索对应需要的日志。**<br>**    如需自定义tag 区分不同日志时，可通过自定义tag 区分。**</p>
+<img data-src="/posts/4a2a/acksls9.png" class></blockquote>
+</li>
+</ul>
+<blockquote>
+<p>参考阿里云官方文档：<a target="_blank" rel="noopener" href="https://help.aliyun.com/document_detail/87540.html">https://help.aliyun.com/document_detail&#x2F;87540.html</a></p>
+</blockquote>
+<h3 id="2-2-DaemonSet-方式接入"><a href="#2-2-DaemonSet-方式接入" class="headerlink" title="2.2 DaemonSet 方式接入"></a>2.2 DaemonSet 方式接入</h3><h4 id="1）通过DaemonSet-控制台方式采集"><a href="#1）通过DaemonSet-控制台方式采集" class="headerlink" title="1）通过DaemonSet 控制台方式采集"></a>1）通过DaemonSet 控制台方式采集</h4><blockquote>
+<p>可选择采集文件或标准输出，本次接入应用标准输出日志。</p>
+</blockquote>
+<ul>
+<li>在SLS 控制台搜索 <strong>Kubenetes - 标准输出</strong>，选择日志收集方式。</li>
+</ul>
+<img data-src="/posts/4a2a/acksls10.png" class>
+
+<ul>
+<li>选择&#x2F;创建 Project 和store。</li>
+</ul>
+<img data-src="/posts/4a2a/acksls11.png" class>
+
+<ul>
+<li>选择已有机器组</li>
+</ul>
+<img data-src="/posts/4a2a/acksls12.png" class>
+
+<ul>
+<li>收集过滤需要的日志，详细语法可参考文档。</li>
+</ul>
+<img data-src="/posts/4a2a/acksls13.png" class>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="punctuation">&#123;</span></span><br><span class="line">  <span class="attr">&quot;inputs&quot;</span><span class="punctuation">:</span> <span class="punctuation">[</span></span><br><span class="line">    <span class="punctuation">&#123;</span></span><br><span class="line">      <span class="attr">&quot;detail&quot;</span><span class="punctuation">:</span> <span class="punctuation">&#123;</span></span><br><span class="line">        <span class="attr">&quot;IncludeLabel&quot;</span><span class="punctuation">:</span> <span class="punctuation">&#123;</span><span class="punctuation">&#125;</span><span class="punctuation">,</span></span><br><span class="line">        <span class="attr">&quot;ExcludeLabel&quot;</span><span class="punctuation">:</span> <span class="punctuation">&#123;</span><span class="attr">&quot;io.kubernetes.container.name&quot;</span><span class="punctuation">:</span> <span class="string">&quot;camel-k-operator&quot;</span><span class="punctuation">&#125;</span><span class="punctuation">,</span></span><br><span class="line">        <span class="attr">&quot;IncludeEnv&quot;</span><span class="punctuation">:</span> <span class="punctuation">&#123;</span><span class="attr">&quot;CAMEL_K_INTEGRATION&quot;</span><span class="punctuation">:</span> <span class="string">&quot;&quot;</span><span class="punctuation">&#125;</span><span class="punctuation">,</span></span><br><span class="line">      <span class="punctuation">&#125;</span><span class="punctuation">,</span></span><br><span class="line">      <span class="attr">&quot;type&quot;</span><span class="punctuation">:</span> <span class="string">&quot;service_docker_stdout&quot;</span></span><br><span class="line">    <span class="punctuation">&#125;</span></span><br><span class="line">  <span class="punctuation">]</span></span><br><span class="line"><span class="punctuation">&#125;</span></span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>进入SLS 控制台，并选择对应Project。点击创建索引</li>
+</ul>
+<img data-src="/posts/4a2a/acksls14.png" class>
+<img data-src="/posts/4a2a/acksls15.png" class>
+
+<ul>
+<li>索引创建后等待1 min左右，即可看到标准输出日志。</li>
+</ul>
+<img data-src="/posts/4a2a/acksls16.png" class>
+
+<h4 id="2）通过DaemonSet-CRD-方式采集"><a href="#2）通过DaemonSet-CRD-方式采集" class="headerlink" title="2）通过DaemonSet CRD 方式采集"></a>2）通过DaemonSet CRD 方式采集</h4><blockquote>
+<p>Edas 中配置日志收集即使用的该方式。</p>
+</blockquote>
+<p><a target="_blank" rel="noopener" href="https://help.aliyun.com/document_detail/74878.htm">https://help.aliyun.com/document_detail&#x2F;74878.htm</a></p>
+<h3 id="2-3-Sidecar-方式接入"><a href="#2-3-Sidecar-方式接入" class="headerlink" title="2.3 Sidecar 方式接入"></a>2.3 Sidecar 方式接入</h3><h4 id="1）通过Sidecar-控制台方式采集"><a href="#1）通过Sidecar-控制台方式采集" class="headerlink" title="1）通过Sidecar 控制台方式采集"></a>1）通过Sidecar 控制台方式采集</h4><p><a target="_blank" rel="noopener" href="https://help.aliyun.com/document_detail/100575.htm">https://help.aliyun.com/document_detail&#x2F;100575.htm</a></p>
+<h4 id="2）通过Sidecar-CRD-方式采集"><a href="#2）通过Sidecar-CRD-方式采集" class="headerlink" title="2）通过Sidecar CRD 方式采集"></a>2）通过Sidecar CRD 方式采集</h4><p><a target="_blank" rel="noopener" href="https://help.aliyun.com/document_detail/100575.htm">https://help.aliyun.com/document_detail&#x2F;100575.htm</a></p>
+<blockquote>
+<p>参考阿里云官方文档：<a target="_blank" rel="noopener" href="https://help.aliyun.com/document_detail/66654.html">https://help.aliyun.com/document_detail&#x2F;66654.html</a></p>
+</blockquote>
+
+    </div>
+
+    
+    
+    
+        
+
+<div>
+<ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>本文作者： </strong>Yakir
+  </li>
+  <li class="post-copyright-link">
+    <strong>本文链接：</strong>
+    <a href="https://359sun.top/posts/4a2a.html" title="ACK集群日志接入SLS">https://359sun.top/posts/4a2a.html</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" rel="noopener" target="_blank"><i class="fab fa-fw fa-creative-commons"></i>BY-NC-SA</a> 许可协议。转载请注明出处！
+  </li>
+</ul>
+</div>
+
+        
+
+  <div class="followme">
+    <p>欢迎关注我的其它发布渠道</p>
+
+    <div class="social-list">
+
+        <div class="social-item">
+          <a target="_blank" class="social-link" href="/atom.xml">
+            <span class="icon">
+              <i class="fa fa-rss"></i>
+            </span>
+
+            <span class="label">RSS</span>
+          </a>
+        </div>
+    </div>
+  </div>
+
+
+      <footer class="post-footer">
+          
+          <div class="post-tags">
+              <!-- <a href="/tags/%E9%98%BF%E9%87%8C%E4%BA%91/" rel="tag"><i class="fa fa-tag"></i> 阿里云</a> -->
+              <a href="/tags/%E9%98%BF%E9%87%8C%E4%BA%91/" rel="tag"><i class="fa fa-tag"></i> 阿里云</a>
+              <!-- <a href="/tags/k8s/" rel="tag"><i class="fa fa-tag"></i> K8S</a> -->
+              <a href="/tags/k8s/" rel="tag"><i class="fa fa-tag"></i> K8S</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/posts/64a8.html" rel="prev" title="VPC 网络规划案例">
+      <i class="fa fa-chevron-left"></i> VPC 网络规划案例
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/posts/c06e.html" rel="next" title="Docker学习记录">
+      Docker学习记录 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+    <div class="comments" id="gitalk-container"></div>
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%80%E3%80%81%E6%8E%A5%E5%85%A5%E5%89%8D%E6%8F%90"><span class="nav-text">一、接入前提</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BA%8C%E3%80%81%E6%8E%A5%E5%85%A5%E6%97%A5%E5%BF%97%E6%96%B9%E5%BC%8F"><span class="nav-text">二、接入日志方式</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#2-1-ACK-%E9%9B%86%E7%BE%A4%E6%89%8B%E5%8A%A8%E6%8E%A5%E5%85%A5"><span class="nav-text">2.1 ACK 集群手动接入</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#1%EF%BC%89%E9%80%9A%E8%BF%87%E6%8E%A7%E5%88%B6%E5%8F%B0%E9%85%8D%E7%BD%AE"><span class="nav-text">1）通过控制台配置</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2%EF%BC%89%E9%80%9A%E8%BF%87YAML-%E6%A8%A1%E6%9D%BF%E5%88%9B%E5%BB%BA%EF%BC%88Deployment-x2F-Pod%EF%BC%89"><span class="nav-text">2）通过YAML 模板创建（Deployment &#x2F; Pod）</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#3%EF%BC%89%E9%AA%8C%E8%AF%81%E6%9F%A5%E7%9C%8B%E6%97%A5%E5%BF%97"><span class="nav-text">3）验证查看日志</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#4%EF%BC%89%E5%85%B6%E4%BB%96"><span class="nav-text">4）其他</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-2-DaemonSet-%E6%96%B9%E5%BC%8F%E6%8E%A5%E5%85%A5"><span class="nav-text">2.2 DaemonSet 方式接入</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#1%EF%BC%89%E9%80%9A%E8%BF%87DaemonSet-%E6%8E%A7%E5%88%B6%E5%8F%B0%E6%96%B9%E5%BC%8F%E9%87%87%E9%9B%86"><span class="nav-text">1）通过DaemonSet 控制台方式采集</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2%EF%BC%89%E9%80%9A%E8%BF%87DaemonSet-CRD-%E6%96%B9%E5%BC%8F%E9%87%87%E9%9B%86"><span class="nav-text">2）通过DaemonSet CRD 方式采集</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-3-Sidecar-%E6%96%B9%E5%BC%8F%E6%8E%A5%E5%85%A5"><span class="nav-text">2.3 Sidecar 方式接入</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#1%EF%BC%89%E9%80%9A%E8%BF%87Sidecar-%E6%8E%A7%E5%88%B6%E5%8F%B0%E6%96%B9%E5%BC%8F%E9%87%87%E9%9B%86"><span class="nav-text">1）通过Sidecar 控制台方式采集</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2%EF%BC%89%E9%80%9A%E8%BF%87Sidecar-CRD-%E6%96%B9%E5%BC%8F%E9%87%87%E9%9B%86"><span class="nav-text">2）通过Sidecar CRD 方式采集</span></a></li></ol></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Yakir"
+      src="/images/avatar.jpg">
+  <p class="site-author-name" itemprop="name">Yakir</p>
+  <div class="site-description" itemprop="description">Yakir Blog</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">11</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">3</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">4</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/yakir3" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;yakir3" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="/atom.xml" title="RSS → &#x2F;atom.xml"><i class="fa fa-rss fa-fw"></i>RSS</a>
+      </span>
+  </div>
+
+
+
+  <div class="links-of-blogroll motion-element links-of-blogroll-block">
+    <div class="links-of-blogroll-title">
+      <!-- modify icon to fire by szw -->
+      <i class="fa fa-history fa-" aria-hidden="true"></i>
+      近期文章
+    </div>
+    <ul class="links-of-blogroll-list">
+      
+      
+        <li class="recent_posts_li">
+          <!--<a href="/" title="" target="_blank"></a>-->
+        </li>
+      
+        <li class="recent_posts_li">
+          <!--<a href="/" title="" target="_blank"></a>-->
+        </li>
+      
+        <li class="recent_posts_li">
+          <!--<a href="/" title="" target="_blank"></a>-->
+        </li>
+      
+    </ul>
+  </div>
+
+
+
+
+      </div>
+        <div class="back-to-top motion-element">
+          <i class="fa fa-arrow-up"></i>
+          <span>0%</span>
+        </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2022</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Yakir</span>
+</div>
+  <div class="powered-by">Powered by Hexo Next
+  </div>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/jquery@3/dist/jquery.min.js"></script>
+  <script src="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/lozad@1/dist/lozad.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+<link rel="stylesheet" href="//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.css">
+
+<script>
+NexT.utils.loadComments(document.querySelector('#gitalk-container'), () => {
+  NexT.utils.getScript('//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.js', () => {
+    var gitalk = new Gitalk({
+      clientID    : 'dc69ab400b19bd3a1bab',
+      clientSecret: '5a20b4b4faa303672257572d4df0be83b97061cb',
+      repo        : 'yakir3.github.io',
+      owner       : 'yakir3',
+      admin       : ['yakir3'],
+      id          : '44985b600fbbdad515a48180658d74b3',
+        language: 'zh-CN',
+      distractionFreeMode: true
+    });
+    gitalk.render('gitalk-container');
+  }, window.Gitalk);
+});
+</script>
+
+</body>
+</html>

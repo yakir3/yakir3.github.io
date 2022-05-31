@@ -1,0 +1,825 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 6.2.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+<link rel="stylesheet" href="https://fonts.loli.net/css?family=Noto Serif SC:300,300italic,400,400italic,700,700italic&display=swap&subset=latin,latin-ext">
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.css">
+  <link rel="stylesheet" href="/lib/pace/pace-theme-minimal.min.css">
+  <script src="/lib/pace/pace.min.js"></script>
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"359sun.top","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"left","always":true,"display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":true,"show_result":true,"style":"mac"},"back2top":{"enable":true,"sidebar":true,"scrollpercent":true},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":true,"mediumzoom":false,"lazyload":true,"pangu":false,"comments":{"style":"tabs","active":"gitalk","storage":true,"lazyload":false,"nav":{"gitalk":{"order":-2}},"activeClass":"gitalk"},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+  <meta name="description" content="一、ACK集群网络规划https:&#x2F;&#x2F;help.aliyun.com&#x2F;document_detail&#x2F;86500.html 二、RBAC授权https:&#x2F;&#x2F;yuque.antfin.com&#x2F;kifo8h&#x2F;nee5aa&#x2F;mvx5t5 三、网络容器网络CNIhttps:&#x2F;&#x2F;help.aliyun.com&#x2F;document_detail&#x2F;195424.html">
+<meta property="og:type" content="article">
+<meta property="og:title" content="ACK-K8S学习记录">
+<meta property="og:url" content="https://359sun.top/posts/754e.html">
+<meta property="og:site_name" content="Yakir Blog">
+<meta property="og:description" content="一、ACK集群网络规划https:&#x2F;&#x2F;help.aliyun.com&#x2F;document_detail&#x2F;86500.html 二、RBAC授权https:&#x2F;&#x2F;yuque.antfin.com&#x2F;kifo8h&#x2F;nee5aa&#x2F;mvx5t5 三、网络容器网络CNIhttps:&#x2F;&#x2F;help.aliyun.com&#x2F;document_detail&#x2F;195424.html">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://359sun.top/posts/754e/k8s1.png">
+<meta property="og:image" content="https://359sun.top/posts/754e/k8s2.png">
+<meta property="og:image" content="https://359sun.top/posts/754e/k8s3.png">
+<meta property="og:image" content="https://359sun.top/posts/754e/k8s4.png">
+<meta property="article:published_time" content="2022-05-31T15:04:28.000Z">
+<meta property="article:modified_time" content="2022-05-31T15:29:56.471Z">
+<meta property="article:author" content="Yakir">
+<meta property="article:tag" content="阿里云">
+<meta property="article:tag" content="K8S">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://359sun.top/posts/754e/k8s1.png">
+
+<link rel="canonical" href="https://359sun.top/posts/754e.html">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>ACK-K8S学习记录 | Yakir Blog</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+<link rel="alternate" href="/atom.xml" title="Yakir Blog" type="application/atom+xml">
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">Yakir Blog</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+        <li class="menu-item menu-item-musiclist">
+
+    <a href="/musiclist/" rel="section"><i class="fa fa-music fa-fw"></i>歌单</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="reading-progress-bar"></div>
+
+  <a href="https://github.com/yakir3" class="github-corner" title="Follow me on GitHub" aria-label="Follow me on GitHub" rel="noopener" target="_blank"><svg width="80" height="80" viewBox="0 0 250 250" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path></svg></a>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://359sun.top/posts/754e.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.jpg">
+      <meta itemprop="name" content="Yakir">
+      <meta itemprop="description" content="Yakir Blog">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Yakir Blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          ACK-K8S学习记录
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+              
+
+              <time title="创建时间：2022-05-31 23:04:28 / 修改时间：23:29:56" itemprop="dateCreated datePublished" datetime="2022-05-31T23:04:28+08:00">2022-05-31</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E4%BA%91%E5%8E%9F%E7%94%9F/" itemprop="url" rel="index"><span itemprop="name">云原生</span></a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span><br>
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+                <span class="post-meta-item-text">本文字数：</span>
+              <span>4.8k</span>
+            </span>
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+                <span class="post-meta-item-text">阅读时长 &asymp;</span>
+              <span>4 分钟</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h3 id="一、ACK集群网络规划"><a href="#一、ACK集群网络规划" class="headerlink" title="一、ACK集群网络规划"></a>一、ACK集群网络规划</h3><p><a target="_blank" rel="noopener" href="https://help.aliyun.com/document_detail/86500.html">https://help.aliyun.com/document_detail&#x2F;86500.html</a></p>
+<h3 id="二、RBAC授权"><a href="#二、RBAC授权" class="headerlink" title="二、RBAC授权"></a>二、RBAC授权</h3><p><a target="_blank" rel="noopener" href="https://yuque.antfin.com/kifo8h/nee5aa/mvx5t5">https://yuque.antfin.com/kifo8h/nee5aa/mvx5t5</a></p>
+<h3 id="三、网络"><a href="#三、网络" class="headerlink" title="三、网络"></a>三、网络</h3><h4 id="容器网络CNI"><a href="#容器网络CNI" class="headerlink" title="容器网络CNI"></a>容器网络CNI</h4><p><a target="_blank" rel="noopener" href="https://help.aliyun.com/document_detail/195424.html">https://help.aliyun.com/document_detail&#x2F;195424.html</a></p>
+<span id="more"></span>
+
+<h4 id="Service：将一组容器暴露访问接入点，可负载均衡"><a href="#Service：将一组容器暴露访问接入点，可负载均衡" class="headerlink" title="Service：将一组容器暴露访问接入点，可负载均衡"></a>Service：将一组容器暴露访问接入点，可负载均衡</h4><ul>
+<li><p><strong>ClusterIP</strong>：在集群内部IP上公开服务。选择此值使服务只能从集群中访问。（默认创建的 ServiceType）</p>
+</li>
+<li><p><strong>NodePort</strong>：在每个Node的IP上公开静态端口（NodePort）服务。将自动创建NodePort服务到ClusterIP服务的路由。可以通过请求：来从群集外部请求NodePort服务。</p>
+</li>
+<li><p><strong>LoadBalancer</strong>：使用云提供商的负载均衡器在外部公开服务。将自动创建外部负载均衡器到NodePort和ClusterIP服务的路由</p>
+</li>
+<li><p><strong>Headless Service</strong>：在Service属性中指定clusterIP字段为None类型。采用Headless Service类型后，Service将没有固定的虚拟IP地址，客户端访问Service的域名时会通过DNS返回所有的后端Pod实例的IP地址，客户端需要采用DNS负载均衡来实现对后端的负载均衡</p>
+</li>
+<li><p><strong>ExternalName</strong>：将集群外部的域名映射到集群内部的Service上，例如将外部的数据库域名映射到集群内部的Service名，那么就能在集群内部通过Service名直接访问。</p>
+</li>
+</ul>
+<blockquote>
+<p><strong>集群信息：</strong></p>
+<ul>
+<li>集群CIDR（Master、Node ECS实例IP）：172.16.0.0&#x2F;16 </li>
+<li>Pod CIDR：10.16.0.0&#x2F;12</li>
+<li>Service CIDR：10.32.0.0&#x2F;16</li>
+</ul>
+<p><strong>Service信息：</strong></p>
+<ul>
+<li>暴露ClusterIP：10.32.230.55</li>
+<li>内部端点：reos-app-file-base-svc:80 TCP</li>
+</ul>
+</blockquote>
+<p><strong>Pod 信息（两个副本）：</strong></p>
+<blockquote>
+<ul>
+<li>IP：10.16.1.41、10.16.3.227</li>
+<li>容器内部启动端口：8080</li>
+</ul>
+</blockquote>
+<p><strong>NodePort信息（两个Node节点、使用ClusterIP模式时没有该信息）：</strong></p>
+<blockquote>
+<ul>
+<li>NodeIP：172.16.9.150、172.16.9.64</li>
+<li>公开的静态端口：30152、30144</li>
+</ul>
+</blockquote>
+<p><strong>LoadBanlancer 信息（公网或私网）：</strong></p>
+<blockquote>
+<ul>
+<li>暴露公网IP：112.124.13.114</li>
+<li>外部端点：112.124.13.114:80</li>
+</ul>
+<p><strong>此时，可通过四种方式进行应用的请求（最终流量到达一致，都会到容器内部）：</strong></p>
+<ol>
+<li>集群内部请求 ServiceIP：10.32.230.55:80 或 reos-app-file-base-svc:80（解析需Coredns组件）</li>
+<li>集群内部请求 PodIP（随时变化，一般不使用）：10.16.1.41:8080 或 10.16.3.227:8080</li>
+<li>集群内部或外部请求 NodeIP：172.16.9.150:30152 或 172.16.9.64:30144</li>
+<li>集群内部或外部请求 SLB IP：112.124.13.114:80 （注意集群内部访问时要修改外部策略 local –&gt; Cluster）</li>
+</ol>
+<p><strong>查看端点信息：kubectl get endpoints&#x2F;xxxxx -owide</strong></p>
+</blockquote>
+<img data-src="/posts/754e/k8s1.png" class>
+
+
+<h4 id="Ingress：将集群内的-Service-对外暴露7层的访问接入点"><a href="#Ingress：将集群内的-Service-对外暴露7层的访问接入点" class="headerlink" title="Ingress：将集群内的 Service 对外暴露7层的访问接入点"></a>Ingress：将集群内的 Service 对外暴露7层的访问接入点</h4><p>如：前后端使用 &#x2F;static&#x2F; 、 &#x2F;apis&#x2F; 的不同 URL ，使用 Ingress 匹配规则并进行对应后端的反向代理</p>
+<img data-src="/posts/754e/k8s2.png" class>
+
+<h4 id="Coredns：服务发现DNS，实现不同部署环境访问同样的访问入口"><a href="#Coredns：服务发现DNS，实现不同部署环境访问同样的访问入口" class="headerlink" title="Coredns：服务发现DNS，实现不同部署环境访问同样的访问入口"></a>Coredns：服务发现DNS，实现不同部署环境访问同样的访问入口</h4><ul>
+<li>通过 Service 的服务名解析出 ClusterIP</li>
+<li>通过 StatefulSet 的 Pod 名解析出 Pod 的 IP</li>
+</ul>
+<h4 id="其他"><a href="#其他" class="headerlink" title="其他"></a>其他</h4><ul>
+<li>相关阿里云资源：<a target="_blank" rel="noopener" href="https://help.aliyun.com/product/27706.html">VPC</a>、<a target="_blank" rel="noopener" href="https://help.aliyun.com/product/27537.html">SLB</a></li>
+<li><a target="_blank" rel="noopener" href="https://help.aliyun.com/document_detail/97467.html">Terway 与 Flannel对比</a></li>
+</ul>
+<h3 id="四、存储"><a href="#四、存储" class="headerlink" title="四、存储"></a>四、存储</h3><img data-src="/posts/754e/k8s3.png" class>
+<h4 id="容器存储接口CSI-Plugin-组件"><a href="#容器存储接口CSI-Plugin-组件" class="headerlink" title="容器存储接口CSI-Plugin 组件"></a>容器存储接口CSI-Plugin 组件</h4><ul>
+<li>云盘存储卷</li>
+<li>容器网络文件系统</li>
+<li>NAS 存储卷</li>
+<li>OSS 存储卷</li>
+<li>CPFS 存储卷</li>
+<li>本地存储卷</li>
+<li>容器存储监控&amp;运维</li>
+</ul>
+<h4 id="存储FlexVolume-组件"><a href="#存储FlexVolume-组件" class="headerlink" title="存储FlexVolume 组件"></a>存储FlexVolume 组件</h4><ul>
+<li>云盘存储卷</li>
+<li>NAS 存储卷</li>
+<li>OSS 存储卷</li>
+<li>CPFS 存储卷</li>
+<li>持久化存储卷声明</li>
+</ul>
+<h3 id="五、应用"><a href="#五、应用" class="headerlink" title="五、应用"></a>五、应用</h3><h4 id="工作负载"><a href="#工作负载" class="headerlink" title="工作负载"></a>工作负载</h4><ul>
+<li>无状态工作 Deployment</li>
+<li>有状态工作 StatefulSet<ul>
+<li>特性：Pod 一致性、稳定的持久化存储、稳定的网络标志（hostname）、稳定的次序（副本的数字序号）</li>
+</ul>
+</li>
+<li>守护进程集 DaemenSet<ul>
+<li>保证每个节点上都运行一个容器副本</li>
+<li>部署集群日志、监控或其他系统管理应用</li>
+</ul>
+</li>
+<li>任务 Job<ul>
+<li>仅执行一次性任务，保证批处理任务一个或多个 Pod 成功结束</li>
+<li>支持的Job类型：非并行、固定结束次数、工作队列并行Job、固定结束次数的并行Job</li>
+</ul>
+</li>
+<li>定时任务 CronJob<ul>
+<li>执行周期性和重复性任务（如备份操作或发送邮件），通过时间调度</li>
+</ul>
+</li>
+<li>容器组<ul>
+<li>Pod：最小部署单元，由单个容器（实际docker 容器）或几个紧耦合的容器组成</li>
+</ul>
+</li>
+<li>自定义资源<ul>
+<li>自定义资源定义拓展 K8S API</li>
+<li>查看集群中所有API 组和包含的资源类型</li>
+</ul>
+</li>
+</ul>
+<h4 id="镜像（ACR仓库）"><a href="#镜像（ACR仓库）" class="headerlink" title="镜像（ACR仓库）"></a>镜像（ACR仓库）</h4><ul>
+<li>镜像签名组件：kritis-validation-hook</li>
+<li>镜像免密拉取组件：aliyun-acr-credential-helper</li>
+</ul>
+<h4 id="配置项-Configmap-与保密字典-Secret"><a href="#配置项-Configmap-与保密字典-Secret" class="headerlink" title="配置项 Configmap 与保密字典 Secret"></a>配置项 Configmap 与保密字典 Secret</h4><ul>
+<li>配置项管理和使用<ul>
+<li>控制台&#x2F;YAML  创建管理Configmap 资源</li>
+<li>使用：设置Pod 环境变量、设置命令行参数、数据卷中使用</li>
+</ul>
+</li>
+<li>保密字典管理和使用<ul>
+<li>控制台&#x2F;YAML 创建管理Secret 资源</li>
+<li>使用：设置Pod 环境变量、数据卷中使用</li>
+</ul>
+</li>
+</ul>
+<h4 id="应用调度与部署"><a href="#应用调度与部署" class="headerlink" title="应用调度与部署"></a>应用调度与部署</h4><ul>
+<li>调度应用Pod 至指定节点：通过设置节点<strong>标签</strong>，配置nodeSelector 强制约束Pod 调度到指定节点（控制台给节点添加标签，然后Pod 启动的YAML 模板 spec –&gt; nodeSelector –&gt; gourp 配置为新增的标签名）</li>
+<li>Descheduler 组件对集群Pod 调度优化（通过策略设置）<ul>
+<li>删除重复Pod，确保只有一个Pod 与同一节点运行的ReplicaSet、Replication Controller、StatefulSet、Job 关联</li>
+<li>删除违反Pod 间反亲和性的Pod</li>
+<li>驱逐其他节点Pod 到未充分利用的节点</li>
+<li>删除重启次数过多的Pod</li>
+</ul>
+</li>
+<li>应用触发器重新部署应用：控制台生成触发器URL，通过请求URL 触发重新部署（可通过curl 或集成开发语言）</li>
+<li>Helm 应用部署<ul>
+<li>Chart：Helm包，包含运行应用所需的镜像、依赖和资源定义、集群中服务定义，类似APT 的dpkg 或YUM 的rpm 文件。</li>
+<li>Release：运行Chart 的实例。同一集群Chart 可以安装多次，每次安装都会创建一个release（如一个MySQL Chart 安装两次，就会在服务器上产生两个release 版本的数据库）。</li>
+<li>Repository： 用于发布和存储Chart 的存储库。</li>
+<li>Helm 组件：Helm CLI 客户端工具、Tiller 服务端组件、Repository 存储库（HTTP协议访问）。</li>
+</ul>
+</li>
+<li>控制台方式&#x2F;YAML方式 部署、发布和监控应用</li>
+</ul>
+<h4 id="使用AHAS对应用进行高可用防护"><a href="#使用AHAS对应用进行高可用防护" class="headerlink" title="使用AHAS对应用进行高可用防护"></a>使用AHAS对应用进行高可用防护</h4><p><a target="_blank" rel="noopener" href="https://help.aliyun.com/document_detail/193575.html">https://help.aliyun.com/document_detail&#x2F;193575.html</a></p>
+<h3 id="六、组件"><a href="#六、组件" class="headerlink" title="六、组件"></a>六、组件</h3><h4 id="核心组件"><a href="#核心组件" class="headerlink" title="核心组件"></a>核心组件</h4><ul>
+<li><p>系统组件</p>
+<ul>
+<li>Kube API Server：集群总线和入口网关。</li>
+<li>Kube Controller Manager：集群内部资源管理器。</li>
+<li>Cloud Controller Manager：提供集群与阿里云基础产品对接能力，如 CLB、VPC等。<h4 id="应用管理"><a href="#应用管理" class="headerlink" title="应用管理"></a>应用管理</h4></li>
+</ul>
+</li>
+<li><p>可选组件</p>
+<ul>
+<li>appcenter：提供统一管理多集群应用部署和应用生命周期的应用中心组件。</li>
+<li>progressive-delivery-tool：提供应用渐进式灰度发布的组件。<h4 id="日志与监控"><a href="#日志与监控" class="headerlink" title="日志与监控"></a>日志与监控</h4></li>
+</ul>
+</li>
+<li><p>系统组件</p>
+<ul>
+<li>alicloud-monitor-controller：ACK提供对接云监控的系统组件。</li>
+<li>metrics-server：ACK基于社区开源监控组件进行改造和增强的监控采集和离线组件，并提供Metrics API进行数据消费，提供HPA的能力。</li>
+</ul>
+</li>
+<li><p>可选组件</p>
+<ul>
+<li>ack-node-problem-detector：ACK基于社区开源项目进行改造和增强的集群节点异常事件监控组件，以及对接第三方监控平台功能的组件。</li>
+<li>ags-metrics-collector：为基因计算客户使用的监控服务组件，可以通过该组件监控基因工作流中各个节点资源使用的详细信息。</li>
+<li>ack-arms-prometheus：使用ARMS Prometheus实现容器服务集群监控。</li>
+<li>logtail-ds：使用日志服务采集Kubernetes容器日志。</li>
+<li>logtail-windows：ACK集群上使用的容器日志收集插件，用于在阿里云上配合SLS服务对Windows容器进行日志收集。<h4 id="存储"><a href="#存储" class="headerlink" title="存储"></a>存储</h4></li>
+</ul>
+</li>
+<li><p>可选组件</p>
+<ul>
+<li>csi-plugin：支持数据卷的挂载、卸载功能。创建集群时，如果选择CSI插件实现阿里云存储的接入能力的话，默认安装该组件。</li>
+<li>csi-provisioner：支持数据卷的自动创建能力。创建集群时，如果选择CSI插件实现阿里云存储的接入能力的话，默认安装该组件。</li>
+<li>storage-operator：用于管理存储组件的生命周期。</li>
+<li>alicloud-disk-controller：支持自动创建云盘卷。</li>
+<li>Flexvolume：社区较早实现的存储卷扩展机制。Flexvolume支持数据卷的挂载、卸载功能。创建集群时，如果选择Flexvolume插件实现阿里云存储的接入能力的话，默认安装该组件。</li>
+</ul>
+</li>
+</ul>
+<h4 id="网络"><a href="#网络" class="headerlink" title="网络"></a>网络</h4><ul>
+<li>系统组件<ul>
+<li>CoreDNS：ACK集群中默认采用的DNS服务发现插件，其遵循Kubernetes DNS-Based Service Discovery规范。</li>
+<li>Nginx Ingress Controller：Nginx Ingress Controller解析Ingress的转发规则。Ingress Controller收到请求，匹配Ingress转发规则转发到后端Service。</li>
+<li>managed-kube-proxy-windows：ACK托管版集群上使用的容器化kube-proxy，用于管理Windows节点上Service的访问入口，包括集群内Pod到Service的访问和集群外访问Service。</li>
+</ul>
+</li>
+<li>可选组件<ul>
+<li>Terway :  阿里云开源的基于专有网络VPC的容器网络接口CNI插件，支持基于Kubernetes标准的网络策略（NetworkPolicy）来定义容器间的访问策略。创建集群时，如果选择Terway网络插件实现集群内部网络互通的话，默认安装该组件。</li>
+<li>Flannel：容器网络接口CNI插件，在阿里云上使用的Flannel网络模式采用阿里云VPC模式。创建集群时，如果选择Flannel网络插件实现集群内部网络互通的话，默认安装该组件。</li>
+<li>ACK NodeLocal DNSCache：基于社区开源项目NodeLocal DNSCache的一套DNS本地缓存解决方案。</li>
+<li>kube-flannel-ds-windows：ACK托管版集群上使用的容器网络插件，用于构建适合Windows容器通讯的L2Bridge集群网络。</li>
+</ul>
+</li>
+</ul>
+<img data-src="/posts/754e/k8s4.png" class>
+
+<h4 id="安全"><a href="#安全" class="headerlink" title="安全"></a><a target="_blank" rel="noopener" href="https://help.aliyun.com/document_detail/277412.html#title-nq4-jps-k41">安全</a></h4><h4 id="其他-1"><a href="#其他-1" class="headerlink" title="其他"></a><a target="_blank" rel="noopener" href="https://help.aliyun.com/document_detail/277412.html#title-iib-fx3-2hl">其他</a></h4><h3 id="七、其他"><a href="#七、其他" class="headerlink" title="七、其他"></a>七、其他</h3><h4 id="K8S-集群-NetworkPolicy-策略"><a href="#K8S-集群-NetworkPolicy-策略" class="headerlink" title="K8S 集群 NetworkPolicy 策略"></a><a target="_blank" rel="noopener" href="https://yuque.antfin.com/kifo8h/nee5aa/bzg9vq">K8S 集群 NetworkPolicy 策略</a></h4><ul>
+<li>Pod 和 Pod 通信通过三个标识符组合来辨识：</li>
+</ul>
+<p>1、其他被允许的 Pods（Pod 无法阻塞自身的访问）<br>2、被允许的 namespace<br>3、IP 组块 （Pod 本身所在的 Node 和 Pod  IP通信默认允许通信）</p>
+<ul>
+<li>默认情况下，Pod 非隔离。 被 NetworkPolicy 选中进入隔离状态。</li>
+<li>NetworkPolicy 策略不会冲突，累积策略。多个策略作用于一个Pod时，Pod 的入站&#x2F;出站策略取所有策略的并集</li>
+<li>两个 Pod 之间通信时，需要源端Pod上的出站（Egress）规则和目标端 Pod 上的入站（Ingress）规则都要允许该流量。</li>
+<li>ACK只支持 Terway 网络模式，不支持 Flannel 网络模式</li>
+</ul>
+
+    </div>
+
+    
+    
+    
+        
+
+<div>
+<ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>本文作者： </strong>Yakir
+  </li>
+  <li class="post-copyright-link">
+    <strong>本文链接：</strong>
+    <a href="https://359sun.top/posts/754e.html" title="ACK-K8S学习记录">https://359sun.top/posts/754e.html</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" rel="noopener" target="_blank"><i class="fab fa-fw fa-creative-commons"></i>BY-NC-SA</a> 许可协议。转载请注明出处！
+  </li>
+</ul>
+</div>
+
+        
+
+  <div class="followme">
+    <p>欢迎关注我的其它发布渠道</p>
+
+    <div class="social-list">
+
+        <div class="social-item">
+          <a target="_blank" class="social-link" href="/atom.xml">
+            <span class="icon">
+              <i class="fa fa-rss"></i>
+            </span>
+
+            <span class="label">RSS</span>
+          </a>
+        </div>
+    </div>
+  </div>
+
+
+      <footer class="post-footer">
+          
+          <div class="post-tags">
+              <!-- <a href="/tags/%E9%98%BF%E9%87%8C%E4%BA%91/" rel="tag"><i class="fa fa-tag"></i> 阿里云</a> -->
+              <a href="/tags/%E9%98%BF%E9%87%8C%E4%BA%91/" rel="tag"><i class="fa fa-tag"></i> 阿里云</a>
+              <!-- <a href="/tags/k8s/" rel="tag"><i class="fa fa-tag"></i> K8S</a> -->
+              <a href="/tags/k8s/" rel="tag"><i class="fa fa-tag"></i> K8S</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/posts/c06e.html" rel="prev" title="Docker学习记录">
+      <i class="fa fa-chevron-left"></i> Docker学习记录
+    </a></div>
+      <div class="post-nav-item"></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+    <div class="comments" id="gitalk-container"></div>
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%B8%80%E3%80%81ACK%E9%9B%86%E7%BE%A4%E7%BD%91%E7%BB%9C%E8%A7%84%E5%88%92"><span class="nav-text">一、ACK集群网络规划</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BA%8C%E3%80%81RBAC%E6%8E%88%E6%9D%83"><span class="nav-text">二、RBAC授权</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%B8%89%E3%80%81%E7%BD%91%E7%BB%9C"><span class="nav-text">三、网络</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%AE%B9%E5%99%A8%E7%BD%91%E7%BB%9CCNI"><span class="nav-text">容器网络CNI</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Service%EF%BC%9A%E5%B0%86%E4%B8%80%E7%BB%84%E5%AE%B9%E5%99%A8%E6%9A%B4%E9%9C%B2%E8%AE%BF%E9%97%AE%E6%8E%A5%E5%85%A5%E7%82%B9%EF%BC%8C%E5%8F%AF%E8%B4%9F%E8%BD%BD%E5%9D%87%E8%A1%A1"><span class="nav-text">Service：将一组容器暴露访问接入点，可负载均衡</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Ingress%EF%BC%9A%E5%B0%86%E9%9B%86%E7%BE%A4%E5%86%85%E7%9A%84-Service-%E5%AF%B9%E5%A4%96%E6%9A%B4%E9%9C%B27%E5%B1%82%E7%9A%84%E8%AE%BF%E9%97%AE%E6%8E%A5%E5%85%A5%E7%82%B9"><span class="nav-text">Ingress：将集群内的 Service 对外暴露7层的访问接入点</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Coredns%EF%BC%9A%E6%9C%8D%E5%8A%A1%E5%8F%91%E7%8E%B0DNS%EF%BC%8C%E5%AE%9E%E7%8E%B0%E4%B8%8D%E5%90%8C%E9%83%A8%E7%BD%B2%E7%8E%AF%E5%A2%83%E8%AE%BF%E9%97%AE%E5%90%8C%E6%A0%B7%E7%9A%84%E8%AE%BF%E9%97%AE%E5%85%A5%E5%8F%A3"><span class="nav-text">Coredns：服务发现DNS，实现不同部署环境访问同样的访问入口</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%85%B6%E4%BB%96"><span class="nav-text">其他</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%9B%9B%E3%80%81%E5%AD%98%E5%82%A8"><span class="nav-text">四、存储</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%AE%B9%E5%99%A8%E5%AD%98%E5%82%A8%E6%8E%A5%E5%8F%A3CSI-Plugin-%E7%BB%84%E4%BB%B6"><span class="nav-text">容器存储接口CSI-Plugin 组件</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%AD%98%E5%82%A8FlexVolume-%E7%BB%84%E4%BB%B6"><span class="nav-text">存储FlexVolume 组件</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BA%94%E3%80%81%E5%BA%94%E7%94%A8"><span class="nav-text">五、应用</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%B7%A5%E4%BD%9C%E8%B4%9F%E8%BD%BD"><span class="nav-text">工作负载</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E9%95%9C%E5%83%8F%EF%BC%88ACR%E4%BB%93%E5%BA%93%EF%BC%89"><span class="nav-text">镜像（ACR仓库）</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E9%85%8D%E7%BD%AE%E9%A1%B9-Configmap-%E4%B8%8E%E4%BF%9D%E5%AF%86%E5%AD%97%E5%85%B8-Secret"><span class="nav-text">配置项 Configmap 与保密字典 Secret</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%BA%94%E7%94%A8%E8%B0%83%E5%BA%A6%E4%B8%8E%E9%83%A8%E7%BD%B2"><span class="nav-text">应用调度与部署</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E4%BD%BF%E7%94%A8AHAS%E5%AF%B9%E5%BA%94%E7%94%A8%E8%BF%9B%E8%A1%8C%E9%AB%98%E5%8F%AF%E7%94%A8%E9%98%B2%E6%8A%A4"><span class="nav-text">使用AHAS对应用进行高可用防护</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%85%AD%E3%80%81%E7%BB%84%E4%BB%B6"><span class="nav-text">六、组件</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%A0%B8%E5%BF%83%E7%BB%84%E4%BB%B6"><span class="nav-text">核心组件</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%BA%94%E7%94%A8%E7%AE%A1%E7%90%86"><span class="nav-text">应用管理</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%97%A5%E5%BF%97%E4%B8%8E%E7%9B%91%E6%8E%A7"><span class="nav-text">日志与监控</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%AD%98%E5%82%A8"><span class="nav-text">存储</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E7%BD%91%E7%BB%9C"><span class="nav-text">网络</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%AE%89%E5%85%A8"><span class="nav-text">安全</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%85%B6%E4%BB%96-1"><span class="nav-text">其他</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%B8%83%E3%80%81%E5%85%B6%E4%BB%96"><span class="nav-text">七、其他</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#K8S-%E9%9B%86%E7%BE%A4-NetworkPolicy-%E7%AD%96%E7%95%A5"><span class="nav-text">K8S 集群 NetworkPolicy 策略</span></a></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Yakir"
+      src="/images/avatar.jpg">
+  <p class="site-author-name" itemprop="name">Yakir</p>
+  <div class="site-description" itemprop="description">Yakir Blog</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">11</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">3</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">4</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/yakir3" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;yakir3" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="/atom.xml" title="RSS → &#x2F;atom.xml"><i class="fa fa-rss fa-fw"></i>RSS</a>
+      </span>
+  </div>
+
+
+
+  <div class="links-of-blogroll motion-element links-of-blogroll-block">
+    <div class="links-of-blogroll-title">
+      <!-- modify icon to fire by szw -->
+      <i class="fa fa-history fa-" aria-hidden="true"></i>
+      近期文章
+    </div>
+    <ul class="links-of-blogroll-list">
+      
+      
+        <li class="recent_posts_li">
+          <!--<a href="/" title="" target="_blank"></a>-->
+        </li>
+      
+        <li class="recent_posts_li">
+          <!--<a href="/" title="" target="_blank"></a>-->
+        </li>
+      
+        <li class="recent_posts_li">
+          <!--<a href="/" title="" target="_blank"></a>-->
+        </li>
+      
+    </ul>
+  </div>
+
+
+
+
+      </div>
+        <div class="back-to-top motion-element">
+          <i class="fa fa-arrow-up"></i>
+          <span>0%</span>
+        </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2022</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Yakir</span>
+</div>
+  <div class="powered-by">Powered by Hexo Next
+  </div>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/jquery@3/dist/jquery.min.js"></script>
+  <script src="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/lozad@1/dist/lozad.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+<link rel="stylesheet" href="//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.css">
+
+<script>
+NexT.utils.loadComments(document.querySelector('#gitalk-container'), () => {
+  NexT.utils.getScript('//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.js', () => {
+    var gitalk = new Gitalk({
+      clientID    : 'dc69ab400b19bd3a1bab',
+      clientSecret: '5a20b4b4faa303672257572d4df0be83b97061cb',
+      repo        : 'yakir3.github.io',
+      owner       : 'yakir3',
+      admin       : ['yakir3'],
+      id          : '56811ba3ee28e0782542eb1382878571',
+        language: 'zh-CN',
+      distractionFreeMode: true
+    });
+    gitalk.render('gitalk-container');
+  }, window.Gitalk);
+});
+</script>
+
+</body>
+</html>
