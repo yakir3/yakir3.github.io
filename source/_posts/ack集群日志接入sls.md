@@ -1,7 +1,7 @@
 ---
 title: ACK集群日志接入SLS
 categories:
-  - 云原生
+  - CNCF
 tags:
   - 阿里云
   - K8S

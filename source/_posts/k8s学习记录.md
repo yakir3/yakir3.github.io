@@ -1,7 +1,7 @@
 ---
 title: ACK-K8S学习记录
 categories:
-  - 云原生
+  - CNCF
 tags:
   - K8S
   - 阿里云

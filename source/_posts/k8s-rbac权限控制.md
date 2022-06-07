@@ -1,7 +1,7 @@
 ---
 title: K8S-RBAC权限控制
 categories:
-  - 云原生
+  - CNCF
 tags:
   - 阿里云
   - K8S

@@ -3,7 +3,7 @@ title: NetworkPolicy隔离策略
 abbrlink: 8aa0
 date: 2022-03-07 22:01:06
 categories:
-  - 云原生
+  - CNCF
 tags:
   - 阿里云
   - K8S

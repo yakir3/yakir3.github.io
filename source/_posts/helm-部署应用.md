@@ -1,7 +1,7 @@
 ---
 title: helm 部署应用
 categories:
-  - 云原生
+  - CNCF
 tags:
   - 阿里云
 abbrlink: ce0f

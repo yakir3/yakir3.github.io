@@ -1,7 +1,7 @@
 ---
 title: Docker学习记录
 categories:
-  - 云原生
+  - CNCF
 tags:
   - Docker
 abbrlink: c06e

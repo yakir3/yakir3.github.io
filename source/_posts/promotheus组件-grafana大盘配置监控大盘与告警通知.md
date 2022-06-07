@@ -3,7 +3,7 @@ title: promotheus组件-grafana大盘配置监控大盘与告警通知
 abbrlink: 9a8h
 date: 2022-03-16 23:21:06
 categories:
-  - 云原生
+  - CNCF
 tags:
   - 阿里云
   - K8S
