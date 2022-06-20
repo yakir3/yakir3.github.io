@@ -6,7 +6,7 @@
   <link href="https://359sun.top/atom.xml" rel="self"/>
   
   <link href="https://359sun.top/"/>
-  <updated>2022-06-06T12:38:20.840Z</updated>
+  <updated>2022-06-20T15:38:21.168Z</updated>
   <id>https://359sun.top/</id>
   
   <author>
@@ -17,11 +17,33 @@
   <generator uri="https://hexo.io/">Hexo</generator>
   
   <entry>
-    <title>rabbitMQ</title>
+    <title>基于 Ubuntu + Containerd 部署 K8S 集群</title>
+    <link href="https://359sun.top/posts/28d6.html"/>
+    <id>https://359sun.top/posts/28d6.html</id>
+    <published>2022-06-07T14:17:15.000Z</published>
+    <updated>2022-06-20T15:38:21.168Z</updated>
+    
+    
+    <summary type="html">&lt;h3 id=&quot;一、环境准备&quot;&gt;&lt;a href=&quot;#一、环境准备&quot; class=&quot;headerlink&quot; title=&quot;一、环境准备&quot;&gt;&lt;/a&gt;一、环境准备&lt;/h3&gt;&lt;h4 id=&quot;1-multipass-虚拟机创建&quot;&gt;&lt;a href=&quot;#1-multipass-虚拟机创建&quot; class=&quot;headerlink&quot; title=&quot;1. multipass  虚拟机创建&quot;&gt;&lt;/a&gt;1. multipass  虚拟机创建&lt;/h4&gt;&lt;figure class=&quot;highlight shell&quot;&gt;&lt;table&gt;&lt;tr&gt;&lt;td class=&quot;gutter&quot;&gt;&lt;pre&gt;&lt;span class=&quot;line&quot;&gt;1&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;2&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;3&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;4&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;5&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;6&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;7&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;8&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;9&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;10&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;11&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;12&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;13&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;14&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;15&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;16&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;17&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;18&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;19&lt;/span&gt;&lt;br&gt;&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;code&quot;&gt;&lt;pre&gt;&lt;span class=&quot;line&quot;&gt;&lt;span class=&quot;meta prompt_&quot;&gt;# &lt;/span&gt;&lt;span class=&quot;language-bash&quot;&gt;生成密钥对&lt;/span&gt;&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;ssh-keygen -t rsa -b 4096 -f ~/k8s_rsa -C k8s&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;&lt;span class=&quot;meta prompt_&quot;&gt;&lt;/span&gt;&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;&lt;span class=&quot;meta prompt_&quot;&gt;# &lt;/span&gt;&lt;span class=&quot;language-bash&quot;&gt;创建 Master 节点&lt;/span&gt;&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;multipass launch -c 2 -m 2G -d 20G -n master --cloud-init - &amp;lt;&amp;lt; EOF&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;ssh_authorized_keys:&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;- $(cat ~/.ssh/k8s_rsa.pub)&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;EOF&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;&lt;span class=&quot;meta prompt_&quot;&gt;&lt;/span&gt;&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;&lt;span class=&quot;meta prompt_&quot;&gt;# &lt;/span&gt;&lt;span class=&quot;language-bash&quot;&gt;创建 Node 节点&lt;/span&gt;&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;multipass launch -c 1 -m 2G -d 20G -n node1 --cloud-init - &amp;lt;&amp;lt; EOF&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;ssh_authorized_keys:&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;- $(cat ~/.ssh/k8s_rsa.pub)&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;EOF&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;multipass launch -c 1 -m 2G -d 20G -n node2 --cloud-init - &amp;lt;&amp;lt; EOF&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;ssh_authorized_keys:&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;- $(cat ~/.ssh/k8s_rsa.pub)&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;EOF&lt;/span&gt;&lt;br&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/figure&gt;
+&lt;blockquote&gt;
+&lt;p&gt;–cloud-init ：导入本地生成的公钥文件到初始化系统中，可以使用密钥免密 SSH&lt;/p&gt;
+&lt;/blockquote&gt;</summary>
+    
+    
+    
+    <category term="CNCF" scheme="https://359sun.top/categories/cncf/"/>
+    
+    
+    <category term="K8S" scheme="https://359sun.top/tags/k8s/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>RabbitMQ 简述与使用</title>
     <link href="https://359sun.top/posts/9bae.html"/>
     <id>https://359sun.top/posts/9bae.html</id>
     <published>2022-06-06T12:33:11.000Z</published>
-    <updated>2022-06-06T12:38:20.840Z</updated>
+    <updated>2022-06-20T15:35:12.630Z</updated>
     
     
     <summary type="html">&lt;h3 id=&quot;一、RabbitMQ-介绍&quot;&gt;&lt;a href=&quot;#一、RabbitMQ-介绍&quot; class=&quot;headerlink&quot; title=&quot;一、RabbitMQ 介绍&quot;&gt;&lt;/a&gt;一、RabbitMQ 介绍&lt;/h3&gt;&lt;h4 id=&quot;什么是消息队列&quot;&gt;&lt;a href=&quot;#什么是消息队列&quot; class=&quot;headerlink&quot; title=&quot;什么是消息队列&quot;&gt;&lt;/a&gt;什么是消息队列&lt;/h4&gt;&lt;p&gt;消息（Message）是指在应用间传送的数据。消息可以非常简单，比如只包含文本字符串，也可以更复杂，可能包含嵌入对象。&lt;/p&gt;
@@ -93,11 +115,11 @@
   </entry>
   
   <entry>
-    <title>ACK-K8S学习记录</title>
+    <title>ACK-K8S 学习记录</title>
     <link href="https://359sun.top/posts/754e.html"/>
     <id>https://359sun.top/posts/754e.html</id>
     <published>2022-05-31T15:04:28.000Z</published>
-    <updated>2022-06-06T12:40:05.595Z</updated>
+    <updated>2022-06-20T15:36:59.584Z</updated>
     
     
     <summary type="html">&lt;h3 id=&quot;一、ACK集群网络规划&quot;&gt;&lt;a href=&quot;#一、ACK集群网络规划&quot; class=&quot;headerlink&quot; title=&quot;一、ACK集群网络规划&quot;&gt;&lt;/a&gt;一、ACK集群网络规划&lt;/h3&gt;&lt;p&gt;&lt;a href=&quot;https://help.aliyun.com/document_detail/86500.html&quot;&gt;https://help.aliyun.com/document_detail&amp;#x2F;86500.html&lt;/a&gt;&lt;/p&gt;
@@ -135,11 +157,11 @@
   </entry>
   
   <entry>
-    <title>ACK集群日志接入SLS</title>
+    <title>ACK 集群日志接入 SLS</title>
     <link href="https://359sun.top/posts/4a2a.html"/>
     <id>https://359sun.top/posts/4a2a.html</id>
     <published>2022-05-31T14:38:39.000Z</published>
-    <updated>2022-06-06T12:39:08.636Z</updated>
+    <updated>2022-06-20T15:36:33.257Z</updated>
     
     
     <summary type="html">&lt;h2 id=&quot;一、接入前提&quot;&gt;&lt;a href=&quot;#一、接入前提&quot; class=&quot;headerlink&quot; title=&quot;一、接入前提&quot;&gt;&lt;/a&gt;一、接入前提&lt;/h2&gt;&lt;p&gt;&lt;strong&gt;ACK 集群开启日志服务组件Logtail&lt;/strong&gt;&lt;/p&gt;
@@ -237,11 +259,11 @@
   </entry>
   
   <entry>
-    <title>阿里云-RAM与STS权限</title>
+    <title>阿里云-RAM 与 STS 权限</title>
     <link href="https://359sun.top/posts/fdc.html"/>
     <id>https://359sun.top/posts/fdc.html</id>
     <published>2022-03-20T15:37:32.000Z</published>
-    <updated>2022-05-05T14:32:18.242Z</updated>
+    <updated>2022-06-20T15:37:06.227Z</updated>
     
     
     <summary type="html">&lt;h3 id=&quot;一、前言&quot;&gt;&lt;a href=&quot;#一、前言&quot; class=&quot;headerlink&quot; title=&quot;一、前言&quot;&gt;&lt;/a&gt;一、前言&lt;/h3&gt;&lt;p&gt;当通过OpenApi接口来调用云资源时（即替代控制台的操作），当前的方式有两种：&lt;/p&gt;

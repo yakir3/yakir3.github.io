@@ -198,6 +198,104 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://359sun.top/posts/28d6.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.jpg">
+      <meta itemprop="name" content="Yakir">
+      <meta itemprop="description" content="Yakir Blog">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Yakir Blog">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/posts/28d6.html" class="post-title-link" itemprop="url">基于 Ubuntu + Containerd 部署 K8S 集群</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2022-06-07 22:17:15" itemprop="dateCreated datePublished" datetime="2022-06-07T22:17:15+08:00">2022-06-07</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2022-06-20 23:38:21" itemprop="dateModified" datetime="2022-06-20T23:38:21+08:00">2022-06-20</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/cncf/" itemprop="url" rel="index"><span itemprop="name">CNCF</span></a>
+                </span>
+            </span>
+
+          <br>
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+                <span class="post-meta-item-text">本文字数：</span>
+              <span>11k</span>
+            </span>
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+                <span class="post-meta-item-text">阅读时长 &asymp;</span>
+              <span>10 分钟</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h3 id="一、环境准备"><a href="#一、环境准备" class="headerlink" title="一、环境准备"></a>一、环境准备</h3><h4 id="1-multipass-虚拟机创建"><a href="#1-multipass-虚拟机创建" class="headerlink" title="1. multipass  虚拟机创建"></a>1. multipass  虚拟机创建</h4><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta prompt_"># </span><span class="language-bash">生成密钥对</span></span><br><span class="line">ssh-keygen -t rsa -b 4096 -f ~/k8s_rsa -C k8s</span><br><span class="line"><span class="meta prompt_"></span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">创建 Master 节点</span></span><br><span class="line">multipass launch -c 2 -m 2G -d 20G -n master --cloud-init - &lt;&lt; EOF</span><br><span class="line">ssh_authorized_keys:</span><br><span class="line">- $(cat ~/.ssh/k8s_rsa.pub)</span><br><span class="line">EOF</span><br><span class="line"><span class="meta prompt_"></span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">创建 Node 节点</span></span><br><span class="line">multipass launch -c 1 -m 2G -d 20G -n node1 --cloud-init - &lt;&lt; EOF</span><br><span class="line">ssh_authorized_keys:</span><br><span class="line">- $(cat ~/.ssh/k8s_rsa.pub)</span><br><span class="line">EOF</span><br><span class="line"></span><br><span class="line">multipass launch -c 1 -m 2G -d 20G -n node2 --cloud-init - &lt;&lt; EOF</span><br><span class="line">ssh_authorized_keys:</span><br><span class="line">- $(cat ~/.ssh/k8s_rsa.pub)</span><br><span class="line">EOF</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>–cloud-init ：导入本地生成的公钥文件到初始化系统中，可以使用密钥免密 SSH</p>
+</blockquote>
+          <!--noindex-->
+            <div class="post-button">
+              <a class="btn" href="/posts/28d6.html#more" rel="contents">
+                阅读全文 &raquo;
+              </a>
+            </div>
+          <!--/noindex-->
+        
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
     <link itemprop="mainEntityOfPage" href="https://359sun.top/posts/9bae.html">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -212,7 +310,7 @@
       <header class="post-header">
         <h2 class="post-title" itemprop="name headline">
           
-            <a href="/posts/9bae.html" class="post-title-link" itemprop="url">rabbitMQ</a>
+            <a href="/posts/9bae.html" class="post-title-link" itemprop="url">RabbitMQ 简述与使用</a>
         </h2>
 
         <div class="post-meta">
@@ -221,10 +319,16 @@
                 <i class="far fa-calendar"></i>
               </span>
               <span class="post-meta-item-text">发表于</span>
-              
 
-              <time title="创建时间：2022-06-06 20:33:11 / 修改时间：20:38:20" itemprop="dateCreated datePublished" datetime="2022-06-06T20:33:11+08:00">2022-06-06</time>
+              <time title="创建时间：2022-06-06 20:33:11" itemprop="dateCreated datePublished" datetime="2022-06-06T20:33:11+08:00">2022-06-06</time>
             </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2022-06-20 23:35:12" itemprop="dateModified" datetime="2022-06-20T23:35:12+08:00">2022-06-20</time>
+              </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
                 <i class="far fa-folder"></i>
@@ -426,7 +530,7 @@
       <header class="post-header">
         <h2 class="post-title" itemprop="name headline">
           
-            <a href="/posts/754e.html" class="post-title-link" itemprop="url">ACK-K8S学习记录</a>
+            <a href="/posts/754e.html" class="post-title-link" itemprop="url">ACK-K8S 学习记录</a>
         </h2>
 
         <div class="post-meta">
@@ -443,7 +547,7 @@
                   <i class="far fa-calendar-check"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2022-06-06 20:40:05" itemprop="dateModified" datetime="2022-06-06T20:40:05+08:00">2022-06-06</time>
+                <time title="修改时间：2022-06-20 23:36:59" itemprop="dateModified" datetime="2022-06-20T23:36:59+08:00">2022-06-20</time>
               </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -618,7 +722,7 @@
       <header class="post-header">
         <h2 class="post-title" itemprop="name headline">
           
-            <a href="/posts/4a2a.html" class="post-title-link" itemprop="url">ACK集群日志接入SLS</a>
+            <a href="/posts/4a2a.html" class="post-title-link" itemprop="url">ACK 集群日志接入 SLS</a>
         </h2>
 
         <div class="post-meta">
@@ -635,7 +739,7 @@
                   <i class="far fa-calendar-check"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2022-06-06 20:39:08" itemprop="dateModified" datetime="2022-06-06T20:39:08+08:00">2022-06-06</time>
+                <time title="修改时间：2022-06-20 23:36:33" itemprop="dateModified" datetime="2022-06-20T23:36:33+08:00">2022-06-20</time>
               </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -1022,7 +1126,7 @@
       <header class="post-header">
         <h2 class="post-title" itemprop="name headline">
           
-            <a href="/posts/fdc.html" class="post-title-link" itemprop="url">阿里云-RAM与STS权限</a>
+            <a href="/posts/fdc.html" class="post-title-link" itemprop="url">阿里云-RAM 与 STS 权限</a>
         </h2>
 
         <div class="post-meta">
@@ -1039,7 +1143,7 @@
                   <i class="far fa-calendar-check"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2022-05-05 22:32:18" itemprop="dateModified" datetime="2022-05-05T22:32:18+08:00">2022-05-05</time>
+                <time title="修改时间：2022-06-20 23:37:06" itemprop="dateModified" datetime="2022-06-20T23:37:06+08:00">2022-06-20</time>
               </span>
 
           <br>
@@ -1081,110 +1185,6 @@
           <!--noindex-->
             <div class="post-button">
               <a class="btn" href="/posts/fdc.html#more" rel="contents">
-                阅读全文 &raquo;
-              </a>
-            </div>
-          <!--/noindex-->
-        
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://359sun.top/posts/9a8h.html">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.jpg">
-      <meta itemprop="name" content="Yakir">
-      <meta itemprop="description" content="Yakir Blog">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Yakir Blog">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/posts/9a8h.html" class="post-title-link" itemprop="url">promotheus组件-grafana大盘配置监控大盘与告警通知</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2022-03-16 23:21:06" itemprop="dateCreated datePublished" datetime="2022-03-16T23:21:06+08:00">2022-03-16</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="far fa-calendar-check"></i>
-                </span>
-                <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2022-06-06 20:39:35" itemprop="dateModified" datetime="2022-06-06T20:39:35+08:00">2022-06-06</time>
-              </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-folder"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/cncf/" itemprop="url" rel="index"><span itemprop="name">CNCF</span></a>
-                </span>
-            </span>
-
-          <br>
-            <span class="post-meta-item" title="本文字数">
-              <span class="post-meta-item-icon">
-                <i class="far fa-file-word"></i>
-              </span>
-                <span class="post-meta-item-text">本文字数：</span>
-              <span>1.1k</span>
-            </span>
-            <span class="post-meta-item" title="阅读时长">
-              <span class="post-meta-item-icon">
-                <i class="far fa-clock"></i>
-              </span>
-                <span class="post-meta-item-text">阅读时长 &asymp;</span>
-              <span>1 分钟</span>
-            </span>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h3 id="一、背景"><a href="#一、背景" class="headerlink" title="一、背景"></a>一、背景</h3><ul>
-<li>线上ACK 集群部署了StatefulSet 应用（rabbitMQ），由于rabbitMQ 本身自带的management 后台数据展示较为简陋且没有告警功能，因此考虑接入云上产品监控资源数据且对接告警通知功能，主要通过如下产品实现：<ul>
-<li>接入Prometheus 监控+grafana 进行数据图表展示。</li>
-<li>利用Arms 产品获取Prometheus 的监控指标，按照设定的阈值进行告警通知功能。</li>
-</ul>
-</li>
-</ul>
-<h3 id="二、操作过程"><a href="#二、操作过程" class="headerlink" title="二、操作过程"></a>二、操作过程</h3><h4 id="1）接入Prometheus-组件监控，获取数据指标"><a href="#1）接入Prometheus-组件监控，获取数据指标" class="headerlink" title="1）接入Prometheus 组件监控，获取数据指标"></a>1）接入Prometheus 组件监控，获取数据指标</h4><ul>
-<li>进入云产品 <strong>Prometheus监控服务</strong>，选择对应集群。（ACK集群需要先安装Prometheus 监控组件，安装参考：<a target="_blank" rel="noopener" href="https://help.aliyun.com/document_detail/161304.html">ARMS Prometheus监控</a>）<img data-src="/posts/9a8h/1.png" class></li>
-</ul>
-          <!--noindex-->
-            <div class="post-button">
-              <a class="btn" href="/posts/9a8h.html#more" rel="contents">
                 阅读全文 &raquo;
               </a>
             </div>
@@ -1275,7 +1275,7 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">13</span>
+          <span class="site-state-item-count">14</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>

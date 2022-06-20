@@ -1,5 +1,5 @@
 ---
-title: rabbitMQ
+title: RabbitMQ 简述与使用
 categories:
   - MiddleWare
 tags:
