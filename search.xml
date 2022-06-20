@@ -44,7 +44,7 @@
       </tags>
   </entry>
   <entry>
-    <title>ACK集群日志接入SLS</title>
+    <title>ACK 集群日志接入 SLS</title>
     <url>/posts/4a2a.html</url>
     <content><![CDATA[<link rel="stylesheet" class="aplayer-secondary-style-marker" href="/assets/css/APlayer.min.css"><script src="/assets/js/APlayer.min.js" class="aplayer-secondary-script-marker"></script><script class="meting-secondary-script-marker" src="/assets/js/Meting.min.js"></script><h2 id="一、接入前提"><a href="#一、接入前提" class="headerlink" title="一、接入前提"></a>一、接入前提</h2><p><strong>ACK 集群开启日志服务组件Logtail</strong></p>
 <ul>
@@ -839,7 +839,7 @@
       </tags>
   </entry>
   <entry>
-    <title>ACK-K8S学习记录</title>
+    <title>ACK-K8S 学习记录</title>
     <url>/posts/754e.html</url>
     <content><![CDATA[<link rel="stylesheet" class="aplayer-secondary-style-marker" href="/assets/css/APlayer.min.css"><script src="/assets/js/APlayer.min.js" class="aplayer-secondary-script-marker"></script><script class="meting-secondary-script-marker" src="/assets/js/Meting.min.js"></script><h3 id="一、ACK集群网络规划"><a href="#一、ACK集群网络规划" class="headerlink" title="一、ACK集群网络规划"></a>一、ACK集群网络规划</h3><p><a href="https://help.aliyun.com/document_detail/86500.html">https://help.aliyun.com/document_detail&#x2F;86500.html</a></p>
 <h3 id="二、RBAC授权"><a href="#二、RBAC授权" class="headerlink" title="二、RBAC授权"></a>二、RBAC授权</h3><p><a href="https://yuque.antfin.com/kifo8h/nee5aa/mvx5t5">https://yuque.antfin.com/kifo8h/nee5aa/mvx5t5</a></p>
@@ -1185,7 +1185,7 @@
       </tags>
   </entry>
   <entry>
-    <title>阿里云-RAM与STS权限</title>
+    <title>阿里云-RAM 与 STS 权限</title>
     <url>/posts/fdc.html</url>
     <content><![CDATA[<link rel="stylesheet" class="aplayer-secondary-style-marker" href="/assets/css/APlayer.min.css"><script src="/assets/js/APlayer.min.js" class="aplayer-secondary-script-marker"></script><script class="meting-secondary-script-marker" src="/assets/js/Meting.min.js"></script><h3 id="一、前言"><a href="#一、前言" class="headerlink" title="一、前言"></a>一、前言</h3><p>当通过OpenApi接口来调用云资源时（即替代控制台的操作），当前的方式有两种：</p>
 <ul>
@@ -1233,7 +1233,7 @@
 <li>OSS官方推荐使用 阿里云账号 方式：<a href="https://help.aliyun.com/document_detail/100624.html">https://help.aliyun.com/document_detail&#x2F;100624.html</a></li>
 </ul>
 </blockquote>
-<h3 id="三、创建STS角色，自定义授权OSS功能测试"><a href="#三、创建STS角色，自定义授权OSS功能测试" class="headerlink" title="三、创建STS角色，自定义授权OSS功能测试"></a>三、创建STS角色，自定义授权OSS功能测试</h3><p>1）测试账号信息<br>账号：<a href="mailto:&#x64;&#101;&#118;&#111;&#112;&#x73;&#95;&#116;&#x65;&#115;&#x74;&#64;&#120;&#120;&#120;&#46;&#x6f;&#x6e;&#x61;&#108;&#x69;&#x79;&#x75;&#x6e;&#46;&#x63;&#111;&#109;">&#x64;&#101;&#118;&#111;&#112;&#x73;&#95;&#116;&#x65;&#115;&#x74;&#64;&#120;&#120;&#120;&#46;&#x6f;&#x6e;&#x61;&#108;&#x69;&#x79;&#x75;&#x6e;&#46;&#x63;&#111;&#109;</a><br>AK：xxxxx<br>SK：xxxxx<br>ARN：acs:ram::xxxxx:role&#x2F;xxx-sts<br>OSS Bucket名称：oss-test<br>OSS授权目录：dir111&#x2F;dir111_secondline1&#x2F;</p>
+<h3 id="三、创建STS角色，自定义授权OSS功能测试"><a href="#三、创建STS角色，自定义授权OSS功能测试" class="headerlink" title="三、创建STS角色，自定义授权OSS功能测试"></a>三、创建STS角色，自定义授权OSS功能测试</h3><p>1）测试账号信息<br>账号：<a href="mailto:&#x64;&#x65;&#118;&#x6f;&#x70;&#115;&#95;&#116;&#101;&#x73;&#x74;&#x40;&#120;&#x78;&#120;&#x2e;&#x6f;&#110;&#x61;&#108;&#x69;&#121;&#x75;&#110;&#46;&#x63;&#111;&#x6d;">&#x64;&#x65;&#118;&#x6f;&#x70;&#115;&#95;&#116;&#101;&#x73;&#x74;&#x40;&#120;&#x78;&#120;&#x2e;&#x6f;&#110;&#x61;&#108;&#x69;&#121;&#x75;&#110;&#46;&#x63;&#111;&#x6d;</a><br>AK：xxxxx<br>SK：xxxxx<br>ARN：acs:ram::xxxxx:role&#x2F;xxx-sts<br>OSS Bucket名称：oss-test<br>OSS授权目录：dir111&#x2F;dir111_secondline1&#x2F;</p>
 <p>2）进行授权</p>
 <ul>
 <li>创建RAM用户（子账号），生成AK SK （此步骤忽略）</li>
@@ -1296,7 +1296,7 @@
       </tags>
   </entry>
   <entry>
-    <title>rabbitMQ</title>
+    <title>RabbitMQ 简述与使用</title>
     <url>/posts/9bae.html</url>
     <content><![CDATA[<link rel="stylesheet" class="aplayer-secondary-style-marker" href="/assets/css/APlayer.min.css"><script src="/assets/js/APlayer.min.js" class="aplayer-secondary-script-marker"></script><script class="meting-secondary-script-marker" src="/assets/js/Meting.min.js"></script><h3 id="一、RabbitMQ-介绍"><a href="#一、RabbitMQ-介绍" class="headerlink" title="一、RabbitMQ 介绍"></a>一、RabbitMQ 介绍</h3><h4 id="什么是消息队列"><a href="#什么是消息队列" class="headerlink" title="什么是消息队列"></a>什么是消息队列</h4><p>消息（Message）是指在应用间传送的数据。消息可以非常简单，比如只包含文本字符串，也可以更复杂，可能包含嵌入对象。</p>
 <p>消息队列（Message Queue）是一种应用间的通信方式，消息发送后可以立即返回，由消息系统来确保消息的可靠传递。消息发布者只管把消息发布到 MQ 中而不用管谁来取，消息使用者只管从 MQ 中取消息而不管是谁发布的。这样发布者和使用者都不用知道对方的存在。</p>
@@ -1434,12 +1434,15 @@
       </tags>
   </entry>
   <entry>
-    <title>ubuntuK8sDeploy</title>
+    <title>基于 Ubuntu + Containerd 部署 K8S 集群</title>
     <url>/posts/28d6.html</url>
     <content><![CDATA[<link rel="stylesheet" class="aplayer-secondary-style-marker" href="/assets/css/APlayer.min.css"><script src="/assets/js/APlayer.min.js" class="aplayer-secondary-script-marker"></script><script class="meting-secondary-script-marker" src="/assets/js/Meting.min.js"></script><h3 id="一、环境准备"><a href="#一、环境准备" class="headerlink" title="一、环境准备"></a>一、环境准备</h3><h4 id="1-multipass-虚拟机创建"><a href="#1-multipass-虚拟机创建" class="headerlink" title="1. multipass  虚拟机创建"></a>1. multipass  虚拟机创建</h4><figure class="highlight shell"><table><tr><td class="code"><pre><span class="line"><span class="meta prompt_"># </span><span class="language-bash">生成密钥对</span></span><br><span class="line">ssh-keygen -t rsa -b 4096 -f ~/k8s_rsa -C k8s</span><br><span class="line"><span class="meta prompt_"></span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">创建 Master 节点</span></span><br><span class="line">multipass launch -c 2 -m 2G -d 20G -n master --cloud-init - &lt;&lt; EOF</span><br><span class="line">ssh_authorized_keys:</span><br><span class="line">- $(cat ~/.ssh/k8s_rsa.pub)</span><br><span class="line">EOF</span><br><span class="line"><span class="meta prompt_"></span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">创建 Node 节点</span></span><br><span class="line">multipass launch -c 1 -m 2G -d 20G -n node1 --cloud-init - &lt;&lt; EOF</span><br><span class="line">ssh_authorized_keys:</span><br><span class="line">- $(cat ~/.ssh/k8s_rsa.pub)</span><br><span class="line">EOF</span><br><span class="line"></span><br><span class="line">multipass launch -c 1 -m 2G -d 20G -n node2 --cloud-init - &lt;&lt; EOF</span><br><span class="line">ssh_authorized_keys:</span><br><span class="line">- $(cat ~/.ssh/k8s_rsa.pub)</span><br><span class="line">EOF</span><br></pre></td></tr></table></figure>
 <blockquote>
 <p>–cloud-init ：导入本地生成的公钥文件到初始化系统中，可以使用密钥免密 SSH</p>
 </blockquote>
+<span id="more"></span>
+
+
 <h4 id="2-主机与网络规划"><a href="#2-主机与网络规划" class="headerlink" title="2. 主机与网络规划"></a>2. 主机与网络规划</h4><table>
 <thead>
 <tr>

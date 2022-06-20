@@ -25,7 +25,7 @@
 
   <meta name="description" content="一、前言当通过OpenApi接口来调用云资源时（即替代控制台的操作），当前的方式有两种：  通过 AK+SK 方式直接调用，只要该AK所属的账号有相关权限即可调用对应资源（授权分为系统策略和自定义策略） 阿里云账号（RAM用户）&#x2F;阿里云服务（ECS等）&#x2F;身份提供商（SSO） 通过扮演角色获取角色的临时令牌（即通过调用AssumeRole接口），通过该临时令牌（临时令牌可设定会话">
 <meta property="og:type" content="article">
-<meta property="og:title" content="阿里云-RAM与STS权限">
+<meta property="og:title" content="阿里云-RAM 与 STS 权限">
 <meta property="og:url" content="https://359sun.top/posts/fdc.html">
 <meta property="og:site_name" content="Yakir Blog">
 <meta property="og:description" content="一、前言当通过OpenApi接口来调用云资源时（即替代控制台的操作），当前的方式有两种：  通过 AK+SK 方式直接调用，只要该AK所属的账号有相关权限即可调用对应资源（授权分为系统策略和自定义策略） 阿里云账号（RAM用户）&#x2F;阿里云服务（ECS等）&#x2F;身份提供商（SSO） 通过扮演角色获取角色的临时令牌（即通过调用AssumeRole接口），通过该临时令牌（临时令牌可设定会话">
@@ -39,7 +39,7 @@
 <meta property="og:image" content="https://359sun.top/posts/fdc/ram7.png">
 <meta property="og:image" content="https://359sun.top/posts/fdc/ram8.png">
 <meta property="article:published_time" content="2022-03-20T15:37:32.000Z">
-<meta property="article:modified_time" content="2022-05-05T14:32:18.242Z">
+<meta property="article:modified_time" content="2022-06-20T15:37:06.227Z">
 <meta property="article:author" content="Yakir">
 <meta property="article:tag" content="阿里云">
 <meta name="twitter:card" content="summary">
@@ -58,7 +58,7 @@
   };
 </script>
 
-  <title>阿里云-RAM与STS权限 | Yakir Blog</title>
+  <title>阿里云-RAM 与 STS 权限 | Yakir Blog</title>
   
 
 
@@ -224,7 +224,7 @@
     </span>
       <header class="post-header">
         <h1 class="post-title" itemprop="name headline">
-          阿里云-RAM与STS权限
+          阿里云-RAM 与 STS 权限
         </h1>
 
         <div class="post-meta">
@@ -241,7 +241,7 @@
                   <i class="far fa-calendar-check"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2022-05-05 22:32:18" itemprop="dateModified" datetime="2022-05-05T22:32:18+08:00">2022-05-05</time>
+                <time title="修改时间：2022-06-20 23:37:06" itemprop="dateModified" datetime="2022-06-20T23:37:06+08:00">2022-06-20</time>
               </span>
 
           
@@ -322,7 +322,7 @@
 <li>OSS官方推荐使用 阿里云账号 方式：<a target="_blank" rel="noopener" href="https://help.aliyun.com/document_detail/100624.html">https://help.aliyun.com/document_detail&#x2F;100624.html</a></li>
 </ul>
 </blockquote>
-<h3 id="三、创建STS角色，自定义授权OSS功能测试"><a href="#三、创建STS角色，自定义授权OSS功能测试" class="headerlink" title="三、创建STS角色，自定义授权OSS功能测试"></a>三、创建STS角色，自定义授权OSS功能测试</h3><p>1）测试账号信息<br>账号：<a href="mailto:&#x64;&#101;&#118;&#111;&#112;&#x73;&#95;&#116;&#x65;&#115;&#x74;&#64;&#120;&#120;&#120;&#46;&#x6f;&#x6e;&#x61;&#108;&#x69;&#x79;&#x75;&#x6e;&#46;&#x63;&#111;&#109;">&#x64;&#101;&#118;&#111;&#112;&#x73;&#95;&#116;&#x65;&#115;&#x74;&#64;&#120;&#120;&#120;&#46;&#x6f;&#x6e;&#x61;&#108;&#x69;&#x79;&#x75;&#x6e;&#46;&#x63;&#111;&#109;</a><br>AK：xxxxx<br>SK：xxxxx<br>ARN：acs:ram::xxxxx:role&#x2F;xxx-sts<br>OSS Bucket名称：oss-test<br>OSS授权目录：dir111&#x2F;dir111_secondline1&#x2F;</p>
+<h3 id="三、创建STS角色，自定义授权OSS功能测试"><a href="#三、创建STS角色，自定义授权OSS功能测试" class="headerlink" title="三、创建STS角色，自定义授权OSS功能测试"></a>三、创建STS角色，自定义授权OSS功能测试</h3><p>1）测试账号信息<br>账号：<a href="mailto:&#x64;&#x65;&#118;&#x6f;&#x70;&#115;&#95;&#116;&#101;&#x73;&#x74;&#x40;&#120;&#x78;&#120;&#x2e;&#x6f;&#110;&#x61;&#108;&#x69;&#121;&#x75;&#110;&#46;&#x63;&#111;&#x6d;">&#x64;&#x65;&#118;&#x6f;&#x70;&#115;&#95;&#116;&#101;&#x73;&#x74;&#x40;&#120;&#x78;&#120;&#x2e;&#x6f;&#110;&#x61;&#108;&#x69;&#121;&#x75;&#110;&#46;&#x63;&#111;&#x6d;</a><br>AK：xxxxx<br>SK：xxxxx<br>ARN：acs:ram::xxxxx:role&#x2F;xxx-sts<br>OSS Bucket名称：oss-test<br>OSS授权目录：dir111&#x2F;dir111_secondline1&#x2F;</p>
 <p>2）进行授权</p>
 <ul>
 <li>创建RAM用户（子账号），生成AK SK （此步骤忽略）</li>
@@ -394,7 +394,7 @@
   </li>
   <li class="post-copyright-link">
     <strong>本文链接：</strong>
-    <a href="https://359sun.top/posts/fdc.html" title="阿里云-RAM与STS权限">https://359sun.top/posts/fdc.html</a>
+    <a href="https://359sun.top/posts/fdc.html" title="阿里云-RAM 与 STS 权限">https://359sun.top/posts/fdc.html</a>
   </li>
   <li class="post-copyright-license">
     <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" rel="noopener" target="_blank"><i class="fab fa-fw fa-creative-commons"></i>BY-NC-SA</a> 许可协议。转载请注明出处！
