@@ -1,134 +1,270 @@
 <?xml version="1.0" encoding="utf-8"?>
 <search>
   <entry>
+    <title>阿里云-RAM 与 STS 权限</title>
+    <url>/posts/fdc.html</url>
+    <content><![CDATA[<link rel="stylesheet" class="aplayer-secondary-style-marker" href="/assets/css/APlayer.min.css"><script src="/assets/js/APlayer.min.js" class="aplayer-secondary-script-marker"></script><script class="meting-secondary-script-marker" src="/assets/js/Meting.min.js"></script><h3 id="一、前言"><a href="#一、前言" class="headerlink" title="一、前言"></a>一、前言</h3><p>当通过OpenApi接口来调用云资源时（即替代控制台的操作），当前的方式有两种：</p>
+<ul>
+<li>通过 AK+SK 方式直接调用，只要该AK所属的账号有相关权限即可调用对应资源（授权分为系统策略和自定义策略）</li>
+<li>阿里云账号（RAM用户）&#x2F;阿里云服务（ECS等）&#x2F;身份提供商（SSO） 通过扮演角色获取角色的临时令牌（即通过调用AssumeRole接口），通过该临时令牌（临时令牌可设定会话时间），通过 STS接口获取到的 临时AK+临时SK+临时STSToken 进行调用对应资源</li>
+</ul>
+<h3 id="二、官方概念介绍"><a href="#二、官方概念介绍" class="headerlink" title="二、官方概念介绍"></a>二、官方概念介绍</h3><ol>
+<li>STS概念</li>
+</ol>
+<ul>
+<li>阿里云STS（Security Token Service）是阿里云提供的一种临时访问权限管理服务。RAM提供RAM用户和RAM角色两种身份。其中，RAM角色不具备永久身份凭证，而只能通过STS获取可以自定义时效和访问权限的临时身份凭证，即安全令牌（STS Token）</li>
+</ul>
+<span id="more"></span>
+<p>建议阅读：<a href="https://help.aliyun.com/document_detail/28756.html">https://help.aliyun.com/document_detail&#x2F;28756.html</a></p>
+<ol start="2">
+<li>RAM概念</li>
+</ol>
+<ul>
+<li>RAM用户：身份实体，可访问阿里云资源的账号或程序；创建时可选择登录场景、AccessKey场景（通过程序调用API）。</li>
+<li><strong>RAM角色</strong>：虚拟用户，向信任的RAM实体账号进行授权（根据STS令牌颁发短时有效的临时访问token）；创建角色后会生成Arn描述符（角色的描述符：每个RAM角色存在唯一值且遵循阿里云arn命名规范）。</li>
+<li>RAM权限策略：一组权限集，使用简单的Policy语法进行描述（分为系统策略和自定义策略）；权限策略是实际细分授权资源集、操作集、授权条件的描述。</li>
+</ul>
+<img data-src="/posts/fdc/ram1.png" class>
+
+<blockquote>
+<p>创建RAM角色时有三种类型：</p>
+<ul>
+<li><strong>阿里云账号</strong>：允许RAM用户所扮演的角色。扮演角色的RAM用户可以属于自己的阿里云账号，也可以属于其他阿里云账号。此类角色主要用来解决跨账号访问和临时授权问题</li>
+<li><strong>阿里云服务</strong>：允许云服务所扮演的角色。此类角色主要用于授权云服务代理您进行资源操作（服务又分为两种）<ul>
+<li>普通服务角色：您需要自定义角色名称，选择受信服务，并自定义权限策略</li>
+<li>服务关联角色：您只需选择受信的云服务，云服务会自带预设的角色名称和权限策略</li>
+<li>两种服务角色没太大区别，服务关联角色会多一个预设的配置（一般服务角色用户阿里云跨服务间的调用，例如ECS的授予&#x2F;收回RAM角色功能、RDS云服务调用KMS角色加密等，从某个云产品调用另一个云产品的授权）</li>
+</ul>
+</li>
+</ul>
+</blockquote>
+<img data-src="/posts/fdc/ram2.png" class>
+<blockquote>
+<ul>
+<li><strong>身份提供商</strong>：允许可信身份提供商下的用户所扮演的角色。此类角色主要用于实现与阿里云的单点登录（SSO）</li>
+</ul>
+<p><strong>常用的RAM角色一般为创建 阿里云账号 方式（OSS官方推荐使用）</strong></p>
+<ul>
+<li>授权RAM角色介绍：<a href="https://help.aliyun.com/document_detail/116819.html">https://help.aliyun.com/document_detail&#x2F;116819.html</a></li>
+<li>OSS官方推荐使用 阿里云账号 方式：<a href="https://help.aliyun.com/document_detail/100624.html">https://help.aliyun.com/document_detail&#x2F;100624.html</a></li>
+</ul>
+</blockquote>
+<h3 id="三、创建STS角色，自定义授权OSS功能测试"><a href="#三、创建STS角色，自定义授权OSS功能测试" class="headerlink" title="三、创建STS角色，自定义授权OSS功能测试"></a>三、创建STS角色，自定义授权OSS功能测试</h3><p>1）测试账号信息<br>账号：<a href="mailto:&#x64;&#101;&#118;&#111;&#x70;&#115;&#x5f;&#116;&#x65;&#x73;&#116;&#64;&#120;&#x78;&#x78;&#46;&#x6f;&#x6e;&#97;&#x6c;&#105;&#121;&#117;&#x6e;&#x2e;&#x63;&#111;&#x6d;">&#x64;&#101;&#118;&#111;&#x70;&#115;&#x5f;&#116;&#x65;&#x73;&#116;&#64;&#120;&#x78;&#x78;&#46;&#x6f;&#x6e;&#97;&#x6c;&#105;&#121;&#117;&#x6e;&#x2e;&#x63;&#111;&#x6d;</a><br>AK：xxxxx<br>SK：xxxxx<br>ARN：acs:ram::xxxxx:role&#x2F;xxx-sts<br>OSS Bucket名称：oss-test<br>OSS授权目录：dir111&#x2F;dir111_secondline1&#x2F;</p>
+<p>2）进行授权</p>
+<ul>
+<li>创建RAM用户（子账号），生成AK SK （此步骤忽略）</li>
+<li>测试账号添加STS权限</li>
+</ul>
+<img data-src="/posts/fdc/ram3.png" class>
+
+<ul>
+<li>添加权限策略，使用自定义策略授权（OSS官方示例Policy：<a href="https://help.aliyun.com/document_detail/266627.html">https://help.aliyun.com/document_detail&#x2F;266627.html</a>）</li>
+</ul>
+<img data-src="/posts/fdc/ram4.png" class>
+
+<ul>
+<li>添加RAM角色并授权Policy</li>
+</ul>
+<img data-src="/posts/fdc/ram5.png" class>
+
+<img data-src="/posts/fdc/ram6.png" class>
+
+<p>3）测试验证（控制台无法登录RAM账号验证权限情况下，可以使用ossutil或ossbrowser工具进行验证）</p>
+<ul>
+<li>ossutil使用：<a href="https://help.aliyun.com/document_detail/50451.html">https://help.aliyun.com/document_detail&#x2F;50451.html</a></li>
+</ul>
+<img data-src="/posts/fdc/ram7.png" class>
+
+<ul>
+<li>ossbrowser使用：<a href="https://help.aliyun.com/document_detail/92268.html">https://help.aliyun.com/document_detail&#x2F;92268.html</a></li>
+</ul>
+<p>4）验证列举和其他相关权限无误后，将ARN信息提供研发即可</p>
+<blockquote>
+<p>权限流程：</p>
+<ol>
+<li>客户端程序&#x2F;调用端发起扮演角色，此时在进入实际要获取的角色权限前，需要通过调用AssumeRole接口返回STS凭证（调用STS接口需要<strong>AliyunSTSAssumeRoleAccess</strong>权限，因此对应RAM账号需要授权该系统策略）</li>
+<li>通过返回的STS临时凭证（临时AK+临时SK+临时token）发起相关云资源接口的调用</li>
+<li>客户端使用STS发起调用时，会验证两个部分的权限策略Policy （注意：最后的权限取这两个权限Policy的交集）</li>
+</ol>
+<ul>
+<li>STS扮演的角色本身授权的权限策略是否拥有对应云资源的权限（系统或自定义的Policy）</li>
+<li>SDK&#x2F;API调用时传入的policy_text参数值，在构造调用请求时传入（<a href="https://help.aliyun.com/document_detail/100624.html">https://help.aliyun.com/document_detail&#x2F;100624.html</a><img data-src="/posts/fdc/ram8.png" class></li>
+</ul>
+</blockquote>
+<h3 id="四、结合实际需求"><a href="#四、结合实际需求" class="headerlink" title="四、结合实际需求"></a>四、结合实际需求</h3><ol>
+<li><p>开发提出需求：需要某一个oss bucket的STS ARN信息</p>
+</li>
+<li><p>需要相关信息：</p>
+</li>
+</ol>
+<ul>
+<li>oss bucket具体需授权目录，必须</li>
+<li>endpoint: oss bucket所属区域，非必须</li>
+<li>bucket-name: oss bucket名称，必须</li>
+<li>调用OSS RAM账号，必须</li>
+</ul>
+<ol start="3">
+<li>通过提供信息进行创建RAM角色、Policy策略新建（注意oss 细粒度的策略）、授权策略到RAM角色中，最后将新建的RAM角色的ARN描述符信息提供给研发。</li>
+</ol>
+]]></content>
+      <tags>
+        <tag>阿里云</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>Docker 学习记录</title>
+    <url>/posts/c06e.html</url>
+    <content><![CDATA[<link rel="stylesheet" class="aplayer-secondary-style-marker" href="/assets/css/APlayer.min.css"><script src="/assets/js/APlayer.min.js" class="aplayer-secondary-script-marker"></script><script class="meting-secondary-script-marker" src="/assets/js/Meting.min.js"></script><h3 id="一、Docker-基本原理"><a href="#一、Docker-基本原理" class="headerlink" title="一、Docker 基本原理"></a>一、Docker 基本原理</h3><h4 id="1-docker-基本概念"><a href="#1-docker-基本概念" class="headerlink" title="1.docker 基本概念"></a>1.docker 基本概念</h4><p>Docker Client： 客户端<br>Docker Daemon：服务端<br>Docker Images：镜像（只读 CD）<br>Docker Registry： 镜像仓库<br>Docker Container：实际运行服务的容器，通过 Images 启动（可以认为 Container 提供硬件环境，使用 Images 提供好的系统盘，加上项目代码，即可运行服务）</p>
+<span id="more"></span>
+<img data-src="/posts/c06e/docker1.png" class>
+<img data-src="/posts/c06e/docker2.png" class>
+<img data-src="/posts/c06e/docker3.png" class>
+
+<p>为什么使用Docker</p>
+<ul>
+<li>应用整体交付：一致的运行环境，DevOps。</li>
+<li>资源利用率高。</li>
+<li>更快的启动时间：应用扩容。</li>
+</ul>
+<h4 id="2-Dockerfile-编写规范"><a href="#2-Dockerfile-编写规范" class="headerlink" title="2.Dockerfile 编写规范"></a>2.Dockerfile 编写规范</h4><ol>
+<li>使用统一的 base 镜像。</li>
+<li>动静分离（基础稳定内容放在底层）。</li>
+<li>最小原则（镜像只打包必需的东西）。</li>
+<li>一个原则（每个镜像只有一个功能，交互通过网络，模块化管理）。</li>
+<li>使用更少的层，减少每层的内容。</li>
+<li>不要在 Dockerfile 单独修改文件权限（entrypoint &#x2F; 拷贝+修改权限同时操作）。</li>
+<li>利用 cache 加快构建速度。</li>
+<li>版本控制和自动构建（放入 git 版本控制中，自动构建镜像，构建参数&#x2F;变量给予文档说明）。</li>
+<li>使用 .dockerignore 文件（排除文件和目录）</li>
+</ol>
+<p><a href="https://docs.docker.com/engine/reference/builder/">Dockerfile 指令介绍</a></p>
+]]></content>
+      <categories>
+        <category>CNCF</category>
+      </categories>
+      <tags>
+        <tag>Docker</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>VPC 网络规划案例</title>
+    <url>/posts/64a8.html</url>
+    <content><![CDATA[<link rel="stylesheet" class="aplayer-secondary-style-marker" href="/assets/css/APlayer.min.css"><script src="/assets/js/APlayer.min.js" class="aplayer-secondary-script-marker"></script><script class="meting-secondary-script-marker" src="/assets/js/Meting.min.js"></script><h3 id="网段规划概述"><a href="#网段规划概述" class="headerlink" title="网段规划概述"></a>网段规划概述</h3><h4 id="1）规划网段的目的"><a href="#1）规划网段的目的" class="headerlink" title="1）规划网段的目的"></a>1）规划网段的目的</h4><ul>
+<li>方便查看管理，相当于对某一个&#x2F;多个IDC 机房的IP 规划，根据IP 地址可以一目了然的判断出归属。</li>
+<li>便于同集群&#x2F;VPC 内网段判断网络、路由走向、以及网络隔离策略（白名单）。</li>
+<li>区分多VPC&#x2F;网络 环境，方便在打通网络时区分子网网段。</li>
+</ul>
+<h4 id="2）规范化设计的方式"><a href="#2）规范化设计的方式" class="headerlink" title="2）规范化设计的方式"></a>2）规范化设计的方式</h4><p>首先需要分清两类，是否有ACK 等集群类资源单独规划：</p>
+<ol>
+<li>如无集群资源（即只有RDS、ECS 等常规资源），按正常内网网段定义VPC与交换机即可</li>
+<li>有集群资源，最好划分单独交换机部署常规资源，<strong>独立交换机</strong>部署集群资源。</li>
+</ol>
+<span id="more"></span>
+
+<p>由于线上部署，或者未来趋势 基本云上都会已集群方式存在，因此只讨论第二种方式。<br>网段设计规范：</p>
+<ul>
+<li>VPC可使用的私网网段：192.168.0.0&#x2F;16、10.0.0.0&#x2F;8、172.16.0.0&#x2F;12及其子网，每个专有网络只能指定一个网段。</li>
+<li>交换机可使用的网段：需要&lt;&#x3D; VPC网段（子集）</li>
+</ul>
+<img data-src="/posts/64a8/vpc1.png" class>
+
+<ul>
+<li>VPC数量：创建多个VPC 时尽量使用不同网段</li>
+<li>集群数量：同账号下部署多集群时尽量使用不同网段</li>
+<li>如有ACK 集群资源时，需判断集群网络插件模式<ul>
+<li>非Terway 插件时，需要三个私网网段，如：10.1.0.0&#x2F;16（VPC-vswitch）、192.168.0.0&#x2F;24（Pod 使用）、192.168.10.0&#x2F;24（Service 使用）</li>
+<li>使用Terway 插件时，需要两个私网网段，如：10.16.0.0&#x2F;8（VPC-vswitch + Pod）、192.168.0.0&#x2F;24（Service 使用）</li>
+</ul>
+</li>
+</ul>
+<h4 id="个人建议"><a href="#个人建议" class="headerlink" title="**个人建议"></a>**个人建议</h4><ul>
+<li><p>同账号下（同环境）选择 192.168.0.0&#x2F;16、10.0.0.0&#x2F;0、172.16.0.0&#x2F;12 进行VPC 创建组网。</p>
+<ul>
+<li>不同集群与云产品资源之间使用子交换机分割。</li>
+<li>使用云产品白名单或其他网络插件做网络隔离策略。</li>
+</ul>
+</li>
+<li><p>不同账号（如日常、线上）可复用同网段进行组网（一般不存在跨环境调用）。</p>
+</li>
+<li><p>当前环境网络组网信息（建议后续都使用Terway 插件）：</p>
+<ul>
+<li><p>日常环境网络架构</p>
+<img data-src="/posts/64a8/vpc2.png" class>
+</li>
+<li><p>线上网络架构（集群与集群、集群与云产品，通过私网的交换机网段进行隔离）</p>
+</li>
+</ul>
+</li>
+</ul>
+<img data-src="/posts/64a8/vpc3.png" class>
+
+
+<h3 id="线上实际案例"><a href="#线上实际案例" class="headerlink" title="线上实际案例"></a>线上实际案例</h3><h4 id="1）案例1"><a href="#1）案例1" class="headerlink" title="1）案例1"></a>1）案例1</h4><img data-src="/posts/64a8/vpc4.png" class>
+
+<ul>
+<li>VPC：10.0.0.0&#x2F;8 （复用线上VPC）</li>
+<li>交换机：新建4 台交换机<ul>
+<li>test-swc-10_200_0_0_20  （可用区 1）</li>
+<li>test-swc-10_200_16_0_20 （可用区 2）</li>
+<li>test-swc-10_200_64_0_19 （可用区 1）</li>
+<li>test-swc-10_200_96_0_19 （可用区 2）</li>
+</ul>
+</li>
+<li>集群CIDR规划<ul>
+<li>Node CIDR：<ul>
+<li>10.200.0.0&#x2F;20</li>
+<li>10.200.16.0&#x2F;20</li>
+</ul>
+</li>
+<li>Pod CIDR：<ul>
+<li>10.200.64.0&#x2F;19</li>
+<li>10.200.96.0&#x2F;19</li>
+</ul>
+</li>
+<li>Service CIDR：<ul>
+<li>172.31.0.0&#x2F;16<blockquote>
+<p>注意：</p>
+<ul>
+<li>Node 和Pod 交换机如要高可用选择不同可用区时，需要每个可用区都有Node 和Pod 可使用的交换机。</li>
+<li>Service 网段不能与VPC 网段 及VPC 内已有Kubernetes 集群使用的网段重复。</li>
+</ul>
+</blockquote>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<h4 id="2）相关文档与工具"><a href="#2）相关文档与工具" class="headerlink" title="2）相关文档与工具"></a>2）相关文档与工具</h4><ul>
+<li><p><a href="https://help.aliyun.com/document_detail/189596.html">云企业网工作原理与操作</a></p>
+</li>
+<li><p>VPN网关原理与操作：</p>
+<ul>
+<li><a href="https://cloud.tencent.com/developer/article/1824924">IPSec VPN 技术原理</a></li>
+<li><a href="https://help.aliyun.com/document_detail/65072.html">阿里云官方操作文档</a></li>
+</ul>
+</li>
+<li><p><a href="https://www.bejson.com/convert/subnetmask/">子网计算在线工具</a></p>
+</li>
+<li><p>架构图</p>
+</li>
+</ul>
+<p><img data-src="https://intranetproxy.alipay.com/skylark/lark/0/2022/png/21956377/1646207048171-c0f5a83d-b982-4e85-ab78-f724882be069.png#clientId=ufadced67-c1c1-4&from=ui&id=u1dc1cab7&margin=%5Bobject%20Object%5D&name=%E6%80%BB%E4%BD%93%E7%BD%91%E7%BB%9C%E6%9E%B6%E6%9E%84.png&originHeight=1993&originWidth=4131&originalType=binary&ratio=1&size=515776&status=done&style=none&taskId=uffed0b55-26c9-4f1d-b577-67c4f6f81ec" alt="总体网络架构.png"></p>
+]]></content>
+      <categories>
+        <category>网络</category>
+      </categories>
+      <tags>
+        <tag>阿里云</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>Hello World</title>
     <url>/posts/3eeb.html</url>
     <content><![CDATA[<link rel="stylesheet" class="aplayer-secondary-style-marker" href="/assets/css/APlayer.min.css"><script src="/assets/js/APlayer.min.js" class="aplayer-secondary-script-marker"></script><script class="meting-secondary-script-marker" src="/assets/js/Meting.min.js"></script><h2 id="Hello-World"><a href="#Hello-World" class="headerlink" title="Hello World!"></a>Hello World!</h2><h3 id="For-test"><a href="#For-test" class="headerlink" title="For test."></a>For test.</h3><figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line"># /bin/bash</span><br><span class="line">echo test</span><br></pre></td></tr></table></figure>
 
 <p>To Google <a href="https://www.google.com/">谷歌</a></p>
 ]]></content>
-  </entry>
-  <entry>
-    <title>ACK 集群日志接入 SLS</title>
-    <url>/posts/4a2a.html</url>
-    <content><![CDATA[<link rel="stylesheet" class="aplayer-secondary-style-marker" href="/assets/css/APlayer.min.css"><script src="/assets/js/APlayer.min.js" class="aplayer-secondary-script-marker"></script><script class="meting-secondary-script-marker" src="/assets/js/Meting.min.js"></script><h2 id="一、接入前提"><a href="#一、接入前提" class="headerlink" title="一、接入前提"></a>一、接入前提</h2><p><strong>ACK 集群开启日志服务组件Logtail</strong></p>
-<ul>
-<li>创建集群时启用Logtail（初始化ACK 集群时操作，新集群建议开启）<img data-src="/posts/4a2a/acksls1.png" class></li>
-</ul>
-<span id="more"></span>
-<ul>
-<li><p>为已有集群启用Logtail：在ACK控制台–&gt; 进入对应集群管理界面 –&gt; 运维管理 –&gt; 组件管理，找到logtail-ds 组件并点击安装即可。</p>
-<img data-src="/posts/4a2a/acksls2.png" class>
-</li>
-<li><p>创建成功后即可在SLS 控制台搜索到相关集群Project</p>
-</li>
-</ul>
-<img data-src="/posts/4a2a/acksls3.png" class>
-
-
-<h2 id="二、接入日志方式"><a href="#二、接入日志方式" class="headerlink" title="二、接入日志方式"></a>二、接入日志方式</h2><h3 id="2-1-ACK-集群手动接入"><a href="#2-1-ACK-集群手动接入" class="headerlink" title="2.1 ACK 集群手动接入"></a>2.1 ACK 集群手动接入</h3><blockquote>
-<p>本次接入应用标准输出日志，如需接入文件日志，还需创建对应volumeMounts和volumes 配置，规则逻辑类似。</p>
-</blockquote>
-<h4 id="1）通过控制台配置"><a href="#1）通过控制台配置" class="headerlink" title="1）通过控制台配置"></a>1）通过控制台配置</h4><ul>
-<li>进入应用详情页</li>
-</ul>
-<img data-src="/posts/4a2a/acksls4.png" class>
-
-<ul>
-<li>点击应用编辑按钮，添加相关日志采集配置。</li>
-</ul>
-<img data-src="/posts/4a2a/acksls5.png" class>
-<img data-src="/posts/4a2a/acksls6.png" class>
-
-<h4 id="2）通过YAML-模板创建（Deployment-x2F-Pod）"><a href="#2）通过YAML-模板创建（Deployment-x2F-Pod）" class="headerlink" title="2）通过YAML 模板创建（Deployment &#x2F; Pod）"></a>2）通过YAML 模板创建（Deployment &#x2F; Pod）</h4><ul>
-<li><p>采集规则</p>
-<blockquote>
-<ul>
-<li>name: aliyun_logs_{Logstore名称}<br> value: {日志采集路径}</li>
-</ul>
-</blockquote>
-</li>
-<li><p>模板关键配置示例</p>
-</li>
-</ul>
-<p>Pod 示例部分：</p>
-<figure class="highlight yaml"><table><tr><td class="code"><pre><span class="line"><span class="attr">apiVersion:</span> <span class="string">v1</span></span><br><span class="line"><span class="attr">kind:</span> <span class="string">Pod</span></span><br><span class="line"><span class="attr">spec:</span></span><br><span class="line">  <span class="attr">containers:</span></span><br><span class="line">  <span class="bullet">-</span> <span class="attr">name:</span> <span class="string">my-demo-app</span></span><br><span class="line">    <span class="attr">env:</span></span><br><span class="line">    <span class="comment">######### 配置 环境变量 ###########</span></span><br><span class="line">    <span class="bullet">-</span> <span class="attr">name:</span> <span class="string">aliyun_logs_log-stdout</span></span><br><span class="line">      <span class="attr">value:</span> <span class="string">stdout</span></span><br><span class="line">    <span class="bullet">-</span> <span class="attr">name:</span> <span class="string">aliyun_logs_log-varlog</span></span><br><span class="line">      <span class="attr">value:</span> <span class="string">/var/log/*.log</span></span><br><span class="line">    <span class="bullet">-</span> <span class="attr">name:</span> <span class="string">aliyun_logs_mytag1_tags</span></span><br><span class="line">      <span class="attr">value:</span> <span class="string">tag1=v1</span></span><br><span class="line">    <span class="comment">###############################</span></span><br><span class="line">    <span class="comment">######### 配置volume mount ###########</span></span><br><span class="line">    <span class="attr">volumeMounts:</span></span><br><span class="line">    <span class="bullet">-</span> <span class="attr">name:</span> <span class="string">volumn-sls-mydemo</span></span><br><span class="line">      <span class="attr">mountPath:</span> <span class="string">/var/log</span></span><br><span class="line">  <span class="attr">volumes:</span></span><br><span class="line">  <span class="bullet">-</span> <span class="attr">name:</span> <span class="string">volumn-sls-mydemo</span></span><br><span class="line">    <span class="attr">emptyDir:</span> &#123;&#125;</span><br><span class="line">  <span class="comment">###############################</span></span><br></pre></td></tr></table></figure>
-<p>deployment 示例部分：</p>
-<figure class="highlight yaml"><table><tr><td class="code"><pre><span class="line"><span class="attr">apiVersion:</span> <span class="string">apps/v1</span></span><br><span class="line"><span class="attr">kind:</span> <span class="string">Deployment</span></span><br><span class="line"><span class="attr">spec:</span></span><br><span class="line">  <span class="attr">template:</span></span><br><span class="line">    <span class="attr">spec:</span></span><br><span class="line">      <span class="attr">containers:</span></span><br><span class="line">        <span class="bullet">-</span> <span class="attr">args:</span> <span class="string">xxx-args</span></span><br><span class="line">          <span class="attr">env:</span></span><br><span class="line">            <span class="bullet">-</span> <span class="attr">name:</span> <span class="string">aliyun_logs_app-110760134-domain-event-center</span></span><br><span class="line">              <span class="attr">value:</span> <span class="string">stdout</span></span><br><span class="line">          <span class="attr">image:</span> <span class="string">xxx-image</span></span><br></pre></td></tr></table></figure>
-<p>多个应用收集到同一个logstore 示例：</p>
-<figure class="highlight yaml"><table><tr><td class="code"><pre><span class="line"><span class="comment">#应用A 配置：</span></span><br><span class="line"><span class="comment">######### 配置 环境变量 ###########</span></span><br><span class="line">    <span class="bullet">-</span> <span class="attr">name:</span> <span class="string">aliyun_logs_app1-stdout</span></span><br><span class="line">      <span class="attr">value:</span> <span class="string">stdout</span></span><br><span class="line">    <span class="bullet">-</span> <span class="attr">name:</span> <span class="string">aliyun_logs_app1-stdout_logstore</span></span><br><span class="line">      <span class="attr">value:</span> <span class="string">stdout-logstore</span></span><br><span class="line">      </span><br><span class="line">      </span><br><span class="line"><span class="comment">#应用B 配置：</span></span><br><span class="line"><span class="comment">######### 配置 环境变量 ###########</span></span><br><span class="line">    <span class="bullet">-</span> <span class="attr">name:</span> <span class="string">aliyun_logs_app2-stdout</span></span><br><span class="line">      <span class="attr">value:</span> <span class="string">stdout</span></span><br><span class="line">    <span class="bullet">-</span> <span class="attr">name:</span> <span class="string">aliyun_logs_app2-stdout_logstore</span></span><br><span class="line">      <span class="attr">value:</span> <span class="string">stdout-logstore</span></span><br></pre></td></tr></table></figure>
-
-<h4 id="3）验证查看日志"><a href="#3）验证查看日志" class="headerlink" title="3）验证查看日志"></a>3）验证查看日志</h4><ul>
-<li>登录SLS 控制台，进入对应集群Project</li>
-</ul>
-<img data-src="/posts/4a2a/acksls7.png" class>
-
-<ul>
-<li>查询分析</li>
-</ul>
-<img data-src="/posts/4a2a/acksls8.png" class>
-
-<h4 id="4）其他"><a href="#4）其他" class="headerlink" title="4）其他"></a>4）其他</h4><ul>
-<li>注意事项<blockquote>
-<p><strong>注意：</strong><br>**    当多个不同namespace 的同名应用配置为同一个logstore 时，可通过__tag__ 过滤条件，搜索对应需要的日志。**<br>**    如需自定义tag 区分不同日志时，可通过自定义tag 区分。**</p>
-<img data-src="/posts/4a2a/acksls9.png" class></blockquote>
-</li>
-</ul>
-<blockquote>
-<p>参考阿里云官方文档：<a href="https://help.aliyun.com/document_detail/87540.html">https://help.aliyun.com/document_detail&#x2F;87540.html</a></p>
-</blockquote>
-<h3 id="2-2-DaemonSet-方式接入"><a href="#2-2-DaemonSet-方式接入" class="headerlink" title="2.2 DaemonSet 方式接入"></a>2.2 DaemonSet 方式接入</h3><h4 id="1）通过DaemonSet-控制台方式采集"><a href="#1）通过DaemonSet-控制台方式采集" class="headerlink" title="1）通过DaemonSet 控制台方式采集"></a>1）通过DaemonSet 控制台方式采集</h4><blockquote>
-<p>可选择采集文件或标准输出，本次接入应用标准输出日志。</p>
-</blockquote>
-<ul>
-<li>在SLS 控制台搜索 <strong>Kubenetes - 标准输出</strong>，选择日志收集方式。</li>
-</ul>
-<img data-src="/posts/4a2a/acksls10.png" class>
-
-<ul>
-<li>选择&#x2F;创建 Project 和store。</li>
-</ul>
-<img data-src="/posts/4a2a/acksls11.png" class>
-
-<ul>
-<li>选择已有机器组</li>
-</ul>
-<img data-src="/posts/4a2a/acksls12.png" class>
-
-<ul>
-<li>收集过滤需要的日志，详细语法可参考文档。</li>
-</ul>
-<img data-src="/posts/4a2a/acksls13.png" class>
-<figure class="highlight json"><table><tr><td class="code"><pre><span class="line"><span class="punctuation">&#123;</span></span><br><span class="line">  <span class="attr">&quot;inputs&quot;</span><span class="punctuation">:</span> <span class="punctuation">[</span></span><br><span class="line">    <span class="punctuation">&#123;</span></span><br><span class="line">      <span class="attr">&quot;detail&quot;</span><span class="punctuation">:</span> <span class="punctuation">&#123;</span></span><br><span class="line">        <span class="attr">&quot;IncludeLabel&quot;</span><span class="punctuation">:</span> <span class="punctuation">&#123;</span><span class="punctuation">&#125;</span><span class="punctuation">,</span></span><br><span class="line">        <span class="attr">&quot;ExcludeLabel&quot;</span><span class="punctuation">:</span> <span class="punctuation">&#123;</span><span class="attr">&quot;io.kubernetes.container.name&quot;</span><span class="punctuation">:</span> <span class="string">&quot;camel-k-operator&quot;</span><span class="punctuation">&#125;</span><span class="punctuation">,</span></span><br><span class="line">        <span class="attr">&quot;IncludeEnv&quot;</span><span class="punctuation">:</span> <span class="punctuation">&#123;</span><span class="attr">&quot;CAMEL_K_INTEGRATION&quot;</span><span class="punctuation">:</span> <span class="string">&quot;&quot;</span><span class="punctuation">&#125;</span><span class="punctuation">,</span></span><br><span class="line">      <span class="punctuation">&#125;</span><span class="punctuation">,</span></span><br><span class="line">      <span class="attr">&quot;type&quot;</span><span class="punctuation">:</span> <span class="string">&quot;service_docker_stdout&quot;</span></span><br><span class="line">    <span class="punctuation">&#125;</span></span><br><span class="line">  <span class="punctuation">]</span></span><br><span class="line"><span class="punctuation">&#125;</span></span><br></pre></td></tr></table></figure>
-
-<ul>
-<li>进入SLS 控制台，并选择对应Project。点击创建索引</li>
-</ul>
-<img data-src="/posts/4a2a/acksls14.png" class>
-<img data-src="/posts/4a2a/acksls15.png" class>
-
-<ul>
-<li>索引创建后等待1 min左右，即可看到标准输出日志。</li>
-</ul>
-<img data-src="/posts/4a2a/acksls16.png" class>
-
-<h4 id="2）通过DaemonSet-CRD-方式采集"><a href="#2）通过DaemonSet-CRD-方式采集" class="headerlink" title="2）通过DaemonSet CRD 方式采集"></a>2）通过DaemonSet CRD 方式采集</h4><blockquote>
-<p>Edas 中配置日志收集即使用的该方式。</p>
-</blockquote>
-<p><a href="https://help.aliyun.com/document_detail/74878.htm">https://help.aliyun.com/document_detail&#x2F;74878.htm</a></p>
-<h3 id="2-3-Sidecar-方式接入"><a href="#2-3-Sidecar-方式接入" class="headerlink" title="2.3 Sidecar 方式接入"></a>2.3 Sidecar 方式接入</h3><h4 id="1）通过Sidecar-控制台方式采集"><a href="#1）通过Sidecar-控制台方式采集" class="headerlink" title="1）通过Sidecar 控制台方式采集"></a>1）通过Sidecar 控制台方式采集</h4><p><a href="https://help.aliyun.com/document_detail/100575.htm">https://help.aliyun.com/document_detail&#x2F;100575.htm</a></p>
-<h4 id="2）通过Sidecar-CRD-方式采集"><a href="#2）通过Sidecar-CRD-方式采集" class="headerlink" title="2）通过Sidecar CRD 方式采集"></a>2）通过Sidecar CRD 方式采集</h4><p><a href="https://help.aliyun.com/document_detail/100575.htm">https://help.aliyun.com/document_detail&#x2F;100575.htm</a></p>
-<blockquote>
-<p>参考阿里云官方文档：<a href="https://help.aliyun.com/document_detail/66654.html">https://help.aliyun.com/document_detail&#x2F;66654.html</a></p>
-</blockquote>
-]]></content>
-      <categories>
-        <category>CNCF</category>
-      </categories>
-      <tags>
-        <tag>阿里云</tag>
-        <tag>K8S</tag>
-      </tags>
   </entry>
   <entry>
     <title>流量网关方案与灰度发布</title>
@@ -235,7 +371,7 @@
       </tags>
   </entry>
   <entry>
-    <title>git flow 工作流理解</title>
+    <title>Git Flow 工作流</title>
     <url>/posts/539.html</url>
     <content><![CDATA[<link rel="stylesheet" class="aplayer-secondary-style-marker" href="/assets/css/APlayer.min.css"><script src="/assets/js/APlayer.min.js" class="aplayer-secondary-script-marker"></script><script class="meting-secondary-script-marker" src="/assets/js/Meting.min.js"></script><h3 id="一、gitflow：版本分支管理策略（相当于对git的包装）"><a href="#一、gitflow：版本分支管理策略（相当于对git的包装）" class="headerlink" title="一、gitflow：版本分支管理策略（相当于对git的包装）"></a>一、gitflow：版本分支管理策略（相当于对git的包装）</h3><ol>
 <li>GitFlow描述</li>
@@ -366,164 +502,7 @@
       </tags>
   </entry>
   <entry>
-    <title>Docker学习记录</title>
-    <url>/posts/c06e.html</url>
-    <content><![CDATA[<link rel="stylesheet" class="aplayer-secondary-style-marker" href="/assets/css/APlayer.min.css"><script src="/assets/js/APlayer.min.js" class="aplayer-secondary-script-marker"></script><script class="meting-secondary-script-marker" src="/assets/js/Meting.min.js"></script><h3 id="一、Docker-基本原理"><a href="#一、Docker-基本原理" class="headerlink" title="一、Docker 基本原理"></a>一、Docker 基本原理</h3><h4 id="1-docker-基本概念"><a href="#1-docker-基本概念" class="headerlink" title="1.docker 基本概念"></a>1.docker 基本概念</h4><p>Docker Client： 客户端<br>Docker Daemon：服务端<br>Docker Images：镜像（只读 CD）<br>Docker Registry： 镜像仓库<br>Docker Container：实际运行服务的容器，通过 Images 启动（可以认为 Container 提供硬件环境，使用 Images 提供好的系统盘，加上项目代码，即可运行服务）</p>
-<span id="more"></span>
-<img data-src="/posts/c06e/docker1.png" class>
-<img data-src="/posts/c06e/docker2.png" class>
-<img data-src="/posts/c06e/docker3.png" class>
-
-<p>为什么使用Docker</p>
-<ul>
-<li>应用整体交付：一致的运行环境，DevOps。</li>
-<li>资源利用率高。</li>
-<li>更快的启动时间：应用扩容。</li>
-</ul>
-<h4 id="2-Dockerfile-编写规范"><a href="#2-Dockerfile-编写规范" class="headerlink" title="2.Dockerfile 编写规范"></a>2.Dockerfile 编写规范</h4><ol>
-<li>使用统一的 base 镜像。</li>
-<li>动静分离（基础稳定内容放在底层）。</li>
-<li>最小原则（镜像只打包必需的东西）。</li>
-<li>一个原则（每个镜像只有一个功能，交互通过网络，模块化管理）。</li>
-<li>使用更少的层，减少每层的内容。</li>
-<li>不要在 Dockerfile 单独修改文件权限（entrypoint &#x2F; 拷贝+修改权限同时操作）。</li>
-<li>利用 cache 加快构建速度。</li>
-<li>版本控制和自动构建（放入 git 版本控制中，自动构建镜像，构建参数&#x2F;变量给予文档说明）。</li>
-<li>使用 .dockerignore 文件（排除文件和目录）</li>
-</ol>
-<p><a href="https://docs.docker.com/engine/reference/builder/">Dockerfile 指令介绍</a></p>
-]]></content>
-      <categories>
-        <category>CNCF</category>
-      </categories>
-      <tags>
-        <tag>Docker</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>K8S-RBAC权限控制</title>
-    <url>/posts/fa45.html</url>
-    <content><![CDATA[<link rel="stylesheet" class="aplayer-secondary-style-marker" href="/assets/css/APlayer.min.css"><script src="/assets/js/APlayer.min.js" class="aplayer-secondary-script-marker"></script><script class="meting-secondary-script-marker" src="/assets/js/Meting.min.js"></script><h3 id="一、RBAC简易概述"><a href="#一、RBAC简易概述" class="headerlink" title="一、RBAC简易概述"></a>一、RBAC简易概述</h3><img data-src="/posts/fa45/gaisu.png" class>
-<h4 id="1-RBAC-四种-API-对象"><a href="#1-RBAC-四种-API-对象" class="headerlink" title="1) RBAC 四种 API 对象"></a>1) RBAC 四种 API 对象</h4><ul>
-<li>Role：一组权限的集合，在一个命名空间中，可以用其来定义一个角色，只能对命名空间内的资源进行授权。如果是集群级别的资源，则需要使用ClusterRole。例如：定义一个角色用来读取Pod的权限</li>
-<li>ClusterRole：具有和角色一致的命名空间资源的管理能力，还可用于以下特殊元素的授权<ul>
-<li>集群范围的资源，例如Node</li>
-<li>非资源型的路径，例如：&#x2F;healthz</li>
-<li>包含全部命名空间的资源，例如Pods<blockquote>
-<p>例如：定义一个集群角色可让用户访问任意secrets</p>
-</blockquote>
-</li>
-</ul>
-</li>
-<li>RoleBinding：角色绑定</li>
-<li>ClusterRoleBinding：集群角色绑定<blockquote>
-<p>角色绑定和集群角色绑定用于把一个角色绑定在一个目标上，可以是User，Group，Service Account，使用RoleBinding为某个命名空间授权，使用ClusterRoleBinding为集群范围内授权。</p>
-</blockquote>
-</li>
-</ul>
-<p><strong>Role和ClusterRole是权限规则的定义</strong></p>
-<ul>
-<li>rules代表具体的授权规则，类似于阿里云RAM中的权限策略Policy</li>
-<li>Role和ClusterRole区别只在于一个是集群级别的资源控制</li>
-</ul>
-<span id="more"></span>
-
-<p><strong>RoleBinding和ClusterRoleBinding是将User、Group、ServiceAccount绑定到Role或ClusterRole中（类似阿里云RAM中将Policy赋权给RAM角色或RAM账号）</strong></p>
-<ul>
-<li>User、Group、ServiceAccount 是 K8S 集群中单独的概念，与系统级别不同。参考：<a href="https://www.qikqiak.com/k8strain2/security/rbac/#%E5%88%9B%E5%BB%BA%E8%A7%92%E8%89%B2">https://www.qikqiak.com/k8strain2/security/rbac/#%E5%88%9B%E5%BB%BA%E8%A7%92%E8%89%B2</a></li>
-<li>RoleBinding 可以引用同一个 namespace 中的任何 Role ；或者一个 RoleBinding 可以引用某 ClusterRole 并将该 ClusterRole 绑定到 RoleBinding 所在的 namespace。</li>
-<li>如需 ClusterRole 绑定到集群中所有 namespace，必须要使用 ClusterRoleBinding</li>
-<li>RoleBinding 对应可引用一个 ClusterRole 对象用于在 RoleBinding 所在的 namespace 内授予用户对所引用的 ClusterRole 中定义的 namespace 资源的访问权限。（在整个集群内定义一组通用角色，然后在不同 namespace 中复用这些角色）</li>
-</ul>
-<h4 id="2-资源引用方式"><a href="#2-资源引用方式" class="headerlink" title="2) 资源引用方式"></a>2) 资源引用方式</h4><ul>
-<li>多数资源可以用其名称的字符串表示，也就是Endpoint中的URL相对路径，例如pod中的日志是GET &#x2F;api&#x2F;v1&#x2F;namaspaces&#x2F;{namespace}&#x2F;pods&#x2F;{podname}&#x2F;log</li>
-<li>如果需要在一个RBAC对象中体现上下级资源，就需要使用“&#x2F;”分割资源和下级资源。</li>
-</ul>
-<p>例如：若想授权让某个主体同时能够读取Pod和Pod log，则可以配置 resources为一个数组</p>
-<figure class="highlight yaml"><table><tr><td class="code"><pre><span class="line"><span class="attr">rules:</span></span><br><span class="line"><span class="bullet">-</span> <span class="attr">apiGroups:</span> [<span class="string">&quot;&quot;</span>]</span><br><span class="line">   <span class="attr">resources:</span> [<span class="string">&quot;pods&quot;</span>,<span class="string">&quot;pods/log&quot;</span>]</span><br><span class="line">   <span class="attr">verbs:</span> [<span class="string">&quot;get&quot;</span>,<span class="string">&quot;list&quot;</span>]</span><br></pre></td></tr></table></figure>
-
-<ul>
-<li>通过名称（ResourceName）进行引用，在指定ResourceName后，使用get、delete、update、patch请求，就会被限制在这个资源实例范围内</li>
-</ul>
-<p>例如，下面的声明让一个主体只能对名为my-configmap的ConFigmap进行get和update操作：</p>
-<figure class="highlight yaml"><table><tr><td class="code"><pre><span class="line"><span class="attr">rules:</span></span><br><span class="line"><span class="bullet">-</span> <span class="attr">apiGroups:</span> [<span class="string">&quot;&quot;</span>]</span><br><span class="line">   <span class="attr">resources:</span> [<span class="string">&quot;configmap&quot;</span>]</span><br><span class="line">   <span class="attr">resourceNames:</span> [<span class="string">&quot;my-configmap&quot;</span>]</span><br><span class="line">   <span class="attr">verbs:</span> [<span class="string">&quot;get&quot;</span>,<span class="string">&quot;update&quot;</span>]</span><br></pre></td></tr></table></figure>
-
-
-<h4 id="3-rules-参数说明"><a href="#3-rules-参数说明" class="headerlink" title="3) rules 参数说明"></a>3) rules 参数说明</h4><ul>
-<li>apiGroups：支持的API组列表，例如：”apiVersion: batch&#x2F;v1”等</li>
-<li>resources：支持的资源对象列表，例如pods、deplayments、jobs等</li>
-<li>resourceNames: 指定resource的名称（可选）</li>
-<li>verbs：对资源对象的操作方法列表<blockquote>
-<p>api-resources：所有资源信息<br>apiGroups：api-resources下的分类分组</p>
-<p><a href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.23/#-strong-api-groups-strong-">查看API GROUP分组信息</a></p>
-<ul>
-<li>方式一：kubectl explain xxx ， xxx为 “kubectl api-resources” 输出结果的 NAME 值（输出结果的 VERSION 值为v1 则为默认的Core API 分组，默认以”” 表示，如 pods、services）</li>
-<li>方式二：kubectl get –raw &#x2F;apis&#x2F;apps&#x2F;v1</li>
-</ul>
-</blockquote>
-</li>
-</ul>
-<p>可通过 kubectl get –raw &#x2F;apis&#x2F;rbac.authorization.k8s.io&#x2F;v1 可以获取到 RBAC 四个 API 资源对象的相关信息，如下图：</p>
-<img data-src="/posts/fa45/c31775e8bbe3.png" class>
-
-<blockquote>
-<p>创建资源&#x2F;信息的方式</p>
-<ul>
-<li>方式一：kubectl create -f xxx.yaml       –&gt;   文件方式创建</li>
-<li>方式二：kubectl create –arg1&#x3D;xxx –arg2&#x3D;yyy     –&gt;  参数方式创建（后续可通过kubectl edit方式继续编辑）</li>
-</ul>
-</blockquote>
-<h3 id="二、ServiceAccount-测试"><a href="#二、ServiceAccount-测试" class="headerlink" title="二、ServiceAccount 测试"></a>二、ServiceAccount 测试</h3><h4 id="1-创建-serviceaccount-账户并进行对应授权"><a href="#1-创建-serviceaccount-账户并进行对应授权" class="headerlink" title="1) 创建 serviceaccount 账户并进行对应授权"></a>1) 创建 serviceaccount 账户并进行对应授权</h4><ol>
-<li><p>创建 serviceaccount 账户 camel-sva （只需defalut namespace）<br>执行命令：kubectl create serviceaccount camel-sva -n default</p>
-<img data-src="/posts/fa45/634be995b5bc.png" class>
-</li>
-<li><p>创建 role 角色 （授权Integration、Kamelet、KameletBinding 3种资源的 curd 权限）<br>执行命令：kubectl create role camel-sva-role –verb&#x3D;* –resource&#x3D;integrations,kamelets,kameletbindings </p>
-<img data-src="/posts/fa45/21812e1bbfad.png" class>
-</li>
-<li><p>绑定集群权限<br>命令：kubectl create rolebinding camel-sva-rolebinding –role&#x3D;camel-sva-role –serviceaccount&#x3D;default:camel-sva</p>
-<img data-src="/posts/fa45/7528aa1bf3da.png" class>
-</li>
-<li><p>查看账号 secret 信息<br>命令：kubectl get secret&#x2F;camel-sva-token-mdt28 -oyaml</p>
-<img data-src="/posts/fa45/de3ebdd4f016.png" class>
-<p>将获取到的 token 值进行 base64 解码后即可用来调用 apiserver 接口，如下图（接口可通过 kubectl get –raw &#x2F;apis&#x2F; 进行获取）：</p>
-<img data-src="/posts/fa45/1572c2ebc891.png" class></li>
-</ol>
-<h4 id="2-创建用户认证的-kubeconfig-文件"><a href="#2-创建用户认证的-kubeconfig-文件" class="headerlink" title="2) 创建用户认证的 kubeconfig 文件"></a>2) 创建用户认证的 kubeconfig 文件</h4><ol>
-<li><p>创建集群配置文件<br>命令：kubectl config set-cluster kubernetes –certificate-authority&#x3D;&#x2F;etc&#x2F;kubernetes&#x2F;pki&#x2F;ca.crt –server&#x3D;”<a href="https://10.0.0.142:6443&quot;">https://10.0.0.142:6443&quot;</a> –embed-certs&#x3D;true –kubeconfig&#x3D;.&#x2F;camel-sva.conf</p>
-</li>
-<li><p>生成 token（base64编码）<br>命令：D&#x3D;$(kubectl get secret camel-sva-token-mdt28 -o jsonpath&#x3D;{.data.token}|base64 -d)</p>
-</li>
-<li><p>为配置文件添加 token 信息，设置一个用户条目<br>命令：kubectl config set-credentials camel-sva –token&#x3D;$D –kubeconfig&#x3D;.&#x2F;camel-sva.conf</p>
-</li>
-<li><p>为配置文件添加权限信息，设置一个 content 条目<br>kubectl config set-context camel-sva@kubernetes –cluster&#x3D;kubernetes –user&#x3D;camel-sva –kubeconfig&#x3D;.&#x2F;camel-sva.conf</p>
-</li>
-<li><p>为配置文件添加权限信息，设置上下文<br>命令：kubectl config use-context camel-sva@kubernetes –kubeconfig&#x3D;.&#x2F;camel-sva.conf</p>
-</li>
-</ol>
-<p>执行完上述命令后即在当前目录生成配置文件：camel-sva.conf，可 copy 到 kubeconfig对应目录，进行操作。</p>
-<img data-src="/posts/fa45/d6da8c845c41.png" class>
-<p>使用该配置文件进行 kubectl 命令操作，即可验证用户只拥有对应资源的操作权限。</p>
-<img data-src="/posts/fa45/de4222775e67.png" class>
-
-<h4 id="3-API-对象结构"><a href="#3-API-对象结构" class="headerlink" title="3) API 对象结构"></a>3) API 对象结构</h4><img data-src="/posts/fa45/ab8f20ce2acc.png" class>
-
-
-<h3 id="三、参考学习"><a href="#三、参考学习" class="headerlink" title="三、参考学习"></a>三、参考学习</h3><ol>
-<li><a href="https://kubernetes.io/zh/docs/reference/access-authn-authz/rbac/#service-account-permissions">https://kubernetes.io/zh/docs/reference/access-authn-authz/rbac/#service-account-permissions</a></li>
-<li><a href="https://www.qikqiak.com/k8strain2/security/rbac/#%E5%88%9B%E5%BB%BA%E8%A7%92%E8%89%B2">https://www.qikqiak.com/k8strain2/security/rbac/#%E5%88%9B%E5%BB%BA%E8%A7%92%E8%89%B2</a></li>
-<li><a href="https://zhuanlan.zhihu.com/p/97793056">https://zhuanlan.zhihu.com/p/97793056</a></li>
-</ol>
-]]></content>
-      <categories>
-        <category>CNCF</category>
-      </categories>
-      <tags>
-        <tag>阿里云</tag>
-        <tag>K8S</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>helm 部署应用</title>
+    <title>Helm 应用部署</title>
     <url>/posts/ce0f.html</url>
     <content><![CDATA[<link rel="stylesheet" class="aplayer-secondary-style-marker" href="/assets/css/APlayer.min.css"><script src="/assets/js/APlayer.min.js" class="aplayer-secondary-script-marker"></script><script class="meting-secondary-script-marker" src="/assets/js/Meting.min.js"></script><h3 id="一、Helm-安装与模板"><a href="#一、Helm-安装与模板" class="headerlink" title="一、Helm 安装与模板"></a>一、Helm 安装与模板</h3><h4 id="1）Helm-安装部署"><a href="#1）Helm-安装部署" class="headerlink" title="1）Helm 安装部署"></a>1）Helm 安装部署</h4><ul>
 <li><a href="https://helm.sh/zh/docs/intro/install/">安装二进制命令</a>（本地需要连接上kubernetes 集群）</li>
@@ -672,7 +651,7 @@
       </tags>
   </entry>
   <entry>
-    <title>ACK-K8S 学习记录</title>
+    <title>K8S &amp; ACK 学习记录</title>
     <url>/posts/754e.html</url>
     <content><![CDATA[<link rel="stylesheet" class="aplayer-secondary-style-marker" href="/assets/css/APlayer.min.css"><script src="/assets/js/APlayer.min.js" class="aplayer-secondary-script-marker"></script><script class="meting-secondary-script-marker" src="/assets/js/Meting.min.js"></script><h3 id="一、ACK集群网络规划"><a href="#一、ACK集群网络规划" class="headerlink" title="一、ACK集群网络规划"></a>一、ACK集群网络规划</h3><p><a href="https://help.aliyun.com/document_detail/86500.html">https://help.aliyun.com/document_detail&#x2F;86500.html</a></p>
 <h3 id="二、RBAC授权"><a href="#二、RBAC授权" class="headerlink" title="二、RBAC授权"></a>二、RBAC授权</h3><p><a href="https://yuque.antfin.com/kifo8h/nee5aa/mvx5t5">https://yuque.antfin.com/kifo8h/nee5aa/mvx5t5</a></p>
@@ -906,7 +885,7 @@
       </tags>
   </entry>
   <entry>
-    <title>NetworkPolicy隔离策略</title>
+    <title>NetworkPolicy 隔离策略</title>
     <url>/posts/8aa0.html</url>
     <content><![CDATA[<link rel="stylesheet" class="aplayer-secondary-style-marker" href="/assets/css/APlayer.min.css"><script src="/assets/js/APlayer.min.js" class="aplayer-secondary-script-marker"></script><script class="meting-secondary-script-marker" src="/assets/js/Meting.min.js"></script><h3 id="一、背景"><a href="#一、背景" class="headerlink" title="一、背景"></a>一、背景</h3><blockquote>
 <p>一次对当前业务使用ACK 集群的业务调研与改造：针对NetworkPolicy 策略的调研，主要用于新建ACK 集群的网络规划与网络隔离</p>
@@ -1001,68 +980,350 @@
       </tags>
   </entry>
   <entry>
-    <title>promotheus组件-grafana大盘配置监控大盘与告警通知</title>
-    <url>/posts/9a8h.html</url>
-    <content><![CDATA[<link rel="stylesheet" class="aplayer-secondary-style-marker" href="/assets/css/APlayer.min.css"><script src="/assets/js/APlayer.min.js" class="aplayer-secondary-script-marker"></script><script class="meting-secondary-script-marker" src="/assets/js/Meting.min.js"></script><h3 id="一、背景"><a href="#一、背景" class="headerlink" title="一、背景"></a>一、背景</h3><ul>
-<li>线上ACK 集群部署了StatefulSet 应用（rabbitMQ），由于rabbitMQ 本身自带的management 后台数据展示较为简陋且没有告警功能，因此考虑接入云上产品监控资源数据且对接告警通知功能，主要通过如下产品实现：<ul>
-<li>接入Prometheus 监控+grafana 进行数据图表展示。</li>
-<li>利用Arms 产品获取Prometheus 的监控指标，按照设定的阈值进行告警通知功能。</li>
-</ul>
+    <title>K8S-RBAC 权限控制</title>
+    <url>/posts/fa45.html</url>
+    <content><![CDATA[<link rel="stylesheet" class="aplayer-secondary-style-marker" href="/assets/css/APlayer.min.css"><script src="/assets/js/APlayer.min.js" class="aplayer-secondary-script-marker"></script><script class="meting-secondary-script-marker" src="/assets/js/Meting.min.js"></script><h3 id="一、RBAC简易概述"><a href="#一、RBAC简易概述" class="headerlink" title="一、RBAC简易概述"></a>一、RBAC简易概述</h3><img data-src="/posts/fa45/gaisu.png" class>
+<h4 id="1-RBAC-四种-API-对象"><a href="#1-RBAC-四种-API-对象" class="headerlink" title="1) RBAC 四种 API 对象"></a>1) RBAC 四种 API 对象</h4><ul>
+<li>Role：一组权限的集合，在一个命名空间中，可以用其来定义一个角色，只能对命名空间内的资源进行授权。如果是集群级别的资源，则需要使用ClusterRole。例如：定义一个角色用来读取Pod的权限</li>
+<li>ClusterRole：具有和角色一致的命名空间资源的管理能力，还可用于以下特殊元素的授权<ul>
+<li>集群范围的资源，例如Node</li>
+<li>非资源型的路径，例如：&#x2F;healthz</li>
+<li>包含全部命名空间的资源，例如Pods<blockquote>
+<p>例如：定义一个集群角色可让用户访问任意secrets</p>
+</blockquote>
 </li>
 </ul>
-<h3 id="二、操作过程"><a href="#二、操作过程" class="headerlink" title="二、操作过程"></a>二、操作过程</h3><h4 id="1）接入Prometheus-组件监控，获取数据指标"><a href="#1）接入Prometheus-组件监控，获取数据指标" class="headerlink" title="1）接入Prometheus 组件监控，获取数据指标"></a>1）接入Prometheus 组件监控，获取数据指标</h4><ul>
-<li>进入云产品 <strong>Prometheus监控服务</strong>，选择对应集群。（ACK集群需要先安装Prometheus 监控组件，安装参考：<a href="https://help.aliyun.com/document_detail/161304.html">ARMS Prometheus监控</a>）<img data-src="/posts/9a8h/1.png" class></li>
+</li>
+<li>RoleBinding：角色绑定</li>
+<li>ClusterRoleBinding：集群角色绑定<blockquote>
+<p>角色绑定和集群角色绑定用于把一个角色绑定在一个目标上，可以是User，Group，Service Account，使用RoleBinding为某个命名空间授权，使用ClusterRoleBinding为集群范围内授权。</p>
+</blockquote>
+</li>
+</ul>
+<p><strong>Role和ClusterRole是权限规则的定义</strong></p>
+<ul>
+<li>rules代表具体的授权规则，类似于阿里云RAM中的权限策略Policy</li>
+<li>Role和ClusterRole区别只在于一个是集群级别的资源控制</li>
+</ul>
+<span id="more"></span>
+
+<p><strong>RoleBinding和ClusterRoleBinding是将User、Group、ServiceAccount绑定到Role或ClusterRole中（类似阿里云RAM中将Policy赋权给RAM角色或RAM账号）</strong></p>
+<ul>
+<li>User、Group、ServiceAccount 是 K8S 集群中单独的概念，与系统级别不同。参考：<a href="https://www.qikqiak.com/k8strain2/security/rbac/#%E5%88%9B%E5%BB%BA%E8%A7%92%E8%89%B2">https://www.qikqiak.com/k8strain2/security/rbac/#%E5%88%9B%E5%BB%BA%E8%A7%92%E8%89%B2</a></li>
+<li>RoleBinding 可以引用同一个 namespace 中的任何 Role ；或者一个 RoleBinding 可以引用某 ClusterRole 并将该 ClusterRole 绑定到 RoleBinding 所在的 namespace。</li>
+<li>如需 ClusterRole 绑定到集群中所有 namespace，必须要使用 ClusterRoleBinding</li>
+<li>RoleBinding 对应可引用一个 ClusterRole 对象用于在 RoleBinding 所在的 namespace 内授予用户对所引用的 ClusterRole 中定义的 namespace 资源的访问权限。（在整个集群内定义一组通用角色，然后在不同 namespace 中复用这些角色）</li>
+</ul>
+<h4 id="2-资源引用方式"><a href="#2-资源引用方式" class="headerlink" title="2) 资源引用方式"></a>2) 资源引用方式</h4><ul>
+<li>多数资源可以用其名称的字符串表示，也就是Endpoint中的URL相对路径，例如pod中的日志是GET &#x2F;api&#x2F;v1&#x2F;namaspaces&#x2F;{namespace}&#x2F;pods&#x2F;{podname}&#x2F;log</li>
+<li>如果需要在一个RBAC对象中体现上下级资源，就需要使用“&#x2F;”分割资源和下级资源。</li>
+</ul>
+<p>例如：若想授权让某个主体同时能够读取Pod和Pod log，则可以配置 resources为一个数组</p>
+<figure class="highlight yaml"><table><tr><td class="code"><pre><span class="line"><span class="attr">rules:</span></span><br><span class="line"><span class="bullet">-</span> <span class="attr">apiGroups:</span> [<span class="string">&quot;&quot;</span>]</span><br><span class="line">   <span class="attr">resources:</span> [<span class="string">&quot;pods&quot;</span>,<span class="string">&quot;pods/log&quot;</span>]</span><br><span class="line">   <span class="attr">verbs:</span> [<span class="string">&quot;get&quot;</span>,<span class="string">&quot;list&quot;</span>]</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>通过名称（ResourceName）进行引用，在指定ResourceName后，使用get、delete、update、patch请求，就会被限制在这个资源实例范围内</li>
+</ul>
+<p>例如，下面的声明让一个主体只能对名为my-configmap的ConFigmap进行get和update操作：</p>
+<figure class="highlight yaml"><table><tr><td class="code"><pre><span class="line"><span class="attr">rules:</span></span><br><span class="line"><span class="bullet">-</span> <span class="attr">apiGroups:</span> [<span class="string">&quot;&quot;</span>]</span><br><span class="line">   <span class="attr">resources:</span> [<span class="string">&quot;configmap&quot;</span>]</span><br><span class="line">   <span class="attr">resourceNames:</span> [<span class="string">&quot;my-configmap&quot;</span>]</span><br><span class="line">   <span class="attr">verbs:</span> [<span class="string">&quot;get&quot;</span>,<span class="string">&quot;update&quot;</span>]</span><br></pre></td></tr></table></figure>
+
+
+<h4 id="3-rules-参数说明"><a href="#3-rules-参数说明" class="headerlink" title="3) rules 参数说明"></a>3) rules 参数说明</h4><ul>
+<li>apiGroups：支持的API组列表，例如：”apiVersion: batch&#x2F;v1”等</li>
+<li>resources：支持的资源对象列表，例如pods、deplayments、jobs等</li>
+<li>resourceNames: 指定resource的名称（可选）</li>
+<li>verbs：对资源对象的操作方法列表<blockquote>
+<p>api-resources：所有资源信息<br>apiGroups：api-resources下的分类分组</p>
+<p><a href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.23/#-strong-api-groups-strong-">查看API GROUP分组信息</a></p>
+<ul>
+<li>方式一：kubectl explain xxx ， xxx为 “kubectl api-resources” 输出结果的 NAME 值（输出结果的 VERSION 值为v1 则为默认的Core API 分组，默认以”” 表示，如 pods、services）</li>
+<li>方式二：kubectl get –raw &#x2F;apis&#x2F;apps&#x2F;v1</li>
+</ul>
+</blockquote>
+</li>
+</ul>
+<p>可通过 kubectl get –raw &#x2F;apis&#x2F;rbac.authorization.k8s.io&#x2F;v1 可以获取到 RBAC 四个 API 资源对象的相关信息，如下图：</p>
+<img data-src="/posts/fa45/c31775e8bbe3.png" class>
+
+<blockquote>
+<p>创建资源&#x2F;信息的方式</p>
+<ul>
+<li>方式一：kubectl create -f xxx.yaml       –&gt;   文件方式创建</li>
+<li>方式二：kubectl create –arg1&#x3D;xxx –arg2&#x3D;yyy     –&gt;  参数方式创建（后续可通过kubectl edit方式继续编辑）</li>
+</ul>
+</blockquote>
+<h3 id="二、ServiceAccount-测试"><a href="#二、ServiceAccount-测试" class="headerlink" title="二、ServiceAccount 测试"></a>二、ServiceAccount 测试</h3><h4 id="1-创建-serviceaccount-账户并进行对应授权"><a href="#1-创建-serviceaccount-账户并进行对应授权" class="headerlink" title="1) 创建 serviceaccount 账户并进行对应授权"></a>1) 创建 serviceaccount 账户并进行对应授权</h4><ol>
+<li><p>创建 serviceaccount 账户 camel-sva （只需defalut namespace）<br>执行命令：kubectl create serviceaccount camel-sva -n default</p>
+<img data-src="/posts/fa45/634be995b5bc.png" class>
+</li>
+<li><p>创建 role 角色 （授权Integration、Kamelet、KameletBinding 3种资源的 curd 权限）<br>执行命令：kubectl create role camel-sva-role –verb&#x3D;* –resource&#x3D;integrations,kamelets,kameletbindings </p>
+<img data-src="/posts/fa45/21812e1bbfad.png" class>
+</li>
+<li><p>绑定集群权限<br>命令：kubectl create rolebinding camel-sva-rolebinding –role&#x3D;camel-sva-role –serviceaccount&#x3D;default:camel-sva</p>
+<img data-src="/posts/fa45/7528aa1bf3da.png" class>
+</li>
+<li><p>查看账号 secret 信息<br>命令：kubectl get secret&#x2F;camel-sva-token-mdt28 -oyaml</p>
+<img data-src="/posts/fa45/de3ebdd4f016.png" class>
+<p>将获取到的 token 值进行 base64 解码后即可用来调用 apiserver 接口，如下图（接口可通过 kubectl get –raw &#x2F;apis&#x2F; 进行获取）：</p>
+<img data-src="/posts/fa45/1572c2ebc891.png" class></li>
+</ol>
+<h4 id="2-创建用户认证的-kubeconfig-文件"><a href="#2-创建用户认证的-kubeconfig-文件" class="headerlink" title="2) 创建用户认证的 kubeconfig 文件"></a>2) 创建用户认证的 kubeconfig 文件</h4><ol>
+<li><p>创建集群配置文件<br>命令：kubectl config set-cluster kubernetes –certificate-authority&#x3D;&#x2F;etc&#x2F;kubernetes&#x2F;pki&#x2F;ca.crt –server&#x3D;”<a href="https://10.0.0.142:6443&quot;">https://10.0.0.142:6443&quot;</a> –embed-certs&#x3D;true –kubeconfig&#x3D;.&#x2F;camel-sva.conf</p>
+</li>
+<li><p>生成 token（base64编码）<br>命令：D&#x3D;$(kubectl get secret camel-sva-token-mdt28 -o jsonpath&#x3D;{.data.token}|base64 -d)</p>
+</li>
+<li><p>为配置文件添加 token 信息，设置一个用户条目<br>命令：kubectl config set-credentials camel-sva –token&#x3D;$D –kubeconfig&#x3D;.&#x2F;camel-sva.conf</p>
+</li>
+<li><p>为配置文件添加权限信息，设置一个 content 条目<br>kubectl config set-context camel-sva@kubernetes –cluster&#x3D;kubernetes –user&#x3D;camel-sva –kubeconfig&#x3D;.&#x2F;camel-sva.conf</p>
+</li>
+<li><p>为配置文件添加权限信息，设置上下文<br>命令：kubectl config use-context camel-sva@kubernetes –kubeconfig&#x3D;.&#x2F;camel-sva.conf</p>
+</li>
+</ol>
+<p>执行完上述命令后即在当前目录生成配置文件：camel-sva.conf，可 copy 到 kubeconfig对应目录，进行操作。</p>
+<img data-src="/posts/fa45/d6da8c845c41.png" class>
+<p>使用该配置文件进行 kubectl 命令操作，即可验证用户只拥有对应资源的操作权限。</p>
+<img data-src="/posts/fa45/de4222775e67.png" class>
+
+<h4 id="3-API-对象结构"><a href="#3-API-对象结构" class="headerlink" title="3) API 对象结构"></a>3) API 对象结构</h4><img data-src="/posts/fa45/ab8f20ce2acc.png" class>
+
+
+<h3 id="三、参考学习"><a href="#三、参考学习" class="headerlink" title="三、参考学习"></a>三、参考学习</h3><ol>
+<li><a href="https://kubernetes.io/zh/docs/reference/access-authn-authz/rbac/#service-account-permissions">https://kubernetes.io/zh/docs/reference/access-authn-authz/rbac/#service-account-permissions</a></li>
+<li><a href="https://www.qikqiak.com/k8strain2/security/rbac/#%E5%88%9B%E5%BB%BA%E8%A7%92%E8%89%B2">https://www.qikqiak.com/k8strain2/security/rbac/#%E5%88%9B%E5%BB%BA%E8%A7%92%E8%89%B2</a></li>
+<li><a href="https://zhuanlan.zhihu.com/p/97793056">https://zhuanlan.zhihu.com/p/97793056</a></li>
+</ol>
+]]></content>
+      <categories>
+        <category>CNCF</category>
+      </categories>
+      <tags>
+        <tag>阿里云</tag>
+        <tag>K8S</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>可观测性组件-Prometheus 部署</title>
+    <url>/posts/6bfb.html</url>
+    <content><![CDATA[<link rel="stylesheet" class="aplayer-secondary-style-marker" href="/assets/css/APlayer.min.css"><script src="/assets/js/APlayer.min.js" class="aplayer-secondary-script-marker"></script><script class="meting-secondary-script-marker" src="/assets/js/Meting.min.js"></script><h4 id="一、组件说明"><a href="#一、组件说明" class="headerlink" title="一、组件说明"></a>一、组件说明</h4><p><strong>Prometheus Server</strong></p>
+<ul>
+<li>核心组件，负责实现对监控数据的获取，存储与查询。</li>
+<li>支持静态配置管理监控目标，也可通过 Service Discovery 方式动态管理监控目录，获取数据。</li>
+<li>可从其他 Prometheus Server 获取数据</li>
+<li>对外提供 PromQL 实现数据查询和分析</li>
+</ul>
+<p><strong>Exporter</strong></p>
+<ul>
+<li>直接采集，内置用于想 Prometheus 暴露监控数据的 Endpoints，如 node-exporter</li>
+<li>间接采集，通过 Prometheus 提供的客户端库监控采集程序，如 mysql-exporter</li>
+</ul>
+<p><strong>AlertManager</strong><br>基于 PromQL 创建告警规则，满足规则产生告警并推送，支持 mail、webhook 等。</p>
+<p><strong>PushGateway</strong><br>原获取数据方式为基于 Prometheus Server 从 Exporter pull 数据，当网络或其他原因 Server 无法与 Exporter 直接通信时，使用 PushGateway 方式中转。<br>Prometheus server 定期从配置好的 jobs 和 exporters 中拉取 metrics，或者接收来自 Pushgateway 发送过来的 metrics，或者从其它的 Prometheus server 中拉 metrics</p>
+<blockquote>
+<p>metrics：实际监控指标数据，如 cpu 利用率</p>
+</blockquote>
+<span id="more"></span>
+
+<p><strong>Grafana</strong><br>图形界面可视化采集展示数据<br>多数据源<br>告警规则与通知<br>混合展示与注释</p>
+<h4 id="二、二进制方式部署"><a href="#二、二进制方式部署" class="headerlink" title="二、二进制方式部署"></a>二、二进制方式部署</h4><p>略（基本不使用）</p>
+<h4 id="三、容器方式部署"><a href="#三、容器方式部署" class="headerlink" title="三、容器方式部署"></a>三、容器方式部署</h4><ol>
+<li><p>安装 node-export </p>
+<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line"><span class="meta prompt_"># </span><span class="language-bash">创建部署清单</span></span><br><span class="line">cat &gt; node-exporter.yaml &lt;&lt; EOF</span><br><span class="line">node-exporter.yaml</span><br><span class="line">apiVersion: apps/v1</span><br><span class="line">kind: DaemonSet</span><br><span class="line">metadata:</span><br><span class="line">  name: node-exporter</span><br><span class="line">  namespace: monitor</span><br><span class="line">  labels:</span><br><span class="line">    name: node-exporter</span><br><span class="line">spec:</span><br><span class="line">  selector:</span><br><span class="line">    matchLabels:</span><br><span class="line">     name: node-exporter</span><br><span class="line">  template:</span><br><span class="line">    metadata:</span><br><span class="line">      labels:</span><br><span class="line">        name: node-exporter</span><br><span class="line">    spec:</span><br><span class="line">      hostPID: true</span><br><span class="line">      hostIPC: true</span><br><span class="line">      hostNetwork: true</span><br><span class="line">      containers:</span><br><span class="line">      - name: node-exporter</span><br><span class="line">        image: prom/node-exporter:v0.16.0</span><br><span class="line">        ports:</span><br><span class="line">        - containerPort: 9100</span><br><span class="line">        resources:</span><br><span class="line">          requests:</span><br><span class="line">            cpu: 0.15 # 这个容器运行至少需要0.15核cpu</span><br><span class="line">        securityContext:</span><br><span class="line">          privileged: true	# 开启特权模式</span><br><span class="line">        args:</span><br><span class="line">        - --path.procfs</span><br><span class="line">        - /host/proc</span><br><span class="line">        - --path.sysfs</span><br><span class="line">        - /host/sys</span><br><span class="line">        - --collector.filesystem.ignored-mount-points</span><br><span class="line">        - &#x27;&quot;^/(sys|proc|dev|host|etc)($|/)&quot;&#x27;</span><br><span class="line">        volumeMounts:</span><br><span class="line">        - name: dev</span><br><span class="line">          mountPath: /host/dev</span><br><span class="line">        - name: proc</span><br><span class="line">          mountPath: /host/proc</span><br><span class="line">        - name: sys</span><br><span class="line">          mountPath: /host/sys</span><br><span class="line">        - name: rootfs</span><br><span class="line">          mountPath: /rootfs</span><br><span class="line">      tolerations:</span><br><span class="line">      - key: &quot;node-role.kubernetes.io/master&quot;</span><br><span class="line">        operator: &quot;Exists&quot;</span><br><span class="line">        effect: &quot;NoSchedule&quot;</span><br><span class="line">      volumes:</span><br><span class="line">        - name: proc</span><br><span class="line">          hostPath:</span><br><span class="line">            path: /proc</span><br><span class="line">        - name: dev</span><br><span class="line">          hostPath:</span><br><span class="line">            path: /dev</span><br><span class="line">        - name: sys</span><br><span class="line">          hostPath:</span><br><span class="line">            path: /sys</span><br><span class="line">        - name: rootfs</span><br><span class="line">          hostPath:</span><br><span class="line">            path: /</span><br><span class="line">EOF</span><br><span class="line"><span class="meta prompt_"></span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">创建监控 namespace</span></span><br><span class="line">kubectl create ns monitor</span><br><span class="line"><span class="meta prompt_"></span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">部署并查看部署结果</span></span><br><span class="line">kubectl apply -f node-exporter.yaml</span><br><span class="line">kubectl get pods -n monitor -o wide</span><br><span class="line"><span class="meta prompt_"></span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">验证获取指标</span></span><br><span class="line"><span class="meta prompt_">#</span><span class="language-bash">curl node_ip:9100/metrics</span></span><br><span class="line">curl 192.168.49.2:9100/metrics</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>Prometheus Server 部署</p>
+<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line"><span class="meta prompt_"># </span><span class="language-bash">创建 serviceaccount 与 rbac 授权</span></span><br><span class="line">cat &gt; prometheus-rbac.yaml &lt;&lt; EOF</span><br><span class="line">apiVersion: v1</span><br><span class="line">kind: ServiceAccount</span><br><span class="line">metadata:</span><br><span class="line">  name: monitor-sa</span><br><span class="line">  namespace: monitor</span><br><span class="line">---</span><br><span class="line">apiVersion: rbac.authorization.k8s.io/v1</span><br><span class="line">kind: ClusterRole</span><br><span class="line">metadata:</span><br><span class="line">  name: monitor-sa-clusterrole</span><br><span class="line">rules:</span><br><span class="line">- apiGroups:</span><br><span class="line">  - &quot;&quot;</span><br><span class="line">  resources:</span><br><span class="line">  - nodes</span><br><span class="line">  - services</span><br><span class="line">  - endpoints</span><br><span class="line">  - pods</span><br><span class="line">  - nodes/proxy</span><br><span class="line">  - nodes/metrics</span><br><span class="line">  - configmaps</span><br><span class="line">  verbs:</span><br><span class="line">  - get</span><br><span class="line">  - list</span><br><span class="line">  - watch</span><br><span class="line">- nonResourceURLs:</span><br><span class="line">  - /metrics</span><br><span class="line">  verbs:</span><br><span class="line">  - get</span><br><span class="line">---</span><br><span class="line">apiVersion: rbac.authorization.k8s.io/v1</span><br><span class="line">kind: ClusterRoleBinding</span><br><span class="line">metadata:</span><br><span class="line">  name: monitor-clusterrolebinding</span><br><span class="line">roleRef:</span><br><span class="line">  apiGroup: rbac.authorization.k8s.io</span><br><span class="line">  kind: ClusterRole</span><br><span class="line">  name: monitor-sa-clusterrole</span><br><span class="line">subjects:</span><br><span class="line">- kind: ServiceAccount</span><br><span class="line">  name: minitor-sa</span><br><span class="line">  namespace: minitor</span><br><span class="line">EOF</span><br><span class="line"><span class="meta prompt_"></span></span><br><span class="line"><span class="meta prompt_"></span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">创建 Prometheus 存储目录</span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">Prometheus Server 调度节点执行（测试为 minikube 节点）</span></span><br><span class="line">mkdir /data &amp;&amp; chmod 777 /data</span><br><span class="line"><span class="meta prompt_"></span></span><br><span class="line"><span class="meta prompt_"></span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">创建 configMap，存放 Prometheus、AlertManager 配置信息</span></span><br><span class="line">cat &gt; prometheus-cfg.yaml &lt;&lt; &quot;EOF&quot;</span><br><span class="line">kind: ConfigMap</span><br><span class="line">apiVersion: v1</span><br><span class="line">metadata:</span><br><span class="line">  labels:</span><br><span class="line">    app: prometheus</span><br><span class="line">  name: prometheus-config</span><br><span class="line">  namespace: monitor</span><br><span class="line">data:</span><br><span class="line">  prometheus.yml: |</span><br><span class="line">    global:</span><br><span class="line">      scrape_interval: 15s		#采集目标主机监控数据间隔</span><br><span class="line">      scrape_timeout: 10s			#数据采集超时时间</span><br><span class="line">      evaluation_interval: 1m	#触发告警检测时间</span><br><span class="line">      </span><br><span class="line">    # Prometheus 关联 AlertManager 配置</span><br><span class="line">    alerting:</span><br><span class="line">      alertmanagers:</span><br><span class="line">      - static_configs:</span><br><span class="line">        - targets: [&quot;localhost:9093&quot;]</span><br><span class="line">    </span><br><span class="line">    # 告警规则配置，首次读取默认加载，后续根据 evaluation_interval 周期加载</span><br><span class="line">    rule_files:</span><br><span class="line">    #- &quot;alertermanager_rules.yaml&quot;</span><br><span class="line">    - /etc/prometheus/rules.yaml</span><br><span class="line">      </span><br><span class="line">    scrape_configs:									#配置数据源 targe，每个 target 用 job_name 命名。分为静态配置与动态发现</span><br><span class="line">    - job_name: &#x27;kubernetes-node&#x27;</span><br><span class="line">      kubernetes_sd_configs:				#使用 k8s 的服务发现</span><br><span class="line">      - role: node									#使用 node 角色，使用默认 kubelet 提供的 http 端口发现集群中每个 node 节点</span><br><span class="line">      relabel_configs:							#重新标记</span><br><span class="line">      - source_labels: [__address__]	#配置的原始标签，匹配地址</span><br><span class="line">        regex: &#x27;(.*):10250&#x27;						#匹配带有10250端口的 url</span><br><span class="line">        replacement: &#x27;$&#123;1&#125;:9100&#x27;			#保留匹配到 ip:9100 的ip</span><br><span class="line">        target_label: __address__			#新生成的 url 是$&#123;1&#125;获取到的 ip:9100</span><br><span class="line">        action: replace								#动作替换</span><br><span class="line">      - action: labelmap</span><br><span class="line">        regex: __meta_kubernetes_node_label_(.+)	#匹配到下面正则表达式的标签会被保留,如果不做regex正则的话，默认只是会显示instance标签</span><br><span class="line">    - job_name: &#x27;kubernetes-node-cadvisor&#x27;	# 抓取 cAdvisor 数据，是获取 kubelet 上 /metrics/cadvisor 接口数据来获取容器的资源使用情况</span><br><span class="line">      kubernetes_sd_configs:</span><br><span class="line">      - role: node</span><br><span class="line">      scheme: https</span><br><span class="line">      tls_config:</span><br><span class="line">        ca_file: /var/run/secrets/kubernetes.io/serviceaccount/ca.crt</span><br><span class="line">      bearer_token_file: /var/run/secrets/kubernetes.io/serviceaccount/token</span><br><span class="line">      relabel_configs:</span><br><span class="line">      - action: labelmap													#保留匹配到的标签</span><br><span class="line">        regex: __meta_kubernetes_node_label_(.+)	#保留匹配到正则的标签</span><br><span class="line">      - target_label: __address__									#获取到的地址：__address__=&quot;192.168.64.2:10250&quot;</span><br><span class="line">        replacement: kubernetes.default.svc:443		#获取到的地址替换为新地址</span><br><span class="line">      - source_labels: [__meta_kubernetes_node_name]</span><br><span class="line">        regex: (.+)																#匹配原始标签中 __meta_kubernetes_node_name 值</span><br><span class="line">        target_label: __metrics_path__						#获取__metrics_path__对应的值</span><br><span class="line">        replacement: /api/v1/nodes//proxy/metrics/cadvisor</span><br><span class="line">        #把 metrics 替换成新的值 api/v1/nodes/k8s-master1/proxy/metrics/cadvisor</span><br><span class="line">        #$&#123;1&#125;是 __meta_kubernetes_node_name 获取到的值</span><br><span class="line">        #新的 url 就是 https://kubernetes.default.svc:443/api/v1/nodes/k8s-master1/proxy/metrics/cadvisor</span><br><span class="line">    - job_name: &#x27;kubernetes-apiserver&#x27;</span><br><span class="line">      kubernetes_sd_configs:</span><br><span class="line">      - role: endpoints				#使用 k8s 中的 endpoint 服务发现，采集 apiserver 6443 端口获取数据</span><br><span class="line">      scheme: https</span><br><span class="line">      tls_config:</span><br><span class="line">        ca_file: /var/run/secrets/kubernetes.io/serviceaccount/ca.crt</span><br><span class="line">      bearer_token_file: /var/run/secrets/kubernetes.io/serviceaccount/token</span><br><span class="line">      relabel_configs:</span><br><span class="line">      - source_labels: [__meta_kubernetes_namespace, __meta_kubernetes_service_name, __meta_kubernetes_endpoint_port_name]</span><br><span class="line">        # endpoint 这个对象的名称空间,endpoint 对象的服务名,endpoint 的端口名称</span><br><span class="line">        action: keep	#采集满足条件的实例，其他实例不采集</span><br><span class="line">        regex: default;kubernetes;https	#正则匹配到的默认空间下的 service 名字是 kubernetes，协议是 https 的 endpoint 类型保留下来</span><br><span class="line">    - job_name: &#x27;kubernetes-service-endpoints&#x27;</span><br><span class="line">      kubernetes_sd_configs:</span><br><span class="line">      - role: endpoints</span><br><span class="line">      relabel_configs:</span><br><span class="line">      - source_labels: [__meta_kubernetes_service_annotation_prometheus_io_scrape]</span><br><span class="line">        action: keep</span><br><span class="line">        regex: true</span><br><span class="line">        #重新打标仅抓取到的具有 &quot;prometheus.io/scrape: true&quot; 的annotation的端点，意思是说如果某个service具有prometheus.io/scrape = true annotation声明则抓取，annotation本身也是键值结构，所以这里的源标签设置为键，而regex设置值true，当值匹配到regex设定的内容时则执行keep动作也就是保留，其余则丢弃。</span><br><span class="line">      - source_labels: [__meta_kubernetes_service_annotation_prometheus_io_scheme]</span><br><span class="line">        action: replace</span><br><span class="line">        target_label: __scheme__</span><br><span class="line">        regex: (https?)</span><br><span class="line">        #重新设置scheme，匹配源标签__meta_kubernetes_service_annotation_prometheus_io_scheme也就是prometheus.io/scheme annotation，如果源标签的值匹配到regex，则把值替换为__scheme__对应的值。</span><br><span class="line">      - source_labels: [__meta_kubernetes_service_annotation_prometheus_io_path]</span><br><span class="line">        action: replace</span><br><span class="line">        target_label: __metrics_path__</span><br><span class="line">        regex: (.+)</span><br><span class="line">        #应用中暴露的自定义指标 path，如 prometheus.io/path = /mymetrics</span><br><span class="line">      - source_labels: [__address__, __meta_kubernetes_service_annotation_prometheus_io_port]</span><br><span class="line">        action: replace</span><br><span class="line">        target_label: __address__</span><br><span class="line">        regex: ([^:]+)(?::\d+)?;(\d+)</span><br><span class="line">        replacement: $1:$2</span><br><span class="line">        #暴露自定义应用的端口</span><br><span class="line">      - action: labelmap</span><br><span class="line">        regex: __meta_kubernetes_service_label_(.+)</span><br><span class="line">      - source_labels: [__meta_kubernetes_namespace]</span><br><span class="line">        action: replace</span><br><span class="line">        target_label: kubernetes_namespace</span><br><span class="line">      - source_labels: [__meta_kubernetes_service_name]</span><br><span class="line">        action: replace</span><br><span class="line">        target_label: kubernetes_name</span><br><span class="line">EOF</span><br><span class="line"></span><br><span class="line">cat &gt; alertmanager-cfg.yaml &lt;&lt; &quot;EOF&quot;</span><br><span class="line">apiVersion: v1</span><br><span class="line">kind: ConfigMap</span><br><span class="line">metadata:</span><br><span class="line">  name: alert-config</span><br><span class="line">  namespace: monitor</span><br><span class="line">data:</span><br><span class="line">  config.yml: |-</span><br><span class="line">    global:</span><br><span class="line">      # 在没有报警的情况下声明为已解决的时间</span><br><span class="line">      resolve_timeout: 5m</span><br><span class="line">      # 配置邮件发送信息</span><br><span class="line">      smtp_smarthost: &#x27;smtp.163.com:25&#x27;</span><br><span class="line">      smtp_from: &#x27;xxx@163.com&#x27;</span><br><span class="line">      smtp_auth_username: &#x27;xx@163.com&#x27;</span><br><span class="line">      smtp_auth_password: &#x27;password&#x27;</span><br><span class="line">      smtp_hello: &#x27;163.com&#x27;</span><br><span class="line">      smtp_require_tls: false</span><br><span class="line">    # 所有报警信息进入后的根路由，用来设置报警的分发策略</span><br><span class="line">    route:</span><br><span class="line">      # 这里的标签列表是接收到报警信息后的重新分组标签，例如，接收到的报警信息里面有许多具有 cluster=A 和 alertname=LatncyHigh 这样的标签的报警信息将会批量被聚合到一个分组里面</span><br><span class="line">      group_by: [&#x27;alertname&#x27;, &#x27;cluster&#x27;]</span><br><span class="line">      # 当一个新的报警分组被创建后，需要等待至少group_wait时间来初始化通知，这种方式可以确保您能有足够的时间为同一分组来获取多个警报，然后一起触发这个报警信息。</span><br><span class="line">      group_wait: 30s</span><br><span class="line"></span><br><span class="line">      # 当第一个报警发送后，等待&#x27;group_interval&#x27;时间来发送新的一组报警信息。</span><br><span class="line">      group_interval: 5m</span><br><span class="line"></span><br><span class="line">      # 如果一个报警信息已经发送成功了，等待&#x27;repeat_interval&#x27;时间来重新发送他们</span><br><span class="line">      repeat_interval: 5m</span><br><span class="line"></span><br><span class="line">      # 默认的receiver：如果一个报警没有被一个route匹配，则发送给默认的接收器</span><br><span class="line">      receiver: default</span><br><span class="line"></span><br><span class="line">      # 上面所有的属性都由所有子路由继承，并且可以在每个子路由上进行覆盖。</span><br><span class="line">      routes:</span><br><span class="line">      - receiver: email</span><br><span class="line">        group_wait: 10s</span><br><span class="line">        match:</span><br><span class="line">          team: node</span><br><span class="line">    receivers:</span><br><span class="line">    - name: &#x27;default&#x27;</span><br><span class="line">      email_configs:</span><br><span class="line">      - to: &#x27;xxx@gmail.com&#x27;</span><br><span class="line">        send_resolved: true</span><br><span class="line">    - name: &#x27;email&#x27;</span><br><span class="line">      email_configs:</span><br><span class="line">      - to: &#x27;xxx@gmail.com&#x27;</span><br><span class="line">        send_resolved: true</span><br><span class="line">EOF</span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">部署 configmap</span></span><br><span class="line">kubectl apply -f alertmanager-cfg.yaml</span><br><span class="line">kubectl apply -f prometheus-cfg.yaml</span><br><span class="line"><span class="meta prompt_"></span></span><br><span class="line"><span class="meta prompt_"></span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">部署 Prometheus Server 和 AlertManager 容器</span></span><br><span class="line">cat &gt; prometheus-deployment.yaml &lt;&lt; EOF</span><br><span class="line">apiVersion: apps/v1</span><br><span class="line">kind: Deployment</span><br><span class="line">metadata:</span><br><span class="line">  name: prometheus-server</span><br><span class="line">  namespace: monitor</span><br><span class="line">  labels:</span><br><span class="line">    app: prometheus</span><br><span class="line">spec:</span><br><span class="line">  replicas: 1</span><br><span class="line">  selector:</span><br><span class="line">    matchLabels:</span><br><span class="line">      app: prometheus</span><br><span class="line">      component: server</span><br><span class="line">    #matchExpressions:</span><br><span class="line">    #- &#123;key: app, operator: In, values: [prometheus]&#125;</span><br><span class="line">    #- &#123;key: component, operator: In, values: [server]&#125;</span><br><span class="line">  template:</span><br><span class="line">    metadata:</span><br><span class="line">      labels:</span><br><span class="line">        app: prometheus</span><br><span class="line">        component: server</span><br><span class="line">      annotations:</span><br><span class="line">        prometheus.io/scrape: &#x27;false&#x27;</span><br><span class="line">    spec:</span><br><span class="line">      serviceAccountName: monitor-sa</span><br><span class="line">      containers:</span><br><span class="line">      # Prometheus 容器配置</span><br><span class="line">      - name: prometheus</span><br><span class="line">        image: prom/prometheus</span><br><span class="line">        imagePullPolicy: IfNotPresent</span><br><span class="line">        command:</span><br><span class="line">          - prometheus</span><br><span class="line">          - --config.file=/etc/prometheus/prometheus.yml</span><br><span class="line">          - --storage.tsdb.path=/prometheus	#数据存储目录</span><br><span class="line">          - --storage.tsdb.retention=720h	  #数据保存时长</span><br><span class="line">          - --web.enable-lifecycle					#开启热加载</span><br><span class="line">          - --web.enable-admin-api          # admin HTTP API 访问，包括删除时间序列等功能</span><br><span class="line">        ports:</span><br><span class="line">        - containerPort: 9090</span><br><span class="line">          protocol: TCP</span><br><span class="line">        volumeMounts:</span><br><span class="line">        - mountPath: /etc/prometheus/</span><br><span class="line">          name: prometheus-config</span><br><span class="line">        - mountPath: /prometheus/</span><br><span class="line">          name: prometheus-storage-volume</span><br><span class="line">      # Prometheus 容器配置结束</span><br><span class="line">      </span><br><span class="line">      # AlertManager 容器配置</span><br><span class="line">      - name: alertmanager</span><br><span class="line">        image: prom/alertmanager</span><br><span class="line">        imagePullPolicy: IfNotPresent</span><br><span class="line">        args:</span><br><span class="line">        - --config.file=/etc/alertmanager/config.yml</span><br><span class="line">        - --storage.path=/alertmanager/data</span><br><span class="line">        ports:</span><br><span class="line">        - containerPort: 9093</span><br><span class="line">          name: http</span><br><span class="line">        volumeMounts:</span><br><span class="line">        - mountPath: /etc/alertmanager</span><br><span class="line">          name: alertcfg</span><br><span class="line">        resources:</span><br><span class="line">          requests:</span><br><span class="line">            cpu: 100m</span><br><span class="line">            memory: 256Mi</span><br><span class="line">          limits:</span><br><span class="line">            cpu: 100m</span><br><span class="line">            memory: 256Mi          </span><br><span class="line">      # AlertManager 容器配置结束</span><br><span class="line">      volumes:</span><br><span class="line">      - name: prometheus-config</span><br><span class="line">        configMap:</span><br><span class="line">          name: prometheus-config</span><br><span class="line">      - name: prometheus-storage-volume</span><br><span class="line">        hostPath:</span><br><span class="line">         path: /data</span><br><span class="line">         type: Directory</span><br><span class="line">      - name: alertcfg</span><br><span class="line">        configMap:</span><br><span class="line">          name: alert-config</span><br><span class="line">EOF</span><br><span class="line">kubectl apply -f prometheus-deployment.yaml</span><br><span class="line"><span class="meta prompt_"></span></span><br><span class="line"><span class="meta prompt_"></span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">部署 Service，暴露 Prometheus Server 对外接口</span></span><br><span class="line">cat &gt; prometheus-svc.yaml &lt;&lt; EOF</span><br><span class="line">apiVersion: v1</span><br><span class="line">kind: Service</span><br><span class="line">metadata:</span><br><span class="line">  name: prometheus</span><br><span class="line">  namespace: monitor</span><br><span class="line">  labels:</span><br><span class="line">    app: prometheus</span><br><span class="line">spec:</span><br><span class="line">  type: NodePort</span><br><span class="line">  ports:</span><br><span class="line">    - port: 9090</span><br><span class="line">      targetPort: 9090</span><br><span class="line">      protocol: TCP</span><br><span class="line">      nodePort: 30009</span><br><span class="line">  selector:</span><br><span class="line">    app: prometheus</span><br><span class="line">    component: server</span><br><span class="line">EOF</span><br><span class="line">kubectl apply -f prometheus-svc.yaml</span><br><span class="line"><span class="meta prompt_">#</span><span class="language-bash">minikbube 转发本机端口进集群内部 Service 方式</span></span><br><span class="line"><span class="meta prompt_">#</span><span class="language-bash">kubectl port-forward service/prometheus -n monitor --address 127.0.0.1 3009:9090</span></span><br></pre></td></tr></table></figure>
+</li>
+<li><p>Alert 告警配置</p>
+</li>
+</ol>
+<ul>
+<li><p>追加告警规则配置</p>
+<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line"><span class="meta prompt_"># </span><span class="language-bash">追加 ruls.yml 配置内容到 prometheus-cfg.yaml 配置</span></span><br><span class="line">kind: ConfigMap</span><br><span class="line">apiVersion: v1</span><br><span class="line">metadata:</span><br><span class="line">  labels:</span><br><span class="line">    app: prometheus</span><br><span class="line">  name: prometheus-config</span><br><span class="line">  namespace: monitor</span><br><span class="line">data:</span><br><span class="line">  prometheus.yml: |</span><br><span class="line">    ...</span><br><span class="line"><span class="meta prompt_">  # </span><span class="language-bash">告警规则配置，与 prometheus 配置同样写入 /etc/prometheus 目录下</span></span><br><span class="line">  rules.yml: |</span><br><span class="line">    groups:</span><br><span class="line">    - name: test-rule</span><br><span class="line">      rules:</span><br><span class="line">      - alert: NodeMemoryUsage</span><br><span class="line">        expr: (node_memory_MemTotal_bytes - (node_memory_MemFree_bytes + node_memory_Buffers_bytes + node_memory_Cached_bytes)) / node_memory_MemTotal_bytes * 100 &gt; 20</span><br><span class="line">        for: 2m</span><br><span class="line">        labels:</span><br><span class="line">          team: node</span><br><span class="line">        annotations:</span><br><span class="line">          summary: &quot;&#123;&#123;.instance&#125;&#125;: High Memory usage detected&quot;</span><br><span class="line">          description: &quot;&#123;&#123;.instance&#125;&#125;: Memory usage is above 20% (current value is: &#123;&#123;  &#125;&#125;&quot;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>Prometheus 热加载配置</p>
+<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line"><span class="meta prompt_"># </span><span class="language-bash">请求 Prometheus、AlertManager 接口，可使用 Pod IP，热加载配置</span></span><br><span class="line">curl -X POST http://172.17.0.5:9090/-/reload</span><br><span class="line">curl -X POST http://172.17.0.5:9093/-/reload</span><br><span class="line"><span class="meta prompt_"></span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">查看 <span class="built_in">log</span></span></span><br><span class="line">kubectl logs --tail 10 -f prometheus-server-658b54bd7-9gvd9 -n monitor</span><br><span class="line"><span class="meta prompt_"></span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">强制重启加载方式，可能丢失监控数据</span></span><br><span class="line"><span class="meta prompt_">#</span><span class="language-bash">kubectl delete -f prometheus-cfg.yaml &amp;&amp; kubectl delete -f prometheus-deployment.yaml</span></span><br><span class="line"><span class="meta prompt_">#</span><span class="language-bash">kubectl apply -f prometheus-cfg.yaml &amp;&amp; kubectl apply -f prometheus-deployment.yaml</span></span><br></pre></td></tr></table></figure>
+</li>
+<li><p>告警通知：email、webhook</p>
+</li>
+</ul>
+<ol start="4">
+<li>Grafana 部署<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">cat &gt; grafana.yaml &lt;&lt; EOF</span><br><span class="line">apiVersion: apps/v1</span><br><span class="line">kind: Deployment</span><br><span class="line">metadata:</span><br><span class="line">  name: monitoring-grafana</span><br><span class="line">  namespace: monitor</span><br><span class="line">spec:</span><br><span class="line">  replicas: 1</span><br><span class="line">  selector:</span><br><span class="line">    matchLabels:</span><br><span class="line">      task: monitoring</span><br><span class="line">      k8s-app: grafana</span><br><span class="line">  template:</span><br><span class="line">    metadata:</span><br><span class="line">      labels:</span><br><span class="line">        task: monitoring</span><br><span class="line">        k8s-app: grafana</span><br><span class="line">    spec:</span><br><span class="line">      securityContext:</span><br><span class="line">        fsGroup: 472</span><br><span class="line">        runAsUser: 472</span><br><span class="line">      containers:</span><br><span class="line">      - name: grafana</span><br><span class="line">        image: grafana/grafana</span><br><span class="line">        ports:</span><br><span class="line">        - containerPort: 3000</span><br><span class="line">          protocol: TCP</span><br><span class="line">        volumeMounts:</span><br><span class="line">        - mountPath: /etc/ssl/certs</span><br><span class="line">          name: ca-certificates</span><br><span class="line">          readOnly: true</span><br><span class="line">        - mountPath: /var</span><br><span class="line">          name: grafana-storage</span><br><span class="line">        env:</span><br><span class="line">        - name: GF_SECURITY_ADMIN_USER</span><br><span class="line">          value: admin</span><br><span class="line">        - name: GF_SECURITY_ADMIN_PASSWORD</span><br><span class="line">          value: admin123</span><br><span class="line">      volumes:</span><br><span class="line">      - name: ca-certificates</span><br><span class="line">        hostPath:</span><br><span class="line">          path: /etc/ssl/certs</span><br><span class="line">      - name: grafana-storage</span><br><span class="line">        emptyDir: &#123;&#125;</span><br><span class="line">---</span><br><span class="line">apiVersion: v1</span><br><span class="line">kind: Service</span><br><span class="line">metadata:</span><br><span class="line">  labels:</span><br><span class="line">    kubernetes.io/cluster-service: &#x27;true&#x27;</span><br><span class="line">    kubernetes.io/name: monitoring-grafana</span><br><span class="line">  name: monitoring-grafana</span><br><span class="line">  namespace: monitor</span><br><span class="line">spec:</span><br><span class="line">  type: NodePort</span><br><span class="line">  ports:</span><br><span class="line">  - port: 80</span><br><span class="line">    targetPort: 3000</span><br><span class="line">  selector:</span><br><span class="line">    k8s-app: grafana</span><br><span class="line">EOF</span><br><span class="line"></span><br><span class="line">kubectl apply -f grafana.yaml</span><br><span class="line">kubectl get pod,svc -n monitor</span><br><span class="line"><span class="meta prompt_"></span></span><br><span class="line"><span class="meta prompt_"></span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">配置 Grafana</span></span><br><span class="line"><span class="meta prompt_">#</span><span class="language-bash">登录，导入 Prometheus 数据源</span></span><br><span class="line"><span class="meta prompt_">#</span><span class="language-bash">导入监控 K8S 集群模板，官方模板 https://grafana.com/grafana/dashboards/162/revisions</span></span><br><span class="line"><span class="meta prompt_">#</span><span class="language-bash">监控 node，导入 node_exporter.json</span></span><br><span class="line"></span><br><span class="line"></span><br></pre></td></tr></table></figure></li>
+</ol>
+<h4 id="四、Prometheus-Operator-方式部署"><a href="#四、Prometheus-Operator-方式部署" class="headerlink" title="四、Prometheus-Operator 方式部署"></a>四、Prometheus-Operator 方式部署</h4><ol>
+<li><p>部署 prometheus-operator（controller）</p>
+<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line"><span class="meta prompt_"># </span><span class="language-bash">下载官方源码，部署 operator 资源</span></span><br><span class="line">git clone https://github.com/prometheus-operator/prometheus-operator &amp;&amp; cd prometheus-operator</span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">创建 CRD 资源、RBAC 资源、operator 资源</span></span><br><span class="line">kubectl create -f bundle.yaml</span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">查看结果</span></span><br><span class="line">kubectl get pod,svc -owide</span><br><span class="line">NAME                                       READY   STATUS    RESTARTS   AGE</span><br><span class="line">pod/prometheus-operator-567cd8b6f6-xvhp5   1/1     Running   0          127m</span><br><span class="line">NAME                          TYPE        CLUSTER-IP       EXTERNAL-IP   PORT(S)          AGE</span><br><span class="line">service/prometheus-operator   ClusterIP   None             &lt;none&gt;        8080/TCP         127m</span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">查看 CRD 资源下所有 API 资源</span></span><br><span class="line">kubectl get --raw /apis/monitoring.coreos.com/v1</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>部署 prometheus （server，CRD 资源）</p>
+<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line"><span class="meta prompt_"># </span><span class="language-bash">创建 prometheus-server 资源</span></span><br><span class="line">cat &gt; prometheus.yaml &lt;&lt; EOF</span><br><span class="line">apiVersion: monitoring.coreos.com/v1</span><br><span class="line">kind: Prometheus</span><br><span class="line">metadata:</span><br><span class="line">  name: prometheus</span><br><span class="line">spec:</span><br><span class="line">  serviceAccountName: prometheus</span><br><span class="line"><span class="meta prompt_">  #</span><span class="language-bash">配置监控所有 ServiceMonitor</span></span><br><span class="line"><span class="meta prompt_">  #</span><span class="language-bash">ServiceMonitorSelector: &#123;&#125;</span></span><br><span class="line">  serviceMonitorSelector:</span><br><span class="line">    matchLabels:</span><br><span class="line">      team: frontend</span><br><span class="line">  resources:</span><br><span class="line">    requests:</span><br><span class="line">      memory: 200Mi</span><br><span class="line">  enableAdminAPI: false</span><br><span class="line">---</span><br><span class="line">apiVersion: v1</span><br><span class="line">kind: ServiceAccount</span><br><span class="line">metadata:</span><br><span class="line">  name: prometheus</span><br><span class="line">  namespace: default</span><br><span class="line">---</span><br><span class="line">apiVersion: rbac.authorization.k8s.io/v1</span><br><span class="line">kind: ClusterRole</span><br><span class="line">metadata:</span><br><span class="line">  name: prometheus</span><br><span class="line">rules:</span><br><span class="line">- apiGroups: [&quot;&quot;]</span><br><span class="line">  resources:</span><br><span class="line">  - nodes</span><br><span class="line">  - services</span><br><span class="line">  - endpoints</span><br><span class="line">  - pods</span><br><span class="line">  verbs: [&quot;get&quot;, &quot;list&quot;, &quot;watch&quot;]</span><br><span class="line">- apiGroups: [&quot;&quot;]</span><br><span class="line">  resources:</span><br><span class="line">  - configmaps</span><br><span class="line">  verbs: [&quot;get&quot;]</span><br><span class="line">- nonResourceURLs: [&quot;/metrics&quot;]</span><br><span class="line">  verbs: [&quot;get&quot;]</span><br><span class="line">---</span><br><span class="line">apiVersion: rbac.authorization.k8s.io/v1</span><br><span class="line">kind: ClusterRoleBinding</span><br><span class="line">metadata:</span><br><span class="line">  name: prometheus</span><br><span class="line">roleRef:</span><br><span class="line">  apiGroup: rbac.authorization.k8s.io</span><br><span class="line">  kind: ClusterRole</span><br><span class="line">  name: prometheus</span><br><span class="line">subjects:</span><br><span class="line">- kind: ServiceAccount</span><br><span class="line">  name: prometheus</span><br><span class="line">  namespace: default</span><br><span class="line">---</span><br><span class="line">apiVersion: v1</span><br><span class="line">kind: Service</span><br><span class="line">metadata:</span><br><span class="line">  name: prometheus</span><br><span class="line">spec:</span><br><span class="line">  type: NodePort</span><br><span class="line">  ports:</span><br><span class="line">  - name: web</span><br><span class="line">    nodePort: 30900</span><br><span class="line">    port: 9090</span><br><span class="line">    protocol: TCP</span><br><span class="line">    targetPort: web</span><br><span class="line">  selector:</span><br><span class="line">    prometheus: prometheus</span><br><span class="line">EOF</span><br><span class="line"><span class="meta prompt_"></span></span><br><span class="line"><span class="meta prompt_"></span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">创建模拟输出 metrics 程序</span></span><br><span class="line">cat &gt; example.yaml &lt;&lt; EOF</span><br><span class="line">apiVersion: apps/v1</span><br><span class="line">kind: Deployment</span><br><span class="line">metadata:</span><br><span class="line">  name: example-app</span><br><span class="line">spec:</span><br><span class="line">  replicas: 1</span><br><span class="line">  selector:</span><br><span class="line">    matchLabels:</span><br><span class="line">      app: example-app</span><br><span class="line">  template:</span><br><span class="line">    metadata:</span><br><span class="line">      labels:</span><br><span class="line">        app: example-app</span><br><span class="line">    spec:</span><br><span class="line">      containers:</span><br><span class="line">      - name: example-app</span><br><span class="line">        image: zhangguanzhang/instrumented_app</span><br><span class="line">        ports:</span><br><span class="line">        - name: web</span><br><span class="line">          containerPort: 8080</span><br><span class="line">---</span><br><span class="line">kind: Service</span><br><span class="line">apiVersion: v1</span><br><span class="line">metadata:</span><br><span class="line">  name: example-app</span><br><span class="line">  labels:</span><br><span class="line">    app: example-app</span><br><span class="line">spec:</span><br><span class="line">  selector:</span><br><span class="line">    app: example-app</span><br><span class="line">  ports:</span><br><span class="line">  - name: web</span><br><span class="line">    port: 8080</span><br><span class="line">EOF</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>部署 ServiceMonitor （CRD 资源）</p>
+<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line"><span class="meta prompt_"># </span><span class="language-bash">创建 ServiceMonitor</span></span><br><span class="line">cat &gt; service-monitor.yaml &lt;&lt; EOF</span><br><span class="line">apiVersion: monitoring.coreos.com/v1</span><br><span class="line">kind: ServiceMonitor</span><br><span class="line">metadata:</span><br><span class="line">  name: example-app</span><br><span class="line">  labels:</span><br><span class="line">    team: frontend</span><br><span class="line">spec:</span><br><span class="line"><span class="meta prompt_">  #</span><span class="language-bash">namespaceSelector:</span></span><br><span class="line"><span class="meta prompt_">  #</span><span class="language-bash">1.非同namespace时配置具体ns</span></span><br><span class="line"><span class="meta prompt_">  # </span><span class="language-bash"> matchNames:</span></span><br><span class="line"><span class="meta prompt_">  # </span><span class="language-bash"> - target_namespace_name</span></span><br><span class="line"><span class="meta prompt_">  #</span><span class="language-bash">2.任意ns</span></span><br><span class="line"><span class="meta prompt_">  # </span><span class="language-bash"> any:<span class="literal">true</span></span></span><br><span class="line">  selector:</span><br><span class="line">    matchLabels:</span><br><span class="line">      app: example-app</span><br><span class="line">  endpoints:</span><br><span class="line">  - port: web</span><br><span class="line"><span class="meta prompt_">  #</span><span class="language-bash">BasicAuth认证时(<span class="built_in">base64</span>编码)</span></span><br><span class="line"><span class="meta prompt_">  #</span><span class="language-bash">- basicAuth:</span></span><br><span class="line"><span class="meta prompt_">  # </span><span class="language-bash">   password:</span></span><br><span class="line"><span class="meta prompt_">  # </span><span class="language-bash">     name: basic-auth</span></span><br><span class="line"><span class="meta prompt_">  # </span><span class="language-bash">     key: password</span></span><br><span class="line"><span class="meta prompt_">  # </span><span class="language-bash">   username:</span></span><br><span class="line"><span class="meta prompt_">  # </span><span class="language-bash">     name: basic-auth</span></span><br><span class="line"><span class="meta prompt_">  # </span><span class="language-bash">     key: user</span></span><br><span class="line"><span class="meta prompt_">  # </span><span class="language-bash"> port: web</span></span><br><span class="line">EOF</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>访问验证</p>
+<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line"><span class="meta prompt_"># </span><span class="language-bash">查看部署资源信息</span></span><br><span class="line">NAME                                       READY   STATUS    RESTARTS   AGE    IP           NODE       NOMINATED NODE   READINESS GATES</span><br><span class="line">pod/example-app-745967cc67-qbh45           1/1     Running   0          95m    172.17.0.7   minikube   &lt;none&gt;           &lt;none&gt;</span><br><span class="line">pod/prometheus-operator-567cd8b6f6-xvhp5   1/1     Running   0          139m   172.17.0.6   minikube   &lt;none&gt;           &lt;none&gt;</span><br><span class="line">pod/prometheus-prometheus-0                2/2     Running   0          108m   172.17.0.3   minikube   &lt;none&gt;           &lt;none&gt;</span><br><span class="line"></span><br><span class="line">NAME                          TYPE        CLUSTER-IP       EXTERNAL-IP   PORT(S)          AGE    SELECTOR</span><br><span class="line">service/example-app           ClusterIP   10.100.248.130   &lt;none&gt;        8080/TCP         104m   app=example-app</span><br><span class="line">service/kubernetes            ClusterIP   10.96.0.1        &lt;none&gt;        443/TCP          24d    &lt;none&gt;</span><br><span class="line">service/prometheus            NodePort    10.101.76.214    &lt;none&gt;        9090:30900/TCP   28m    prometheus=prometheus</span><br><span class="line">service/prometheus-operated   ClusterIP   None             &lt;none&gt;        9090/TCP         108m   app.kubernetes.io/name=prometheus</span><br><span class="line">service/prometheus-operator   ClusterIP   None             &lt;none&gt;        8080/TCP         139m   app.kubernetes.io/component=controller,app.kubernetes.io/name=prometheus-operator</span><br><span class="line"><span class="meta prompt_"></span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">访问验证</span></span><br><span class="line"><span class="meta prompt_">#</span><span class="language-bash">minikube 需转发端口</span> </span><br><span class="line"><span class="meta prompt_">#</span><span class="language-bash">kubectl port-forward service/prometheus --address 127.0.0.1 9090:9090</span></span><br><span class="line"><span class="meta prompt_">#</span><span class="language-bash">浏览器访问 127.0.0.1:9090/targets</span></span><br></pre></td></tr></table></figure>
+</li>
+<li><p>自定义监控集群资源（Etcd、controller-manager 等）</p>
+</li>
+</ol>
+<ul>
+<li>监控 Etcd<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line"><span class="meta prompt_">#</span><span class="language-bash">1、获取 etcd 证书生成 secret</span></span><br><span class="line"><span class="meta prompt_">#</span><span class="language-bash">2、配置 prometheus StatefulSet 添加上一步生成的 secret</span></span><br><span class="line">kubectl get statefulsets -n monitoring</span><br><span class="line">NAME                READY   AGE</span><br><span class="line">alertmanager-main   3/3     3h25m</span><br><span class="line">prometheus-k8s      1/1     3h25m</span><br><span class="line"><span class="meta prompt_">#</span><span class="language-bash">3、创建 ServiceMonitor 资源并部署</span></span><br><span class="line"><span class="meta prompt_">#</span><span class="language-bash">4、创建 Service、Endpoints 资源并进行关联（标签关联）</span></span><br></pre></td></tr></table></figure></li>
+</ul>
+<ol start="6">
+<li>配置 AlertManager、PrometheusRule 自定义告警</li>
+</ol>
+<ul>
+<li><p>AlertManager 配置（Prometheus Dashboard 页面查看 Config 内容）</p>
+<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">alerting:</span><br><span class="line">  alert_relabel_configs:</span><br><span class="line">  - separator: ;</span><br><span class="line">    regex: prometheus_replica</span><br><span class="line">    replacement: $1</span><br><span class="line">    action: labeldrop</span><br><span class="line">  alertmanagers:</span><br><span class="line">  - kubernetes_sd_configs:</span><br><span class="line">    - role: endpoints</span><br><span class="line">      namespaces:</span><br><span class="line">        names:</span><br><span class="line">        - monitoring</span><br><span class="line">    scheme: http</span><br><span class="line">    path_prefix: /</span><br><span class="line">    timeout: 10s</span><br><span class="line">    relabel_configs:</span><br><span class="line">    - source_labels: [__meta_kubernetes_service_name]</span><br><span class="line">      separator: ;</span><br><span class="line">      regex: alertmanager-main</span><br><span class="line">      replacement: $1</span><br><span class="line">      action: keep</span><br><span class="line">    - source_labels: [__meta_kubernetes_endpoint_port_name]</span><br><span class="line">      separator: ;</span><br><span class="line">      regex: web</span><br><span class="line">      replacement: $1</span><br><span class="line">      action: keep</span><br><span class="line">rule_files:</span><br><span class="line">- /etc/prometheus/rules/prometheus-k8s-rulefiles-0/*.yaml</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>告警规则</p>
+<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line"><span class="meta prompt_"># </span><span class="language-bash">Prometheus Rule</span></span><br><span class="line">cat &gt; prometheus-rules.yaml &lt;&lt; EOF</span><br><span class="line">apiVersion: monitoring.coreos.com/v1</span><br><span class="line">kind: PrometheusRule</span><br><span class="line">metadata:</span><br><span class="line">  labels:</span><br><span class="line">    prometheus: k8s</span><br><span class="line">    role: alert-rules</span><br><span class="line">  name: prometheus-k8s-rules</span><br><span class="line">spec:</span><br><span class="line">  groups:</span><br><span class="line">  - name: k8s.rules</span><br><span class="line">    rules:</span><br><span class="line">    - expr: |</span><br><span class="line">        sum(rate(container_cpu_usage_seconds_total&#123;job=&quot;kubelet&quot;, image!=&quot;&quot;, container_name!=&quot;&quot;&#125;[5m])) by (namespace)</span><br><span class="line">      record: namespace:container_cpu_usage_seconds_total:sum_rate</span><br><span class="line">EOF</span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">生成 rule 配置文件到 prometheus 的 /etc/prometheus/rules/prometheus-k8s-rulefiles-0/ 目录下</span></span><br></pre></td></tr></table></figure>
+</li>
+<li><p>配置告警（AlertManager 配置 secret）</p>
+</li>
+</ul>
+<ol start="7">
+<li>自动发现配置与持久化存储</li>
+</ol>
+<ul>
+<li>自动发现配置（annotations）</li>
+</ul>
+<p>prometheus.io&#x2F;scrape&#x3D;true<br>prometheus.io&#x2F;port&#x3D;xxx</p>
+<ul>
+<li>持久化存储（PV、PVC）</li>
+</ul>
+<blockquote>
+<p>Operator 管理监控以及维护 CRD 资源对象的状态：</p>
+<ul>
+<li>Prometheus</li>
+<li>ServiceMonitor</li>
+<li>PodMonitor</li>
+<li>AltertManager</li>
+<li>PrometheusRule</li>
+</ul>
+</blockquote>
+<blockquote>
+<p>参考文档：<br>1、<a href="https://www.servicemesher.com/blog/prometheus-operator-manual/">https://www.servicemesher.com/blog/prometheus-operator-manual/</a><br>2、<a href="https://www.qikqiak.com/k8s-book/docs/52.Prometheus%E5%9F%BA%E6%9C%AC%E4%BD%BF%E7%94%A8.html">https://www.qikqiak.com/k8s-book/docs/52.Prometheus%E5%9F%BA%E6%9C%AC%E4%BD%BF%E7%94%A8.html</a><br>官方文档：<br>1、<a href="https://github.com/prometheus-operator/prometheus-operator">https://github.com/prometheus-operator/prometheus-operator</a><br>2、<a href="https://github.com/prometheus-operator/kube-prometheus">https://github.com/prometheus-operator/kube-prometheus</a>（新版本）<br>3、告警规则：<a href="https://yunlzheng.gitbook.io/prometheus-book/parti-prometheus-ji-chu/alert/prometheus-alert-rule">https://yunlzheng.gitbook.io/prometheus-book/parti-prometheus-ji-chu/alert/prometheus-alert-rule</a></p>
+</blockquote>
+]]></content>
+      <categories>
+        <category>CNCF</category>
+      </categories>
+      <tags>
+        <tag>Observability</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>ACK 集群日志接入 SLS</title>
+    <url>/posts/4a2a.html</url>
+    <content><![CDATA[<link rel="stylesheet" class="aplayer-secondary-style-marker" href="/assets/css/APlayer.min.css"><script src="/assets/js/APlayer.min.js" class="aplayer-secondary-script-marker"></script><script class="meting-secondary-script-marker" src="/assets/js/Meting.min.js"></script><h2 id="一、接入前提"><a href="#一、接入前提" class="headerlink" title="一、接入前提"></a>一、接入前提</h2><p><strong>ACK 集群开启日志服务组件Logtail</strong></p>
+<ul>
+<li>创建集群时启用Logtail（初始化ACK 集群时操作，新集群建议开启）<img data-src="/posts/4a2a/acksls1.png" class></li>
 </ul>
 <span id="more"></span>
 <ul>
-<li><p>选择 组件监控 ，点击添加组件监控，选择要添加的组件。（本次示例为RabbitMQ）</p>
-<img data-src="/posts/9a8h/2.png" class>
-<img data-src="/posts/9a8h/3.png" class>
+<li><p>为已有集群启用Logtail：在ACK控制台–&gt; 进入对应集群管理界面 –&gt; 运维管理 –&gt; 组件管理，找到logtail-ds 组件并点击安装即可。</p>
+<img data-src="/posts/4a2a/acksls2.png" class>
 </li>
-<li><p>添加后即可进入grafana 大盘查看指标数据。验证数据方式可以通过 **curl  xxx:9419&#x2F;metrics ** 获取指标数据，如图:</p>
-<img data-src="/posts/9a8h/4.png" class></li>
+<li><p>创建成功后即可在SLS 控制台搜索到相关集群Project</p>
+</li>
 </ul>
-<h4 id="2）grafana-接入数据展示"><a href="#2）grafana-接入数据展示" class="headerlink" title="2）grafana 接入数据展示"></a>2）grafana 接入数据展示</h4><ul>
-<li><p>从Pometheus 控制台，点击对应生成的大盘，进入grafana 数据展示界面</p>
-<img data-src="/posts/9a8h/5.png" class>
-</li>
-<li><p>进入grafana Dashboard界面后，需要新增一个panel。操作如下：</p>
-<img data-src="/posts/9a8h/6.png" class>
-<img data-src="/posts/9a8h/7.png" class>
-<img data-src="/posts/9a8h/8.png" class>
-</li>
-<li><p>在ACK集群查看展示组件相关监控数据：在对应ACK 集群中，选择 <strong>运维管理 – Prometheus监控 –Cloud RABBITMQ</strong> ，即可查看大盘数据。</p>
-<img data-src="/posts/9a8h/9.png" class></li>
+<img data-src="/posts/4a2a/acksls3.png" class>
+
+
+<h2 id="二、接入日志方式"><a href="#二、接入日志方式" class="headerlink" title="二、接入日志方式"></a>二、接入日志方式</h2><h3 id="2-1-ACK-集群手动接入"><a href="#2-1-ACK-集群手动接入" class="headerlink" title="2.1 ACK 集群手动接入"></a>2.1 ACK 集群手动接入</h3><blockquote>
+<p>本次接入应用标准输出日志，如需接入文件日志，还需创建对应volumeMounts和volumes 配置，规则逻辑类似。</p>
+</blockquote>
+<h4 id="1）通过控制台配置"><a href="#1）通过控制台配置" class="headerlink" title="1）通过控制台配置"></a>1）通过控制台配置</h4><ul>
+<li>进入应用详情页</li>
 </ul>
-<h4 id="3）创建告警阈值与通知"><a href="#3）创建告警阈值与通知" class="headerlink" title="3）创建告警阈值与通知"></a>3）创建告警阈值与通知</h4><ul>
-<li><p>创建钉钉群，并生成钉钉机器人webhook地址。参考：<a href="https://help.aliyun.com/document_detail/251838.html">https://help.aliyun.com/document_detail&#x2F;251838.html</a></p>
-</li>
-<li><p>在云产品 <strong>Prometheus监控服务</strong> 中，将钉钉机器人添加到告警联系人，使用IM机器人方式。</p>
-<img data-src="/posts/9a8h/10.png" class>
-</li>
-<li><p>在云产品 <strong>应用实时监控服务ARMS – Prometheus监控 – Prometheus告警规则</strong> 中，点击<strong>创建Prometheus告警规则</strong> ，创建告警规则。告警规则详细如图：</p>
-<img data-src="/posts/9a8h/11.png" class>
-<img data-src="/posts/9a8h/12.png" class>
-</li>
-<li><p>在云产品 <strong>应用实时监控服务ARMS – 告警管理 – 通知策略</strong> 中，点击<strong>创建通知策略</strong> ，创建告警通知策略。策略配置详细如图：</p>
-<img data-src="/posts/9a8h/13.png" class>
-<img data-src="/posts/9a8h/14.png" class></li>
-</ul>
-<h4 id="4）验证告警"><a href="#4）验证告警" class="headerlink" title="4）验证告警"></a>4）验证告警</h4><ul>
-<li>将告警规则中PromQL 语句暂时配置为：sum by (queue)(rabbitmq_queue_messages_unacknowledged{app&#x3D;”rabbi-exporter”}) &gt;&#x3D; 0</li>
-</ul>
-<p>来产生告警</p>
+<img data-src="/posts/4a2a/acksls4.png" class>
+
 <ul>
-<li><p>在云产品 <strong>应用实时监控服务ARMS – 告警管理 – 告警发送历史&#x2F;告警事件历史</strong> 中，搜索告警事件与发送结果：</p>
-<img data-src="/posts/9a8h/15.png" class>
-<img data-src="/posts/9a8h/16.png" class>
+<li>点击应用编辑按钮，添加相关日志采集配置。</li>
+</ul>
+<img data-src="/posts/4a2a/acksls5.png" class>
+<img data-src="/posts/4a2a/acksls6.png" class>
+
+<h4 id="2）通过YAML-模板创建（Deployment-x2F-Pod）"><a href="#2）通过YAML-模板创建（Deployment-x2F-Pod）" class="headerlink" title="2）通过YAML 模板创建（Deployment &#x2F; Pod）"></a>2）通过YAML 模板创建（Deployment &#x2F; Pod）</h4><ul>
+<li><p>采集规则</p>
+<blockquote>
+<ul>
+<li>name: aliyun_logs_{Logstore名称}<br> value: {日志采集路径}</li>
+</ul>
+</blockquote>
 </li>
-<li><p>可以看到钉钉群已正常接收告警通知（告警恢复自动发送恢复通知并停止发送告警消息）</p>
-<img data-src="/posts/9a8h/17.png" class></li>
+<li><p>模板关键配置示例</p>
+</li>
 </ul>
-<h3 id="三、注意事项"><a href="#三、注意事项" class="headerlink" title="三、注意事项"></a>三、注意事项</h3><ul>
-<li>ACK 集群 RabbitMQ应用告警是创建的临时告警群。后续如需添加其他人或告警通知发布到正式群组按情况进行调整。</li>
+<p>Pod 示例部分：</p>
+<figure class="highlight yaml"><table><tr><td class="code"><pre><span class="line"><span class="attr">apiVersion:</span> <span class="string">v1</span></span><br><span class="line"><span class="attr">kind:</span> <span class="string">Pod</span></span><br><span class="line"><span class="attr">spec:</span></span><br><span class="line">  <span class="attr">containers:</span></span><br><span class="line">  <span class="bullet">-</span> <span class="attr">name:</span> <span class="string">my-demo-app</span></span><br><span class="line">    <span class="attr">env:</span></span><br><span class="line">    <span class="comment">######### 配置 环境变量 ###########</span></span><br><span class="line">    <span class="bullet">-</span> <span class="attr">name:</span> <span class="string">aliyun_logs_log-stdout</span></span><br><span class="line">      <span class="attr">value:</span> <span class="string">stdout</span></span><br><span class="line">    <span class="bullet">-</span> <span class="attr">name:</span> <span class="string">aliyun_logs_log-varlog</span></span><br><span class="line">      <span class="attr">value:</span> <span class="string">/var/log/*.log</span></span><br><span class="line">    <span class="bullet">-</span> <span class="attr">name:</span> <span class="string">aliyun_logs_mytag1_tags</span></span><br><span class="line">      <span class="attr">value:</span> <span class="string">tag1=v1</span></span><br><span class="line">    <span class="comment">###############################</span></span><br><span class="line">    <span class="comment">######### 配置volume mount ###########</span></span><br><span class="line">    <span class="attr">volumeMounts:</span></span><br><span class="line">    <span class="bullet">-</span> <span class="attr">name:</span> <span class="string">volumn-sls-mydemo</span></span><br><span class="line">      <span class="attr">mountPath:</span> <span class="string">/var/log</span></span><br><span class="line">  <span class="attr">volumes:</span></span><br><span class="line">  <span class="bullet">-</span> <span class="attr">name:</span> <span class="string">volumn-sls-mydemo</span></span><br><span class="line">    <span class="attr">emptyDir:</span> &#123;&#125;</span><br><span class="line">  <span class="comment">###############################</span></span><br></pre></td></tr></table></figure>
+<p>deployment 示例部分：</p>
+<figure class="highlight yaml"><table><tr><td class="code"><pre><span class="line"><span class="attr">apiVersion:</span> <span class="string">apps/v1</span></span><br><span class="line"><span class="attr">kind:</span> <span class="string">Deployment</span></span><br><span class="line"><span class="attr">spec:</span></span><br><span class="line">  <span class="attr">template:</span></span><br><span class="line">    <span class="attr">spec:</span></span><br><span class="line">      <span class="attr">containers:</span></span><br><span class="line">        <span class="bullet">-</span> <span class="attr">args:</span> <span class="string">xxx-args</span></span><br><span class="line">          <span class="attr">env:</span></span><br><span class="line">            <span class="bullet">-</span> <span class="attr">name:</span> <span class="string">aliyun_logs_app-110760134-domain-event-center</span></span><br><span class="line">              <span class="attr">value:</span> <span class="string">stdout</span></span><br><span class="line">          <span class="attr">image:</span> <span class="string">xxx-image</span></span><br></pre></td></tr></table></figure>
+<p>多个应用收集到同一个logstore 示例：</p>
+<figure class="highlight yaml"><table><tr><td class="code"><pre><span class="line"><span class="comment">#应用A 配置：</span></span><br><span class="line"><span class="comment">######### 配置 环境变量 ###########</span></span><br><span class="line">    <span class="bullet">-</span> <span class="attr">name:</span> <span class="string">aliyun_logs_app1-stdout</span></span><br><span class="line">      <span class="attr">value:</span> <span class="string">stdout</span></span><br><span class="line">    <span class="bullet">-</span> <span class="attr">name:</span> <span class="string">aliyun_logs_app1-stdout_logstore</span></span><br><span class="line">      <span class="attr">value:</span> <span class="string">stdout-logstore</span></span><br><span class="line">      </span><br><span class="line">      </span><br><span class="line"><span class="comment">#应用B 配置：</span></span><br><span class="line"><span class="comment">######### 配置 环境变量 ###########</span></span><br><span class="line">    <span class="bullet">-</span> <span class="attr">name:</span> <span class="string">aliyun_logs_app2-stdout</span></span><br><span class="line">      <span class="attr">value:</span> <span class="string">stdout</span></span><br><span class="line">    <span class="bullet">-</span> <span class="attr">name:</span> <span class="string">aliyun_logs_app2-stdout_logstore</span></span><br><span class="line">      <span class="attr">value:</span> <span class="string">stdout-logstore</span></span><br></pre></td></tr></table></figure>
+
+<h4 id="3）验证查看日志"><a href="#3）验证查看日志" class="headerlink" title="3）验证查看日志"></a>3）验证查看日志</h4><ul>
+<li>登录SLS 控制台，进入对应集群Project</li>
 </ul>
+<img data-src="/posts/4a2a/acksls7.png" class>
+
+<ul>
+<li>查询分析</li>
+</ul>
+<img data-src="/posts/4a2a/acksls8.png" class>
+
+<h4 id="4）其他"><a href="#4）其他" class="headerlink" title="4）其他"></a>4）其他</h4><ul>
+<li>注意事项<blockquote>
+<p><strong>注意：</strong><br>**    当多个不同namespace 的同名应用配置为同一个logstore 时，可通过__tag__ 过滤条件，搜索对应需要的日志。**<br>**    如需自定义tag 区分不同日志时，可通过自定义tag 区分。**</p>
+<img data-src="/posts/4a2a/acksls9.png" class></blockquote>
+</li>
+</ul>
+<blockquote>
+<p>参考阿里云官方文档：<a href="https://help.aliyun.com/document_detail/87540.html">https://help.aliyun.com/document_detail&#x2F;87540.html</a></p>
+</blockquote>
+<h3 id="2-2-DaemonSet-方式接入"><a href="#2-2-DaemonSet-方式接入" class="headerlink" title="2.2 DaemonSet 方式接入"></a>2.2 DaemonSet 方式接入</h3><h4 id="1）通过DaemonSet-控制台方式采集"><a href="#1）通过DaemonSet-控制台方式采集" class="headerlink" title="1）通过DaemonSet 控制台方式采集"></a>1）通过DaemonSet 控制台方式采集</h4><blockquote>
+<p>可选择采集文件或标准输出，本次接入应用标准输出日志。</p>
+</blockquote>
+<ul>
+<li>在SLS 控制台搜索 <strong>Kubenetes - 标准输出</strong>，选择日志收集方式。</li>
+</ul>
+<img data-src="/posts/4a2a/acksls10.png" class>
+
+<ul>
+<li>选择&#x2F;创建 Project 和store。</li>
+</ul>
+<img data-src="/posts/4a2a/acksls11.png" class>
+
+<ul>
+<li>选择已有机器组</li>
+</ul>
+<img data-src="/posts/4a2a/acksls12.png" class>
+
+<ul>
+<li>收集过滤需要的日志，详细语法可参考文档。</li>
+</ul>
+<img data-src="/posts/4a2a/acksls13.png" class>
+<figure class="highlight json"><table><tr><td class="code"><pre><span class="line"><span class="punctuation">&#123;</span></span><br><span class="line">  <span class="attr">&quot;inputs&quot;</span><span class="punctuation">:</span> <span class="punctuation">[</span></span><br><span class="line">    <span class="punctuation">&#123;</span></span><br><span class="line">      <span class="attr">&quot;detail&quot;</span><span class="punctuation">:</span> <span class="punctuation">&#123;</span></span><br><span class="line">        <span class="attr">&quot;IncludeLabel&quot;</span><span class="punctuation">:</span> <span class="punctuation">&#123;</span><span class="punctuation">&#125;</span><span class="punctuation">,</span></span><br><span class="line">        <span class="attr">&quot;ExcludeLabel&quot;</span><span class="punctuation">:</span> <span class="punctuation">&#123;</span><span class="attr">&quot;io.kubernetes.container.name&quot;</span><span class="punctuation">:</span> <span class="string">&quot;camel-k-operator&quot;</span><span class="punctuation">&#125;</span><span class="punctuation">,</span></span><br><span class="line">        <span class="attr">&quot;IncludeEnv&quot;</span><span class="punctuation">:</span> <span class="punctuation">&#123;</span><span class="attr">&quot;CAMEL_K_INTEGRATION&quot;</span><span class="punctuation">:</span> <span class="string">&quot;&quot;</span><span class="punctuation">&#125;</span><span class="punctuation">,</span></span><br><span class="line">      <span class="punctuation">&#125;</span><span class="punctuation">,</span></span><br><span class="line">      <span class="attr">&quot;type&quot;</span><span class="punctuation">:</span> <span class="string">&quot;service_docker_stdout&quot;</span></span><br><span class="line">    <span class="punctuation">&#125;</span></span><br><span class="line">  <span class="punctuation">]</span></span><br><span class="line"><span class="punctuation">&#125;</span></span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>进入SLS 控制台，并选择对应Project。点击创建索引</li>
+</ul>
+<img data-src="/posts/4a2a/acksls14.png" class>
+<img data-src="/posts/4a2a/acksls15.png" class>
+
+<ul>
+<li>索引创建后等待1 min左右，即可看到标准输出日志。</li>
+</ul>
+<img data-src="/posts/4a2a/acksls16.png" class>
+
+<h4 id="2）通过DaemonSet-CRD-方式采集"><a href="#2）通过DaemonSet-CRD-方式采集" class="headerlink" title="2）通过DaemonSet CRD 方式采集"></a>2）通过DaemonSet CRD 方式采集</h4><blockquote>
+<p>Edas 中配置日志收集即使用的该方式。</p>
+</blockquote>
+<p><a href="https://help.aliyun.com/document_detail/74878.htm">https://help.aliyun.com/document_detail&#x2F;74878.htm</a></p>
+<h3 id="2-3-Sidecar-方式接入"><a href="#2-3-Sidecar-方式接入" class="headerlink" title="2.3 Sidecar 方式接入"></a>2.3 Sidecar 方式接入</h3><h4 id="1）通过Sidecar-控制台方式采集"><a href="#1）通过Sidecar-控制台方式采集" class="headerlink" title="1）通过Sidecar 控制台方式采集"></a>1）通过Sidecar 控制台方式采集</h4><p><a href="https://help.aliyun.com/document_detail/100575.htm">https://help.aliyun.com/document_detail&#x2F;100575.htm</a></p>
+<h4 id="2）通过Sidecar-CRD-方式采集"><a href="#2）通过Sidecar-CRD-方式采集" class="headerlink" title="2）通过Sidecar CRD 方式采集"></a>2）通过Sidecar CRD 方式采集</h4><p><a href="https://help.aliyun.com/document_detail/100575.htm">https://help.aliyun.com/document_detail&#x2F;100575.htm</a></p>
+<blockquote>
+<p>参考阿里云官方文档：<a href="https://help.aliyun.com/document_detail/66654.html">https://help.aliyun.com/document_detail&#x2F;66654.html</a></p>
+</blockquote>
 ]]></content>
       <categories>
         <category>CNCF</category>
@@ -1208,6 +1469,78 @@
       </categories>
       <tags>
         <tag>RabbitMQ</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>阿里云-Promotheus &amp; Grafana 监控大盘与告警通知</title>
+    <url>/posts/9a8h.html</url>
+    <content><![CDATA[<link rel="stylesheet" class="aplayer-secondary-style-marker" href="/assets/css/APlayer.min.css"><script src="/assets/js/APlayer.min.js" class="aplayer-secondary-script-marker"></script><script class="meting-secondary-script-marker" src="/assets/js/Meting.min.js"></script><h3 id="一、背景"><a href="#一、背景" class="headerlink" title="一、背景"></a>一、背景</h3><ul>
+<li>线上ACK 集群部署了StatefulSet 应用（rabbitMQ），由于rabbitMQ 本身自带的management 后台数据展示较为简陋且没有告警功能，因此考虑接入云上产品监控资源数据且对接告警通知功能，主要通过如下产品实现：<ul>
+<li>接入Prometheus 监控+grafana 进行数据图表展示。</li>
+<li>利用Arms 产品获取Prometheus 的监控指标，按照设定的阈值进行告警通知功能。</li>
+</ul>
+</li>
+</ul>
+<h3 id="二、操作过程"><a href="#二、操作过程" class="headerlink" title="二、操作过程"></a>二、操作过程</h3><h4 id="1）接入Prometheus-组件监控，获取数据指标"><a href="#1）接入Prometheus-组件监控，获取数据指标" class="headerlink" title="1）接入Prometheus 组件监控，获取数据指标"></a>1）接入Prometheus 组件监控，获取数据指标</h4><ul>
+<li>进入云产品 <strong>Prometheus监控服务</strong>，选择对应集群。（ACK集群需要先安装Prometheus 监控组件，安装参考：<a href="https://help.aliyun.com/document_detail/161304.html">ARMS Prometheus监控</a>）<img data-src="/posts/9a8h/1.png" class></li>
+</ul>
+<span id="more"></span>
+<ul>
+<li><p>选择 组件监控 ，点击添加组件监控，选择要添加的组件。（本次示例为RabbitMQ）</p>
+<img data-src="/posts/9a8h/2.png" class>
+<img data-src="/posts/9a8h/3.png" class>
+</li>
+<li><p>添加后即可进入grafana 大盘查看指标数据。验证数据方式可以通过 **curl  xxx:9419&#x2F;metrics ** 获取指标数据，如图:</p>
+<img data-src="/posts/9a8h/4.png" class></li>
+</ul>
+<h4 id="2）grafana-接入数据展示"><a href="#2）grafana-接入数据展示" class="headerlink" title="2）grafana 接入数据展示"></a>2）grafana 接入数据展示</h4><ul>
+<li><p>从Pometheus 控制台，点击对应生成的大盘，进入grafana 数据展示界面</p>
+<img data-src="/posts/9a8h/5.png" class>
+</li>
+<li><p>进入grafana Dashboard界面后，需要新增一个panel。操作如下：</p>
+<img data-src="/posts/9a8h/6.png" class>
+<img data-src="/posts/9a8h/7.png" class>
+<img data-src="/posts/9a8h/8.png" class>
+</li>
+<li><p>在ACK集群查看展示组件相关监控数据：在对应ACK 集群中，选择 <strong>运维管理 – Prometheus监控 –Cloud RABBITMQ</strong> ，即可查看大盘数据。</p>
+<img data-src="/posts/9a8h/9.png" class></li>
+</ul>
+<h4 id="3）创建告警阈值与通知"><a href="#3）创建告警阈值与通知" class="headerlink" title="3）创建告警阈值与通知"></a>3）创建告警阈值与通知</h4><ul>
+<li><p>创建钉钉群，并生成钉钉机器人webhook地址。参考：<a href="https://help.aliyun.com/document_detail/251838.html">https://help.aliyun.com/document_detail&#x2F;251838.html</a></p>
+</li>
+<li><p>在云产品 <strong>Prometheus监控服务</strong> 中，将钉钉机器人添加到告警联系人，使用IM机器人方式。</p>
+<img data-src="/posts/9a8h/10.png" class>
+</li>
+<li><p>在云产品 <strong>应用实时监控服务ARMS – Prometheus监控 – Prometheus告警规则</strong> 中，点击<strong>创建Prometheus告警规则</strong> ，创建告警规则。告警规则详细如图：</p>
+<img data-src="/posts/9a8h/11.png" class>
+<img data-src="/posts/9a8h/12.png" class>
+</li>
+<li><p>在云产品 <strong>应用实时监控服务ARMS – 告警管理 – 通知策略</strong> 中，点击<strong>创建通知策略</strong> ，创建告警通知策略。策略配置详细如图：</p>
+<img data-src="/posts/9a8h/13.png" class>
+<img data-src="/posts/9a8h/14.png" class></li>
+</ul>
+<h4 id="4）验证告警"><a href="#4）验证告警" class="headerlink" title="4）验证告警"></a>4）验证告警</h4><ul>
+<li>将告警规则中PromQL 语句暂时配置为：sum by (queue)(rabbitmq_queue_messages_unacknowledged{app&#x3D;”rabbi-exporter”}) &gt;&#x3D; 0</li>
+</ul>
+<p>来产生告警</p>
+<ul>
+<li><p>在云产品 <strong>应用实时监控服务ARMS – 告警管理 – 告警发送历史&#x2F;告警事件历史</strong> 中，搜索告警事件与发送结果：</p>
+<img data-src="/posts/9a8h/15.png" class>
+<img data-src="/posts/9a8h/16.png" class>
+</li>
+<li><p>可以看到钉钉群已正常接收告警通知（告警恢复自动发送恢复通知并停止发送告警消息）</p>
+<img data-src="/posts/9a8h/17.png" class></li>
+</ul>
+<h3 id="三、注意事项"><a href="#三、注意事项" class="headerlink" title="三、注意事项"></a>三、注意事项</h3><ul>
+<li>ACK 集群 RabbitMQ应用告警是创建的临时告警群。后续如需添加其他人或告警通知发布到正式群组按情况进行调整。</li>
+</ul>
+]]></content>
+      <categories>
+        <category>CNCF</category>
+      </categories>
+      <tags>
+        <tag>阿里云</tag>
+        <tag>K8S</tag>
       </tags>
   </entry>
   <entry>
@@ -1406,229 +1739,6 @@
       </categories>
       <tags>
         <tag>K8S</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>VPC 网络规划案例</title>
-    <url>/posts/64a8.html</url>
-    <content><![CDATA[<link rel="stylesheet" class="aplayer-secondary-style-marker" href="/assets/css/APlayer.min.css"><script src="/assets/js/APlayer.min.js" class="aplayer-secondary-script-marker"></script><script class="meting-secondary-script-marker" src="/assets/js/Meting.min.js"></script><h3 id="网段规划概述"><a href="#网段规划概述" class="headerlink" title="网段规划概述"></a>网段规划概述</h3><h4 id="1）规划网段的目的"><a href="#1）规划网段的目的" class="headerlink" title="1）规划网段的目的"></a>1）规划网段的目的</h4><ul>
-<li>方便查看管理，相当于对某一个&#x2F;多个IDC 机房的IP 规划，根据IP 地址可以一目了然的判断出归属。</li>
-<li>便于同集群&#x2F;VPC 内网段判断网络、路由走向、以及网络隔离策略（白名单）。</li>
-<li>区分多VPC&#x2F;网络 环境，方便在打通网络时区分子网网段。</li>
-</ul>
-<h4 id="2）规范化设计的方式"><a href="#2）规范化设计的方式" class="headerlink" title="2）规范化设计的方式"></a>2）规范化设计的方式</h4><p>首先需要分清两类，是否有ACK 等集群类资源单独规划：</p>
-<ol>
-<li>如无集群资源（即只有RDS、ECS 等常规资源），按正常内网网段定义VPC与交换机即可</li>
-<li>有集群资源，最好划分单独交换机部署常规资源，<strong>独立交换机</strong>部署集群资源。</li>
-</ol>
-<span id="more"></span>
-
-<p>由于线上部署，或者未来趋势 基本云上都会已集群方式存在，因此只讨论第二种方式。<br>网段设计规范：</p>
-<ul>
-<li>VPC可使用的私网网段：192.168.0.0&#x2F;16、10.0.0.0&#x2F;8、172.16.0.0&#x2F;12及其子网，每个专有网络只能指定一个网段。</li>
-<li>交换机可使用的网段：需要&lt;&#x3D; VPC网段（子集）</li>
-</ul>
-<img data-src="/posts/64a8/vpc1.png" class>
-
-<ul>
-<li>VPC数量：创建多个VPC 时尽量使用不同网段</li>
-<li>集群数量：同账号下部署多集群时尽量使用不同网段</li>
-<li>如有ACK 集群资源时，需判断集群网络插件模式<ul>
-<li>非Terway 插件时，需要三个私网网段，如：10.1.0.0&#x2F;16（VPC-vswitch）、192.168.0.0&#x2F;24（Pod 使用）、192.168.10.0&#x2F;24（Service 使用）</li>
-<li>使用Terway 插件时，需要两个私网网段，如：10.16.0.0&#x2F;8（VPC-vswitch + Pod）、192.168.0.0&#x2F;24（Service 使用）</li>
-</ul>
-</li>
-</ul>
-<h4 id="个人建议"><a href="#个人建议" class="headerlink" title="**个人建议"></a>**个人建议</h4><ul>
-<li><p>同账号下（同环境）选择 192.168.0.0&#x2F;16、10.0.0.0&#x2F;0、172.16.0.0&#x2F;12 进行VPC 创建组网。</p>
-<ul>
-<li>不同集群与云产品资源之间使用子交换机分割。</li>
-<li>使用云产品白名单或其他网络插件做网络隔离策略。</li>
-</ul>
-</li>
-<li><p>不同账号（如日常、线上）可复用同网段进行组网（一般不存在跨环境调用）。</p>
-</li>
-<li><p>当前环境网络组网信息（建议后续都使用Terway 插件）：</p>
-<ul>
-<li><p>日常环境网络架构</p>
-<img data-src="/posts/64a8/vpc2.png" class>
-</li>
-<li><p>线上网络架构（集群与集群、集群与云产品，通过私网的交换机网段进行隔离）</p>
-</li>
-</ul>
-</li>
-</ul>
-<img data-src="/posts/64a8/vpc3.png" class>
-
-
-<h3 id="线上实际案例"><a href="#线上实际案例" class="headerlink" title="线上实际案例"></a>线上实际案例</h3><h4 id="1）案例1"><a href="#1）案例1" class="headerlink" title="1）案例1"></a>1）案例1</h4><img data-src="/posts/64a8/vpc4.png" class>
-
-<ul>
-<li>VPC：10.0.0.0&#x2F;8 （复用线上VPC）</li>
-<li>交换机：新建4 台交换机<ul>
-<li>test-swc-10_200_0_0_20  （可用区 1）</li>
-<li>test-swc-10_200_16_0_20 （可用区 2）</li>
-<li>test-swc-10_200_64_0_19 （可用区 1）</li>
-<li>test-swc-10_200_96_0_19 （可用区 2）</li>
-</ul>
-</li>
-<li>集群CIDR规划<ul>
-<li>Node CIDR：<ul>
-<li>10.200.0.0&#x2F;20</li>
-<li>10.200.16.0&#x2F;20</li>
-</ul>
-</li>
-<li>Pod CIDR：<ul>
-<li>10.200.64.0&#x2F;19</li>
-<li>10.200.96.0&#x2F;19</li>
-</ul>
-</li>
-<li>Service CIDR：<ul>
-<li>172.31.0.0&#x2F;16<blockquote>
-<p>注意：</p>
-<ul>
-<li>Node 和Pod 交换机如要高可用选择不同可用区时，需要每个可用区都有Node 和Pod 可使用的交换机。</li>
-<li>Service 网段不能与VPC 网段 及VPC 内已有Kubernetes 集群使用的网段重复。</li>
-</ul>
-</blockquote>
-</li>
-</ul>
-</li>
-</ul>
-</li>
-</ul>
-<h4 id="2）相关文档与工具"><a href="#2）相关文档与工具" class="headerlink" title="2）相关文档与工具"></a>2）相关文档与工具</h4><ul>
-<li><p><a href="https://help.aliyun.com/document_detail/189596.html">云企业网工作原理与操作</a></p>
-</li>
-<li><p>VPN网关原理与操作：</p>
-<ul>
-<li><a href="https://cloud.tencent.com/developer/article/1824924">IPSec VPN 技术原理</a></li>
-<li><a href="https://help.aliyun.com/document_detail/65072.html">阿里云官方操作文档</a></li>
-</ul>
-</li>
-<li><p><a href="https://www.bejson.com/convert/subnetmask/">子网计算在线工具</a></p>
-</li>
-<li><p>架构图</p>
-</li>
-</ul>
-<p><img data-src="https://intranetproxy.alipay.com/skylark/lark/0/2022/png/21956377/1646207048171-c0f5a83d-b982-4e85-ab78-f724882be069.png#clientId=ufadced67-c1c1-4&from=ui&id=u1dc1cab7&margin=%5Bobject%20Object%5D&name=%E6%80%BB%E4%BD%93%E7%BD%91%E7%BB%9C%E6%9E%B6%E6%9E%84.png&originHeight=1993&originWidth=4131&originalType=binary&ratio=1&size=515776&status=done&style=none&taskId=uffed0b55-26c9-4f1d-b577-67c4f6f81ec" alt="总体网络架构.png"></p>
-]]></content>
-      <categories>
-        <category>网络</category>
-      </categories>
-      <tags>
-        <tag>阿里云</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>阿里云-RAM 与 STS 权限</title>
-    <url>/posts/fdc.html</url>
-    <content><![CDATA[<link rel="stylesheet" class="aplayer-secondary-style-marker" href="/assets/css/APlayer.min.css"><script src="/assets/js/APlayer.min.js" class="aplayer-secondary-script-marker"></script><script class="meting-secondary-script-marker" src="/assets/js/Meting.min.js"></script><h3 id="一、前言"><a href="#一、前言" class="headerlink" title="一、前言"></a>一、前言</h3><p>当通过OpenApi接口来调用云资源时（即替代控制台的操作），当前的方式有两种：</p>
-<ul>
-<li>通过 AK+SK 方式直接调用，只要该AK所属的账号有相关权限即可调用对应资源（授权分为系统策略和自定义策略）</li>
-<li>阿里云账号（RAM用户）&#x2F;阿里云服务（ECS等）&#x2F;身份提供商（SSO） 通过扮演角色获取角色的临时令牌（即通过调用AssumeRole接口），通过该临时令牌（临时令牌可设定会话时间），通过 STS接口获取到的 临时AK+临时SK+临时STSToken 进行调用对应资源</li>
-</ul>
-<h3 id="二、官方概念介绍"><a href="#二、官方概念介绍" class="headerlink" title="二、官方概念介绍"></a>二、官方概念介绍</h3><ol>
-<li>STS概念</li>
-</ol>
-<ul>
-<li>阿里云STS（Security Token Service）是阿里云提供的一种临时访问权限管理服务。RAM提供RAM用户和RAM角色两种身份。其中，RAM角色不具备永久身份凭证，而只能通过STS获取可以自定义时效和访问权限的临时身份凭证，即安全令牌（STS Token）</li>
-</ul>
-<span id="more"></span>
-<p>建议阅读：<a href="https://help.aliyun.com/document_detail/28756.html">https://help.aliyun.com/document_detail&#x2F;28756.html</a></p>
-<ol start="2">
-<li>RAM概念</li>
-</ol>
-<ul>
-<li>RAM用户：身份实体，可访问阿里云资源的账号或程序；创建时可选择登录场景、AccessKey场景（通过程序调用API）。</li>
-<li><strong>RAM角色</strong>：虚拟用户，向信任的RAM实体账号进行授权（根据STS令牌颁发短时有效的临时访问token）；创建角色后会生成Arn描述符（角色的描述符：每个RAM角色存在唯一值且遵循阿里云arn命名规范）。</li>
-<li>RAM权限策略：一组权限集，使用简单的Policy语法进行描述（分为系统策略和自定义策略）；权限策略是实际细分授权资源集、操作集、授权条件的描述。</li>
-</ul>
-<img data-src="/posts/fdc/ram1.png" class>
-
-<blockquote>
-<p>创建RAM角色时有三种类型：</p>
-<ul>
-<li><strong>阿里云账号</strong>：允许RAM用户所扮演的角色。扮演角色的RAM用户可以属于自己的阿里云账号，也可以属于其他阿里云账号。此类角色主要用来解决跨账号访问和临时授权问题</li>
-<li><strong>阿里云服务</strong>：允许云服务所扮演的角色。此类角色主要用于授权云服务代理您进行资源操作（服务又分为两种）<ul>
-<li>普通服务角色：您需要自定义角色名称，选择受信服务，并自定义权限策略</li>
-<li>服务关联角色：您只需选择受信的云服务，云服务会自带预设的角色名称和权限策略</li>
-<li>两种服务角色没太大区别，服务关联角色会多一个预设的配置（一般服务角色用户阿里云跨服务间的调用，例如ECS的授予&#x2F;收回RAM角色功能、RDS云服务调用KMS角色加密等，从某个云产品调用另一个云产品的授权）</li>
-</ul>
-</li>
-</ul>
-</blockquote>
-<img data-src="/posts/fdc/ram2.png" class>
-<blockquote>
-<ul>
-<li><strong>身份提供商</strong>：允许可信身份提供商下的用户所扮演的角色。此类角色主要用于实现与阿里云的单点登录（SSO）</li>
-</ul>
-<p><strong>常用的RAM角色一般为创建 阿里云账号 方式（OSS官方推荐使用）</strong></p>
-<ul>
-<li>授权RAM角色介绍：<a href="https://help.aliyun.com/document_detail/116819.html">https://help.aliyun.com/document_detail&#x2F;116819.html</a></li>
-<li>OSS官方推荐使用 阿里云账号 方式：<a href="https://help.aliyun.com/document_detail/100624.html">https://help.aliyun.com/document_detail&#x2F;100624.html</a></li>
-</ul>
-</blockquote>
-<h3 id="三、创建STS角色，自定义授权OSS功能测试"><a href="#三、创建STS角色，自定义授权OSS功能测试" class="headerlink" title="三、创建STS角色，自定义授权OSS功能测试"></a>三、创建STS角色，自定义授权OSS功能测试</h3><p>1）测试账号信息<br>账号：<a href="mailto:&#100;&#x65;&#x76;&#x6f;&#x70;&#115;&#95;&#x74;&#101;&#x73;&#x74;&#x40;&#x78;&#x78;&#120;&#46;&#111;&#x6e;&#x61;&#x6c;&#x69;&#x79;&#x75;&#110;&#46;&#x63;&#x6f;&#x6d;">&#100;&#x65;&#x76;&#x6f;&#x70;&#115;&#95;&#x74;&#101;&#x73;&#x74;&#x40;&#x78;&#x78;&#120;&#46;&#111;&#x6e;&#x61;&#x6c;&#x69;&#x79;&#x75;&#110;&#46;&#x63;&#x6f;&#x6d;</a><br>AK：xxxxx<br>SK：xxxxx<br>ARN：acs:ram::xxxxx:role&#x2F;xxx-sts<br>OSS Bucket名称：oss-test<br>OSS授权目录：dir111&#x2F;dir111_secondline1&#x2F;</p>
-<p>2）进行授权</p>
-<ul>
-<li>创建RAM用户（子账号），生成AK SK （此步骤忽略）</li>
-<li>测试账号添加STS权限</li>
-</ul>
-<img data-src="/posts/fdc/ram3.png" class>
-
-<ul>
-<li>添加权限策略，使用自定义策略授权（OSS官方示例Policy：<a href="https://help.aliyun.com/document_detail/266627.html">https://help.aliyun.com/document_detail&#x2F;266627.html</a>）</li>
-</ul>
-<img data-src="/posts/fdc/ram4.png" class>
-
-<ul>
-<li>添加RAM角色并授权Policy</li>
-</ul>
-<img data-src="/posts/fdc/ram5.png" class>
-
-<img data-src="/posts/fdc/ram6.png" class>
-
-<p>3）测试验证（控制台无法登录RAM账号验证权限情况下，可以使用ossutil或ossbrowser工具进行验证）</p>
-<ul>
-<li>ossutil使用：<a href="https://help.aliyun.com/document_detail/50451.html">https://help.aliyun.com/document_detail&#x2F;50451.html</a></li>
-</ul>
-<img data-src="/posts/fdc/ram7.png" class>
-
-<ul>
-<li>ossbrowser使用：<a href="https://help.aliyun.com/document_detail/92268.html">https://help.aliyun.com/document_detail&#x2F;92268.html</a></li>
-</ul>
-<p>4）验证列举和其他相关权限无误后，将ARN信息提供研发即可</p>
-<blockquote>
-<p>权限流程：</p>
-<ol>
-<li>客户端程序&#x2F;调用端发起扮演角色，此时在进入实际要获取的角色权限前，需要通过调用AssumeRole接口返回STS凭证（调用STS接口需要<strong>AliyunSTSAssumeRoleAccess</strong>权限，因此对应RAM账号需要授权该系统策略）</li>
-<li>通过返回的STS临时凭证（临时AK+临时SK+临时token）发起相关云资源接口的调用</li>
-<li>客户端使用STS发起调用时，会验证两个部分的权限策略Policy （注意：最后的权限取这两个权限Policy的交集）</li>
-</ol>
-<ul>
-<li>STS扮演的角色本身授权的权限策略是否拥有对应云资源的权限（系统或自定义的Policy）</li>
-<li>SDK&#x2F;API调用时传入的policy_text参数值，在构造调用请求时传入（<a href="https://help.aliyun.com/document_detail/100624.html">https://help.aliyun.com/document_detail&#x2F;100624.html</a><img data-src="/posts/fdc/ram8.png" class></li>
-</ul>
-</blockquote>
-<h3 id="四、结合实际需求"><a href="#四、结合实际需求" class="headerlink" title="四、结合实际需求"></a>四、结合实际需求</h3><ol>
-<li><p>开发提出需求：需要某一个oss bucket的STS ARN信息</p>
-</li>
-<li><p>需要相关信息：</p>
-</li>
-</ol>
-<ul>
-<li>oss bucket具体需授权目录，必须</li>
-<li>endpoint: oss bucket所属区域，非必须</li>
-<li>bucket-name: oss bucket名称，必须</li>
-<li>调用OSS RAM账号，必须</li>
-</ul>
-<ol start="3">
-<li>通过提供信息进行创建RAM角色、Policy策略新建（注意oss 细粒度的策略）、授权策略到RAM角色中，最后将新建的RAM角色的ARN描述符信息提供给研发。</li>
-</ol>
-]]></content>
-      <tags>
-        <tag>阿里云</tag>
       </tags>
   </entry>
 </search>

@@ -6,7 +6,7 @@
   <link href="https://359sun.top/atom.xml" rel="self"/>
   
   <link href="https://359sun.top/"/>
-  <updated>2022-06-21T14:57:16.920Z</updated>
+  <updated>2022-06-28T14:10:06.418Z</updated>
   <id>https://359sun.top/</id>
   
   <author>
@@ -15,6 +15,41 @@
   </author>
   
   <generator uri="https://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>可观测性组件-Prometheus 部署</title>
+    <link href="https://359sun.top/posts/6bfb.html"/>
+    <id>https://359sun.top/posts/6bfb.html</id>
+    <published>2022-06-28T14:02:38.000Z</published>
+    <updated>2022-06-28T14:10:06.418Z</updated>
+    
+    
+    <summary type="html">&lt;h4 id=&quot;一、组件说明&quot;&gt;&lt;a href=&quot;#一、组件说明&quot; class=&quot;headerlink&quot; title=&quot;一、组件说明&quot;&gt;&lt;/a&gt;一、组件说明&lt;/h4&gt;&lt;p&gt;&lt;strong&gt;Prometheus Server&lt;/strong&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;核心组件，负责实现对监控数据的获取，存储与查询。&lt;/li&gt;
+&lt;li&gt;支持静态配置管理监控目标，也可通过 Service Discovery 方式动态管理监控目录，获取数据。&lt;/li&gt;
+&lt;li&gt;可从其他 Prometheus Server 获取数据&lt;/li&gt;
+&lt;li&gt;对外提供 PromQL 实现数据查询和分析&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;&lt;strong&gt;Exporter&lt;/strong&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;直接采集，内置用于想 Prometheus 暴露监控数据的 Endpoints，如 node-exporter&lt;/li&gt;
+&lt;li&gt;间接采集，通过 Prometheus 提供的客户端库监控采集程序，如 mysql-exporter&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;&lt;strong&gt;AlertManager&lt;/strong&gt;&lt;br&gt;基于 PromQL 创建告警规则，满足规则产生告警并推送，支持 mail、webhook 等。&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;PushGateway&lt;/strong&gt;&lt;br&gt;原获取数据方式为基于 Prometheus Server 从 Exporter pull 数据，当网络或其他原因 Server 无法与 Exporter 直接通信时，使用 PushGateway 方式中转。&lt;br&gt;Prometheus server 定期从配置好的 jobs 和 exporters 中拉取 metrics，或者接收来自 Pushgateway 发送过来的 metrics，或者从其它的 Prometheus server 中拉 metrics&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;metrics：实际监控指标数据，如 cpu 利用率&lt;/p&gt;
+&lt;/blockquote&gt;</summary>
+    
+    
+    
+    <category term="CNCF" scheme="https://359sun.top/categories/cncf/"/>
+    
+    
+    <category term="Observability" scheme="https://359sun.top/tags/observability/"/>
+    
+  </entry>
   
   <entry>
     <title>基于 Ubuntu + Containerd 部署 K8S 集群</title>
@@ -115,11 +150,11 @@
   </entry>
   
   <entry>
-    <title>ACK-K8S 学习记录</title>
+    <title>K8S &amp; ACK 学习记录</title>
     <link href="https://359sun.top/posts/754e.html"/>
     <id>https://359sun.top/posts/754e.html</id>
     <published>2022-05-31T15:04:28.000Z</published>
-    <updated>2022-06-20T15:36:59.584Z</updated>
+    <updated>2022-06-28T14:13:56.218Z</updated>
     
     
     <summary type="html">&lt;h3 id=&quot;一、ACK集群网络规划&quot;&gt;&lt;a href=&quot;#一、ACK集群网络规划&quot; class=&quot;headerlink&quot; title=&quot;一、ACK集群网络规划&quot;&gt;&lt;/a&gt;一、ACK集群网络规划&lt;/h3&gt;&lt;p&gt;&lt;a href=&quot;https://help.aliyun.com/document_detail/86500.html&quot;&gt;https://help.aliyun.com/document_detail&amp;#x2F;86500.html&lt;/a&gt;&lt;/p&gt;
@@ -138,11 +173,11 @@
   </entry>
   
   <entry>
-    <title>Docker学习记录</title>
+    <title>Docker 学习记录</title>
     <link href="https://359sun.top/posts/c06e.html"/>
     <id>https://359sun.top/posts/c06e.html</id>
     <published>2022-05-31T15:00:45.000Z</published>
-    <updated>2022-06-06T12:39:24.596Z</updated>
+    <updated>2022-06-28T14:13:24.024Z</updated>
     
     
     <summary type="html">&lt;h3 id=&quot;一、Docker-基本原理&quot;&gt;&lt;a href=&quot;#一、Docker-基本原理&quot; class=&quot;headerlink&quot; title=&quot;一、Docker 基本原理&quot;&gt;&lt;/a&gt;一、Docker 基本原理&lt;/h3&gt;&lt;h4 id=&quot;1-docker-基本概念&quot;&gt;&lt;a href=&quot;#1-docker-基本概念&quot; class=&quot;headerlink&quot; title=&quot;1.docker 基本概念&quot;&gt;&lt;/a&gt;1.docker 基本概念&lt;/h4&gt;&lt;p&gt;Docker Client： 客户端&lt;br&gt;Docker Daemon：服务端&lt;br&gt;Docker Images：镜像（只读 CD）&lt;br&gt;Docker Registry： 镜像仓库&lt;br&gt;Docker Container：实际运行服务的容器，通过 Images 启动（可以认为 Container 提供硬件环境，使用 Images 提供好的系统盘，加上项目代码，即可运行服务）&lt;/p&gt;</summary>
@@ -209,11 +244,11 @@
   </entry>
   
   <entry>
-    <title>helm 部署应用</title>
+    <title>Helm 应用部署</title>
     <link href="https://359sun.top/posts/ce0f.html"/>
     <id>https://359sun.top/posts/ce0f.html</id>
     <published>2022-05-04T13:46:04.000Z</published>
-    <updated>2022-06-06T12:39:54.265Z</updated>
+    <updated>2022-06-28T14:12:49.637Z</updated>
     
     
     <summary type="html">&lt;h3 id=&quot;一、Helm-安装与模板&quot;&gt;&lt;a href=&quot;#一、Helm-安装与模板&quot; class=&quot;headerlink&quot; title=&quot;一、Helm 安装与模板&quot;&gt;&lt;/a&gt;一、Helm 安装与模板&lt;/h3&gt;&lt;h4 id=&quot;1）Helm-安装部署&quot;&gt;&lt;a href=&quot;#1）Helm-安装部署&quot; class=&quot;headerlink&quot; title=&quot;1）Helm 安装部署&quot;&gt;&lt;/a&gt;1）Helm 安装部署&lt;/h4&gt;&lt;ul&gt;
@@ -230,11 +265,11 @@
   </entry>
   
   <entry>
-    <title>git flow 工作流理解</title>
+    <title>Git Flow 工作流</title>
     <link href="https://359sun.top/posts/539.html"/>
     <id>https://359sun.top/posts/539.html</id>
     <published>2022-05-04T13:14:23.000Z</published>
-    <updated>2022-05-05T14:30:35.542Z</updated>
+    <updated>2022-06-28T14:12:27.775Z</updated>
     
     
     <summary type="html">&lt;h3 id=&quot;一、gitflow：版本分支管理策略（相当于对git的包装）&quot;&gt;&lt;a href=&quot;#一、gitflow：版本分支管理策略（相当于对git的包装）&quot; class=&quot;headerlink&quot; title=&quot;一、gitflow：版本分支管理策略（相当于对git的包装）&quot;&gt;&lt;/a&gt;一、gitflow：版本分支管理策略（相当于对git的包装）&lt;/h3&gt;&lt;ol&gt;
@@ -286,11 +321,11 @@
   </entry>
   
   <entry>
-    <title>promotheus组件-grafana大盘配置监控大盘与告警通知</title>
+    <title>阿里云-Promotheus &amp; Grafana 监控大盘与告警通知</title>
     <link href="https://359sun.top/posts/9a8h.html"/>
     <id>https://359sun.top/posts/9a8h.html</id>
     <published>2022-03-16T15:21:06.000Z</published>
-    <updated>2022-06-06T12:39:35.161Z</updated>
+    <updated>2022-06-28T14:07:40.330Z</updated>
     
     
     <summary type="html">&lt;h3 id=&quot;一、背景&quot;&gt;&lt;a href=&quot;#一、背景&quot; class=&quot;headerlink&quot; title=&quot;一、背景&quot;&gt;&lt;/a&gt;一、背景&lt;/h3&gt;&lt;ul&gt;
@@ -316,11 +351,11 @@
   </entry>
   
   <entry>
-    <title>NetworkPolicy隔离策略</title>
+    <title>NetworkPolicy 隔离策略</title>
     <link href="https://359sun.top/posts/8aa0.html"/>
     <id>https://359sun.top/posts/8aa0.html</id>
     <published>2022-03-07T14:01:06.000Z</published>
-    <updated>2022-06-06T12:40:18.619Z</updated>
+    <updated>2022-06-28T14:11:35.389Z</updated>
     
     
     <summary type="html">&lt;h3 id=&quot;一、背景&quot;&gt;&lt;a href=&quot;#一、背景&quot; class=&quot;headerlink&quot; title=&quot;一、背景&quot;&gt;&lt;/a&gt;一、背景&lt;/h3&gt;&lt;blockquote&gt;
@@ -351,11 +386,11 @@
   </entry>
   
   <entry>
-    <title>K8S-RBAC权限控制</title>
+    <title>K8S-RBAC 权限控制</title>
     <link href="https://359sun.top/posts/fa45.html"/>
     <id>https://359sun.top/posts/fa45.html</id>
     <published>2022-03-01T15:55:02.000Z</published>
-    <updated>2022-06-06T12:40:33.451Z</updated>
+    <updated>2022-06-28T14:11:23.029Z</updated>
     
     
     <summary type="html">&lt;h3 id=&quot;一、RBAC简易概述&quot;&gt;&lt;a href=&quot;#一、RBAC简易概述&quot; class=&quot;headerlink&quot; title=&quot;一、RBAC简易概述&quot;&gt;&lt;/a&gt;一、RBAC简易概述&lt;/h3&gt;&lt;img data-src=&quot;/posts/fa45/gaisu.png&quot; class&gt;
