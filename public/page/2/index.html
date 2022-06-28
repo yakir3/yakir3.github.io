@@ -198,6 +198,102 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://359sun.top/posts/fdc.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.jpg">
+      <meta itemprop="name" content="Yakir">
+      <meta itemprop="description" content="Yakir Blog">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Yakir Blog">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/posts/fdc.html" class="post-title-link" itemprop="url">阿里云-RAM 与 STS 权限</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2022-03-20 23:37:32" itemprop="dateCreated datePublished" datetime="2022-03-20T23:37:32+08:00">2022-03-20</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2022-06-20 23:37:06" itemprop="dateModified" datetime="2022-06-20T23:37:06+08:00">2022-06-20</time>
+              </span>
+
+          <br>
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+                <span class="post-meta-item-text">本文字数：</span>
+              <span>2.5k</span>
+            </span>
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+                <span class="post-meta-item-text">阅读时长 &asymp;</span>
+              <span>2 分钟</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h3 id="一、前言"><a href="#一、前言" class="headerlink" title="一、前言"></a>一、前言</h3><p>当通过OpenApi接口来调用云资源时（即替代控制台的操作），当前的方式有两种：</p>
+<ul>
+<li>通过 AK+SK 方式直接调用，只要该AK所属的账号有相关权限即可调用对应资源（授权分为系统策略和自定义策略）</li>
+<li>阿里云账号（RAM用户）&#x2F;阿里云服务（ECS等）&#x2F;身份提供商（SSO） 通过扮演角色获取角色的临时令牌（即通过调用AssumeRole接口），通过该临时令牌（临时令牌可设定会话时间），通过 STS接口获取到的 临时AK+临时SK+临时STSToken 进行调用对应资源</li>
+</ul>
+<h3 id="二、官方概念介绍"><a href="#二、官方概念介绍" class="headerlink" title="二、官方概念介绍"></a>二、官方概念介绍</h3><ol>
+<li>STS概念</li>
+</ol>
+<ul>
+<li>阿里云STS（Security Token Service）是阿里云提供的一种临时访问权限管理服务。RAM提供RAM用户和RAM角色两种身份。其中，RAM角色不具备永久身份凭证，而只能通过STS获取可以自定义时效和访问权限的临时身份凭证，即安全令牌（STS Token）</li>
+</ul>
+          <!--noindex-->
+            <div class="post-button">
+              <a class="btn" href="/posts/fdc.html#more" rel="contents">
+                阅读全文 &raquo;
+              </a>
+            </div>
+          <!--/noindex-->
+        
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
     <link itemprop="mainEntityOfPage" href="https://359sun.top/posts/9a8h.html">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -212,7 +308,7 @@
       <header class="post-header">
         <h2 class="post-title" itemprop="name headline">
           
-            <a href="/posts/9a8h.html" class="post-title-link" itemprop="url">promotheus组件-grafana大盘配置监控大盘与告警通知</a>
+            <a href="/posts/9a8h.html" class="post-title-link" itemprop="url">阿里云-Promotheus & Grafana 监控大盘与告警通知</a>
         </h2>
 
         <div class="post-meta">
@@ -229,7 +325,7 @@
                   <i class="far fa-calendar-check"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2022-06-06 20:39:35" itemprop="dateModified" datetime="2022-06-06T20:39:35+08:00">2022-06-06</time>
+                <time title="修改时间：2022-06-28 22:07:40" itemprop="dateModified" datetime="2022-06-28T22:07:40+08:00">2022-06-28</time>
               </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -316,7 +412,7 @@
       <header class="post-header">
         <h2 class="post-title" itemprop="name headline">
           
-            <a href="/posts/8aa0.html" class="post-title-link" itemprop="url">NetworkPolicy隔离策略</a>
+            <a href="/posts/8aa0.html" class="post-title-link" itemprop="url">NetworkPolicy 隔离策略</a>
         </h2>
 
         <div class="post-meta">
@@ -333,7 +429,7 @@
                   <i class="far fa-calendar-check"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2022-06-06 20:40:18" itemprop="dateModified" datetime="2022-06-06T20:40:18+08:00">2022-06-06</time>
+                <time title="修改时间：2022-06-28 22:11:35" itemprop="dateModified" datetime="2022-06-28T22:11:35+08:00">2022-06-28</time>
               </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -425,7 +521,7 @@
       <header class="post-header">
         <h2 class="post-title" itemprop="name headline">
           
-            <a href="/posts/fa45.html" class="post-title-link" itemprop="url">K8S-RBAC权限控制</a>
+            <a href="/posts/fa45.html" class="post-title-link" itemprop="url">K8S-RBAC 权限控制</a>
         </h2>
 
         <div class="post-meta">
@@ -442,7 +538,7 @@
                   <i class="far fa-calendar-check"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2022-06-06 20:40:33" itemprop="dateModified" datetime="2022-06-06T20:40:33+08:00">2022-06-06</time>
+                <time title="修改时间：2022-06-28 22:11:23" itemprop="dateModified" datetime="2022-06-28T22:11:23+08:00">2022-06-28</time>
               </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -676,7 +772,7 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">14</span>
+          <span class="site-state-item-count">15</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
@@ -689,7 +785,7 @@
       <div class="site-state-item site-state-tags">
             <a href="/tags/">
           
-        <span class="site-state-item-count">6</span>
+        <span class="site-state-item-count">7</span>
         <span class="site-state-item-name">标签</span></a>
       </div>
   </nav>

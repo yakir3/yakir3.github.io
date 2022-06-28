@@ -1,5 +1,5 @@
 ---
-title: helm 部署应用
+title: Helm 应用部署
 categories:
   - CNCF
 tags:

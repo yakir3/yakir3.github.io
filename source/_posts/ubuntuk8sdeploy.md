@@ -54,15 +54,14 @@ EOF
 | 操作系统 | Ubuntu 20.04.4 LTS |
 | 内核版本 | 5.4.0-109-generic |
 | containerd | 1.5.10-1 |
-| kubernetes
-- kubeadm
-- kube-apiserver
-- kube-controller-manager
-- kubectl
-- kubelet
-- kube-proxy
-- kube-scheduler
- | v1.23.2 |
+| kubernetes | v1.23.2 |
+| kubeadm | v1.23.2 |
+| kube-apiserver | v1.23.2 |
+| kube-controller-manager | v1.23.2 |
+| kube-scheduler | v1.23.2 |
+| kubectl | v1.23.2 |
+| kubelet | v1.23.2 |
+| kube-proxy |  |
 | etcd | v3.5.1 |
 | CNI 插件（calico） | v3.18 |
 
@@ -90,7 +89,7 @@ sudo ufw disable && sudo systemctl disable ufw
 swapoff -a
 sed -ri 's/.*swap.*/#&/' /etc/fstab
 ```
-> *** k8s集群安装为什么需要关闭 swap 分区？ swap 必须关，否则 kubelet 起不来,进而导致 k8s 集群起不来； 且考虑 kublet 会用 swap 做数据交换的话，对性能影响比较大
+> k8s集群安装为什么需要关闭 swap 分区？ swap 必须关，否则 kubelet 起不来,进而导致 k8s 集群起不来； 且考虑 kublet 会用 swap 做数据交换的话，对性能影响比较大
 
 
 - 同步时间与时区
@@ -253,6 +252,7 @@ systemctl status kubelet
 ```
 
 #### 2.初始化主节点
++ Master 节点执行
 ```shell
 # 导出默认初始化配置
 kubeadm config print init-defaults > kubeadm.yaml
@@ -317,6 +317,7 @@ sudo kubeadm init --config=kubeadm.yaml
 
 ```
 
++ Node 节点执行
 ```shell
 #初始化完成生成的命令：Node 节点执行，加入集群
 sudo kubeadm join 192.168.64.4:6443 --token abcdef.0123456789abcdef \
@@ -331,7 +332,7 @@ sudo chown $(id -u):$(id -g) $HOME/.kube/config
 ```
 
 #### 3.安装 CNI 网络插件（calico）
-> calico 插件官方地址：[https://projectcalico.docs.tigera.io/getting-started/kubernetes/quickstart](https://projectcalico.docs.tigera.io/getting-started/kubernetes/quickstart)
+> calico 插件官方地址: [https://projectcalico.docs.tigera.io/getting-started/kubernetes/quickstart](https://projectcalico.docs.tigera.io/getting-started/kubernetes/quickstart)
 
 ```shell
 # calico 官方下载 calico 插件部署清单
@@ -402,14 +403,14 @@ curl 172.16.166.132:80 -I     # 请求 Pod 应用内部端口（targetPort，容
 ```
 
 #### 5.Kubernetes 组件
-**控制平台组件**
+**控制平面组件**
 
 - kube-apiserver：多实例伸缩，高可用且可均衡流量？
 - etcd：高可用与备份策略？
 - kube-scheduler  调度策略：Pod 资源需求、硬件/软件/策略约束、亲和性和反亲和性规范、数据位置、工作负载间干扰和最后时限
 - kube-controller-manager
 
-**Node 组件（所有节点）**
+**数据平面组件（所有节点）**
 
 - kubelet
 - kubeproxy

@@ -1,5 +1,5 @@
 ---
-title: K8S-RBAC权限控制
+title: K8S-RBAC 权限控制
 categories:
   - CNCF
 tags:

@@ -1,5 +1,5 @@
 ---
-title: NetworkPolicy隔离策略
+title: NetworkPolicy 隔离策略
 abbrlink: 8aa0
 date: 2022-03-07 22:01:06
 categories:
