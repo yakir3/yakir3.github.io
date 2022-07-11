@@ -6,7 +6,7 @@
   <link href="https://359sun.top/atom.xml" rel="self"/>
   
   <link href="https://359sun.top/"/>
-  <updated>2022-06-28T14:10:06.418Z</updated>
+  <updated>2022-07-11T14:04:01.239Z</updated>
   <id>https://359sun.top/</id>
   
   <author>
@@ -17,11 +17,44 @@
   <generator uri="https://hexo.io/">Hexo</generator>
   
   <entry>
-    <title>可观测性组件-Prometheus 部署</title>
+    <title>可观测性-Fluentd 日志组件</title>
+    <link href="https://359sun.top/posts/41fe.html"/>
+    <id>https://359sun.top/posts/41fe.html</id>
+    <published>2022-07-11T13:56:17.000Z</published>
+    <updated>2022-07-11T14:04:01.239Z</updated>
+    
+    
+    <summary type="html">&lt;h3 id=&quot;一、组件说明&quot;&gt;&lt;a href=&quot;#一、组件说明&quot; class=&quot;headerlink&quot; title=&quot;一、组件说明&quot;&gt;&lt;/a&gt;一、组件说明&lt;/h3&gt;&lt;p&gt;&lt;strong&gt;Fluentd&lt;/strong&gt;&lt;br&gt;负责从 Kubernetes 搜集日志，每个 node 节点上面的 fluentd 监控并收集该节点上面的系统+容器日志，并将处理过后的日志信息发送给 Elasticsearch。&lt;/p&gt;
+&lt;img data-src=&quot;/posts/41fe/fluent1.png&quot; class&gt;
+&lt;blockquote&gt;
+&lt;p&gt;fluentd 数据流逻辑：source –&amp;gt; parser –&amp;gt; filter –&amp;gt; output&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;&lt;strong&gt;Elasticsearch&lt;/strong&gt;&lt;br&gt;搜索引擎，负责存储日志并提供查询接口。&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;Kibana&lt;/strong&gt;&lt;br&gt;提供了一个 Web GUI，用户可以浏览和搜索存储在 Elasticsearch 中的日志。 &lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;主要的日志收集方案：&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;在节点上运行一个 agent 来收集日志（daemonSet）&lt;/li&gt;
+&lt;li&gt;在 Pod 中包含一个 sidecar 容器来收集应用日志&lt;/li&gt;
+&lt;li&gt;直接在应用程序中将日志信息推送到采集后端（一般不采用该方式）&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/blockquote&gt;</summary>
+    
+    
+    
+    <category term="CNCF" scheme="https://359sun.top/categories/cncf/"/>
+    
+    
+    <category term="Observability" scheme="https://359sun.top/tags/observability/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>可观测性-监控组件 Prometheus</title>
     <link href="https://359sun.top/posts/6bfb.html"/>
     <id>https://359sun.top/posts/6bfb.html</id>
     <published>2022-06-28T14:02:38.000Z</published>
-    <updated>2022-06-28T14:10:06.418Z</updated>
+    <updated>2022-07-11T14:00:46.787Z</updated>
     
     
     <summary type="html">&lt;h4 id=&quot;一、组件说明&quot;&gt;&lt;a href=&quot;#一、组件说明&quot; class=&quot;headerlink&quot; title=&quot;一、组件说明&quot;&gt;&lt;/a&gt;一、组件说明&lt;/h4&gt;&lt;p&gt;&lt;strong&gt;Prometheus Server&lt;/strong&gt;&lt;/p&gt;

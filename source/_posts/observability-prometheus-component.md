@@ -1,5 +1,5 @@
 ---
-title: 可观测性组件-Prometheus 部署
+title: 可观测性-监控组件 Prometheus
 categories:
   - CNCF
 tags:
