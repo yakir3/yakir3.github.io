@@ -6,7 +6,7 @@
   <link href="https://359sun.top/atom.xml" rel="self"/>
   
   <link href="https://359sun.top/"/>
-  <updated>2022-09-30T13:51:02.097Z</updated>
+  <updated>2022-09-30T13:54:26.641Z</updated>
   <id>https://359sun.top/</id>
   
   <author>
@@ -17,20 +17,50 @@
   <generator uri="https://hexo.io/">Hexo</generator>
   
   <entry>
-    <title>kube-eventer</title>
+    <title>K8S - kube-eventer 事件中心组件</title>
     <link href="https://359sun.top/posts/2ead.html"/>
     <id>https://359sun.top/posts/2ead.html</id>
     <published>2022-09-30T13:42:20.000Z</published>
-    <updated>2022-09-30T13:51:02.097Z</updated>
+    <updated>2022-09-30T13:54:26.641Z</updated>
     
     
-      
-      
-        
-        
-    <summary type="html">&lt;link rel=&quot;stylesheet&quot; class=&quot;aplayer-secondary-style-marker&quot; href=&quot;/assets/css/APlayer.min.css&quot;&gt;&lt;script src=&quot;/assets/js/APlayer.min.js&quot;</summary>
-        
-      
+    <summary type="html">&lt;h3 id=&quot;一、背景&quot;&gt;&lt;a href=&quot;#一、背景&quot; class=&quot;headerlink&quot; title=&quot;一、背景&quot;&gt;&lt;/a&gt;一、背景&lt;/h3&gt;&lt;h4 id=&quot;概述&quot;&gt;&lt;a href=&quot;#概述&quot; class=&quot;headerlink&quot; title=&quot;概述&quot;&gt;&lt;/a&gt;概述&lt;/h4&gt;&lt;ul&gt;
+&lt;li&gt;&lt;p&gt;什么是事件：Kubernetes 的架构设计基于状态机，不同的状态之间进行转换则会生成相应的事件，正常的状态之间转换会生成 Normal 等级的事件，正常状态与异常状态之间的转换会生成Warning等级的事件。&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;kube-eventer 组件：阿里云开源组件，用于获取 K8S 集群中事件消息，并转存至自定义中间件或存储中。（K8S 集群默认只保存1小时内事件）&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;组件官方地址：&lt;a href=&quot;https://github.com/AliyunContainerService/kube-eventer&quot;&gt;https://github.com/AliyunContainerService/kube-eventer&lt;/a&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h4 id=&quot;部署前提与软件&quot;&gt;&lt;a href=&quot;#部署前提与软件&quot; class=&quot;headerlink&quot; title=&quot;部署前提与软件&quot;&gt;&lt;/a&gt;部署前提与软件&lt;/h4&gt;&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th&gt;名称&lt;/th&gt;
+&lt;th&gt;功能&lt;/th&gt;
+&lt;th&gt;备注&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;&lt;tr&gt;
+&lt;td&gt;K8S 集群&lt;/td&gt;
+&lt;td&gt;应用集群&lt;/td&gt;
+&lt;td&gt;使用 minikube 测试集群&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;kube-eventer&lt;/td&gt;
+&lt;td&gt;收集 K8S 集群事件&lt;/td&gt;
+&lt;td&gt;集群第三方组件&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;Kafka &amp;#x2F; Elasticsearch &amp;#x2F; influxDB&lt;/td&gt;
+&lt;td&gt;中间件：存储事件消息&lt;/td&gt;
+&lt;td&gt;存储组件（选型 Kafka）&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;kube-eventer-py&lt;/td&gt;
+&lt;td&gt;从队列获取事件消息发送至 telegram 告警群组&lt;/td&gt;
+&lt;td&gt;事件消费者&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;&lt;/table&gt;</summary>
     
     
     
