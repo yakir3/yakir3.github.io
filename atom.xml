@@ -6,7 +6,7 @@
   <link href="https://359sun.top/atom.xml" rel="self"/>
   
   <link href="https://359sun.top/"/>
-  <updated>2022-07-11T14:04:01.239Z</updated>
+  <updated>2022-09-30T13:51:02.097Z</updated>
   <id>https://359sun.top/</id>
   
   <author>
@@ -15,6 +15,31 @@
   </author>
   
   <generator uri="https://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>kube-eventer</title>
+    <link href="https://359sun.top/posts/2ead.html"/>
+    <id>https://359sun.top/posts/2ead.html</id>
+    <published>2022-09-30T13:42:20.000Z</published>
+    <updated>2022-09-30T13:51:02.097Z</updated>
+    
+    
+      
+      
+        
+        
+    <summary type="html">&lt;link rel=&quot;stylesheet&quot; class=&quot;aplayer-secondary-style-marker&quot; href=&quot;/assets/css/APlayer.min.css&quot;&gt;&lt;script src=&quot;/assets/js/APlayer.min.js&quot;</summary>
+        
+      
+    
+    
+    
+    <category term="CNCF" scheme="https://359sun.top/categories/cncf/"/>
+    
+    
+    <category term="K8S" scheme="https://359sun.top/tags/k8s/"/>
+    
+  </entry>
   
   <entry>
     <title>可观测性-Fluentd 日志组件</title>
