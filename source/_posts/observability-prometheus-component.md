@@ -44,7 +44,7 @@ Prometheus server 定期从配置好的 jobs 和 exporters 中拉取 metrics，�
 1. 安装 node-export 
 ```shell
 # 创建部署清单
-cat > node-exporter.yaml << EOF
+cat > node-exporter.yaml << "EOF"
 node-exporter.yaml
 apiVersion: apps/v1
 kind: DaemonSet
@@ -125,7 +125,7 @@ curl 192.168.49.2:9100/metrics
 2. Prometheus Server 部署
 ```shell
 # 创建 serviceaccount 与 rbac 授权
-cat > prometheus-rbac.yaml << EOF
+cat > prometheus-rbac.yaml << "EOF"
 apiVersion: v1
 kind: ServiceAccount
 metadata:
@@ -177,7 +177,7 @@ mkdir /data && chmod 777 /data
 
 
 # 创建 configMap，存放 Prometheus、AlertManager 配置信息
-cat > prometheus-cfg.yaml << "EOF"
+cat > prometheus-cfg.yaml << ""EOF""
 kind: ConfigMap
 apiVersion: v1
 metadata:
@@ -280,7 +280,7 @@ data:
         target_label: kubernetes_name
 EOF
 
-cat > alertmanager-cfg.yaml << "EOF"
+cat > alertmanager-cfg.yaml << ""EOF""
 apiVersion: v1
 kind: ConfigMap
 metadata:
@@ -336,7 +336,7 @@ kubectl apply -f prometheus-cfg.yaml
 
 
 # 部署 Prometheus Server 和 AlertManager 容器
-cat > prometheus-deployment.yaml << EOF
+cat > prometheus-deployment.yaml << "EOF"
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -421,7 +421,7 @@ kubectl apply -f prometheus-deployment.yaml
 
 
 # 部署 Service，暴露 Prometheus Server 对外接口
-cat > prometheus-svc.yaml << EOF
+cat > prometheus-svc.yaml << "EOF"
 apiVersion: v1
 kind: Service
 metadata:
@@ -492,7 +492,7 @@ kubectl logs --tail 10 -f prometheus-server-658b54bd7-9gvd9 -n monitor
 
 4. Grafana 部署
 ```shell
-cat > grafana.yaml << EOF
+cat > grafana.yaml << "EOF"
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -584,10 +584,12 @@ service/prometheus-operator   ClusterIP   None             <none>        8080/TC
 kubectl get --raw /apis/monitoring.coreos.com/v1
 ```
 
+> 官方源码地址已替换至: https://github.com/prometheus-operator/kube-prometheus, 部署方式参考新地址
+
 2. 部署 prometheus （server，CRD 资源）
 ```shell
 # 创建 prometheus-server 资源
-cat > prometheus.yaml << EOF
+cat > prometheus.yaml << "EOF"
 apiVersion: monitoring.coreos.com/v1
 kind: Prometheus
 metadata:
@@ -660,7 +662,7 @@ EOF
 
 
 # 创建模拟输出 metrics 程序
-cat > example.yaml << EOF
+cat > example.yaml << "EOF"
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -700,7 +702,7 @@ EOF
 3. 部署 ServiceMonitor （CRD 资源）
 ```shell
 # 创建 ServiceMonitor
-cat > service-monitor.yaml << EOF
+cat > service-monitor.yaml << "EOF"
 apiVersion: monitoring.coreos.com/v1
 kind: ServiceMonitor
 metadata:
@@ -801,7 +803,7 @@ rule_files:
 - 告警规则
 ```shell
 # Prometheus Rule
-cat > prometheus-rules.yaml << EOF
+cat > prometheus-rules.yaml << "EOF"
 apiVersion: monitoring.coreos.com/v1
 kind: PrometheusRule
 metadata:
