@@ -6,7 +6,7 @@
   <link href="https://359sun.top/atom.xml" rel="self"/>
   
   <link href="https://359sun.top/"/>
-  <updated>2022-09-30T13:54:26.641Z</updated>
+  <updated>2022-12-08T15:00:24.891Z</updated>
   <id>https://359sun.top/</id>
   
   <author>
@@ -15,6 +15,30 @@
   </author>
   
   <generator uri="https://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>Openssl 原理与操作</title>
+    <link href="https://359sun.top/posts/b8bc.html"/>
+    <id>https://359sun.top/posts/b8bc.html</id>
+    <published>2022-12-08T14:52:20.000Z</published>
+    <updated>2022-12-08T15:00:24.891Z</updated>
+    
+    
+    <summary type="html">&lt;h3 id=&quot;一、原理&quot;&gt;&lt;a href=&quot;#一、原理&quot; class=&quot;headerlink&quot; title=&quot;一、原理&quot;&gt;&lt;/a&gt;一、原理&lt;/h3&gt;&lt;blockquote&gt;
+&lt;p&gt;参考：&lt;br&gt;&lt;a href=&quot;https://www.ruanyifeng.com/blog/2011/08/what_is_a_digital_signature.html&quot;&gt;https://www.ruanyifeng.com/blog/2011/08/what_is_a_digital_signature.html&lt;/a&gt;&lt;br&gt;&lt;a href=&quot;https://www.ruanyifeng.com/blog/2014/09/illustration-ssl.html&quot;&gt;https://www.ruanyifeng.com/blog/2014/09/illustration-ssl.html&lt;/a&gt;&lt;br&gt;&lt;a href=&quot;https://www.nixops.me/articles/ssl-cetificate-create-and-signed.html&quot;&gt;https://www.nixops.me/articles/ssl-cetificate-create-and-signed.html&lt;/a&gt;&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;img data-src=&quot;/posts/b8bc/openssl-1.jpeg&quot; class&gt;
+
+&lt;h3 id=&quot;二、证书操作&quot;&gt;&lt;a href=&quot;#二、证书操作&quot; class=&quot;headerlink&quot; title=&quot;二、证书操作&quot;&gt;&lt;/a&gt;二、证书操作&lt;/h3&gt;&lt;h4 id=&quot;1、第三方签发-SSL-证书&quot;&gt;&lt;a href=&quot;#1、第三方签发-SSL-证书&quot; class=&quot;headerlink&quot; title=&quot;1、第三方签发 SSL 证书&quot;&gt;&lt;/a&gt;1、第三方签发 SSL 证书&lt;/h4&gt;&lt;figure class=&quot;highlight shell&quot;&gt;&lt;table&gt;&lt;tr&gt;&lt;td class=&quot;gutter&quot;&gt;&lt;pre&gt;&lt;span class=&quot;line&quot;&gt;1&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;2&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;3&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;4&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;5&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;6&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;7&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;8&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;9&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;10&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;11&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;12&lt;/span&gt;&lt;br&gt;&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;code&quot;&gt;&lt;pre&gt;&lt;span class=&quot;line&quot;&gt;&lt;span class=&quot;meta prompt_&quot;&gt;# &lt;/span&gt;&lt;span class=&quot;language-bash&quot;&gt;生成私钥，加密参数 -des3&lt;/span&gt;&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;openssl genrsa -out a.com.key 2048&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;&lt;span class=&quot;meta prompt_&quot;&gt;&lt;/span&gt;&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;&lt;span class=&quot;meta prompt_&quot;&gt;&lt;/span&gt;&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;&lt;span class=&quot;meta prompt_&quot;&gt;# &lt;/span&gt;&lt;span class=&quot;language-bash&quot;&gt;生成 csr 文件&lt;/span&gt;&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;openssl genrsa -out a.com.key 2048 openssl req -new -sha256 -key a.com.key -out a.com.csr&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;&lt;span class=&quot;meta prompt_&quot;&gt;# &lt;/span&gt;&lt;span class=&quot;language-bash&quot;&gt;查看 csr 信息&lt;/span&gt;&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;openssl req -noout -text -in a.com.csr&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;&lt;span class=&quot;meta prompt_&quot;&gt;&lt;/span&gt;&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;&lt;span class=&quot;meta prompt_&quot;&gt;&lt;/span&gt;&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;&lt;span class=&quot;meta prompt_&quot;&gt;# &lt;/span&gt;&lt;span class=&quot;language-bash&quot;&gt;提交 csr 文件到 CA 或第三方证书机构获取数字签名后的公钥 crt 文件&lt;/span&gt;&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;&lt;span class=&quot;meta prompt_&quot;&gt;# &lt;/span&gt;&lt;span class=&quot;language-bash&quot;&gt;部署 crt 与 key 文件至 web 服务器&lt;/span&gt;&lt;/span&gt;&lt;br&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/figure&gt;</summary>
+    
+    
+    
+    <category term="Linux" scheme="https://359sun.top/categories/linux/"/>
+    
+    
+    <category term="openssl" scheme="https://359sun.top/tags/openssl/"/>
+    
+  </entry>
   
   <entry>
     <title>K8S - kube-eventer 事件中心组件</title>
@@ -109,7 +133,7 @@
     <link href="https://359sun.top/posts/6bfb.html"/>
     <id>https://359sun.top/posts/6bfb.html</id>
     <published>2022-06-28T14:02:38.000Z</published>
-    <updated>2022-07-11T14:00:46.787Z</updated>
+    <updated>2022-11-03T14:39:15.562Z</updated>
     
     
     <summary type="html">&lt;h4 id=&quot;一、组件说明&quot;&gt;&lt;a href=&quot;#一、组件说明&quot; class=&quot;headerlink&quot; title=&quot;一、组件说明&quot;&gt;&lt;/a&gt;一、组件说明&lt;/h4&gt;&lt;p&gt;&lt;strong&gt;Prometheus Server&lt;/strong&gt;&lt;/p&gt;
