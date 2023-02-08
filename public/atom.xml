@@ -6,7 +6,7 @@
   <link href="https://359sun.top/atom.xml" rel="self"/>
   
   <link href="https://359sun.top/"/>
-  <updated>2022-12-08T15:00:24.891Z</updated>
+  <updated>2023-02-08T15:34:54.093Z</updated>
   <id>https://359sun.top/</id>
   
   <author>
@@ -15,6 +15,30 @@
   </author>
   
   <generator uri="https://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>K8S-网络</title>
+    <link href="https://359sun.top/posts/5d90.html"/>
+    <id>https://359sun.top/posts/5d90.html</id>
+    <published>2023-02-08T15:20:49.000Z</published>
+    <updated>2023-02-08T15:34:54.093Z</updated>
+    
+    
+    <summary type="html">&lt;h3 id=&quot;一、简介&quot;&gt;&lt;a href=&quot;#一、简介&quot; class=&quot;headerlink&quot; title=&quot;一、简介&quot;&gt;&lt;/a&gt;一、简介&lt;/h3&gt;&lt;h4 id=&quot;1）容器网络基本概念&quot;&gt;&lt;a href=&quot;#1）容器网络基本概念&quot; class=&quot;headerlink&quot; title=&quot;1）容器网络基本概念&quot;&gt;&lt;/a&gt;1）容器网络基本概念&lt;/h4&gt;&lt;ul&gt;
+&lt;li&gt;Linux Network Namespace&lt;ul&gt;
+&lt;li&gt;linux 网络设备：network interface device，loopback device，bridge device，veth device，tun&amp;#x2F;tap device，vxlan device，ip tunnel device 等等可完成网络数据包收发，提供额外修改数据包功能设备&lt;/li&gt;
+&lt;li&gt;linux 路由表（三层 ip 包路由寻址功能），arp 表（提供 ip 对应的 mac 信息），fdb（提供基于 mac 转发功能中 mac 地址对应的网络接口） 等&lt;/li&gt;
+&lt;li&gt;linux 协议栈：对网络协议包的封装与解析，如二层 ethernet 包，三层 ip icmp包，四层 tcp&amp;#x2F;udp 包等&lt;/li&gt;
+&lt;li&gt;linux iptable：基于内核模块 netfilter 完成对 linux 的 firewall 管理，例如控制 ingress 与 engress，nat 地址转换，端口映射等&lt;/li&gt;&lt;/ul&gt;&lt;/li&gt;&lt;/ul&gt;</summary>
+    
+    
+    
+    <category term="CNCF" scheme="https://359sun.top/categories/cncf/"/>
+    
+    
+    <category term="K8S" scheme="https://359sun.top/tags/k8s/"/>
+    
+  </entry>
   
   <entry>
     <title>Openssl 原理与操作</title>
@@ -502,7 +526,7 @@
     <link href="https://359sun.top/posts/fa45.html"/>
     <id>https://359sun.top/posts/fa45.html</id>
     <published>2022-03-01T15:55:02.000Z</published>
-    <updated>2022-06-28T14:11:23.029Z</updated>
+    <updated>2023-02-08T15:32:33.103Z</updated>
     
     
     <summary type="html">&lt;h3 id=&quot;一、RBAC简易概述&quot;&gt;&lt;a href=&quot;#一、RBAC简易概述&quot; class=&quot;headerlink&quot; title=&quot;一、RBAC简易概述&quot;&gt;&lt;/a&gt;一、RBAC简易概述&lt;/h3&gt;&lt;img data-src=&quot;/posts/fa45/gaisu.png&quot; class&gt;
