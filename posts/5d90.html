@@ -1,0 +1,1010 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 6.2.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+<link rel="stylesheet" href="https://fonts.loli.net/css?family=Noto Serif SC:300,300italic,400,400italic,700,700italic&display=swap&subset=latin,latin-ext">
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.css">
+  <link rel="stylesheet" href="/lib/pace/pace-theme-minimal.min.css">
+  <script src="/lib/pace/pace.min.js"></script>
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"359sun.top","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"left","always":true,"display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":true,"show_result":true,"style":"mac"},"back2top":{"enable":true,"sidebar":true,"scrollpercent":true},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":true,"mediumzoom":false,"lazyload":true,"pangu":false,"comments":{"style":"tabs","active":"gitalk","storage":true,"lazyload":false,"nav":{"gitalk":{"order":-2}},"activeClass":"gitalk"},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+  <meta name="description" content="一、简介1）容器网络基本概念 Linux Network Namespace linux 网络设备：network interface device，loopback device，bridge device，veth device，tun&#x2F;tap device，vxlan device，ip tunnel device 等等可完成网络数据包收发，提供额外修改数据包功能设备 linux">
+<meta property="og:type" content="article">
+<meta property="og:title" content="K8S-网络">
+<meta property="og:url" content="https://359sun.top/posts/5d90.html">
+<meta property="og:site_name" content="Yakir Blog">
+<meta property="og:description" content="一、简介1）容器网络基本概念 Linux Network Namespace linux 网络设备：network interface device，loopback device，bridge device，veth device，tun&#x2F;tap device，vxlan device，ip tunnel device 等等可完成网络数据包收发，提供额外修改数据包功能设备 linux">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://359sun.top/posts/5d90/k8s-nw1.png">
+<meta property="og:image" content="https://359sun.top/posts/5d90/k8s-nw2.png">
+<meta property="og:image" content="https://359sun.top/posts/5d90/k8s-nw3.png">
+<meta property="og:image" content="https://359sun.top/posts/5d90/k8s-nw4.png">
+<meta property="og:image" content="https://359sun.top/posts/5d90/k8s-nw5.png">
+<meta property="og:image" content="https://359sun.top/posts/5d90/k8s-nw6.png">
+<meta property="og:image" content="https://359sun.top/posts/5d90/k8s-nw7.png">
+<meta property="og:image" content="https://359sun.top/posts/5d90/k8s-nw8.png">
+<meta property="article:published_time" content="2023-02-08T15:20:49.000Z">
+<meta property="article:modified_time" content="2023-02-08T15:34:54.093Z">
+<meta property="article:author" content="Yakir">
+<meta property="article:tag" content="K8S">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://359sun.top/posts/5d90/k8s-nw1.png">
+
+<link rel="canonical" href="https://359sun.top/posts/5d90.html">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>K8S-网络 | Yakir Blog</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+<link rel="alternate" href="/atom.xml" title="Yakir Blog" type="application/atom+xml">
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">Yakir Blog</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+        <li class="menu-item menu-item-musiclist">
+
+    <a href="/musiclist/" rel="section"><i class="fa fa-music fa-fw"></i>歌单</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="reading-progress-bar"></div>
+
+  <a href="https://github.com/yakir3" class="github-corner" title="Follow me on GitHub" aria-label="Follow me on GitHub" rel="noopener" target="_blank"><svg width="80" height="80" viewBox="0 0 250 250" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path></svg></a>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://359sun.top/posts/5d90.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.jpg">
+      <meta itemprop="name" content="Yakir">
+      <meta itemprop="description" content="Yakir Blog">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Yakir Blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          K8S-网络
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+              
+
+              <time title="创建时间：2023-02-08 23:20:49 / 修改时间：23:34:54" itemprop="dateCreated datePublished" datetime="2023-02-08T23:20:49+08:00">2023-02-08</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/cncf/" itemprop="url" rel="index"><span itemprop="name">CNCF</span></a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span><br>
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+                <span class="post-meta-item-text">本文字数：</span>
+              <span>21k</span>
+            </span>
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+                <span class="post-meta-item-text">阅读时长 &asymp;</span>
+              <span>19 分钟</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h3 id="一、简介"><a href="#一、简介" class="headerlink" title="一、简介"></a>一、简介</h3><h4 id="1）容器网络基本概念"><a href="#1）容器网络基本概念" class="headerlink" title="1）容器网络基本概念"></a>1）容器网络基本概念</h4><ul>
+<li>Linux Network Namespace<ul>
+<li>linux 网络设备：network interface device，loopback device，bridge device，veth device，tun&#x2F;tap device，vxlan device，ip tunnel device 等等可完成网络数据包收发，提供额外修改数据包功能设备</li>
+<li>linux 路由表（三层 ip 包路由寻址功能），arp 表（提供 ip 对应的 mac 信息），fdb（提供基于 mac 转发功能中 mac 地址对应的网络接口） 等</li>
+<li>linux 协议栈：对网络协议包的封装与解析，如二层 ethernet 包，三层 ip icmp包，四层 tcp&#x2F;udp 包等</li>
+<li>linux iptable：基于内核模块 netfilter 完成对 linux 的 firewall 管理，例如控制 ingress 与 engress，nat 地址转换，端口映射等<span id="more"></span></li>
+</ul>
+</li>
+</ul>
+<img data-src="/posts/5d90/k8s-nw1.png" class>
+<blockquote>
+<p>linux 不仅仅只有 network namespace 用来进行网络隔离，还有 pid namespace 用来隔离进程，user namespace 用来隔离用户，mount namespace 用来隔离挂载点，ipc namespace 用来隔离信号量和共享内存等，uts namespace 用来隔离主机名和域名。<br>配合 cgroup 控制组，限制 cpu，memory，io 等资源。构成容器的底层实现</p>
+</blockquote>
+<ul>
+<li>Linux Bridge Device</li>
+</ul>
+<p>linux 网桥设备，可以附加 attach 多个 linux 从设备。类似于一个内部虚拟二层交换机，可以进行二层数据包广播。但是注意的是linux bridge设备可以有自己的ip地址。也就是说，多个linux网络设备attach到一个bridge上，那么这些网络设备的ip地址将会失效(只有二层功能)，当一个设备收到数据包的时候，bridge会把数据包转发到其它所有attach到bridge上的从设备，从而实现广播的效果。</p>
+<img data-src="/posts/5d90/k8s-nw2.png" class>
+
+<ul>
+<li>Linux Veth Device</li>
+</ul>
+<p>总是成对出现，一对 peer 两个端点，数据包从一个 peer 流入并流出到另一个 peer。veth pair 可以跨 network namespace。</p>
+<img data-src="/posts/5d90/k8s-nw3.png" class>
+
+<h4 id="2）k8s-集群容器网络通讯方式"><a href="#2）k8s-集群容器网络通讯方式" class="headerlink" title="2）k8s 集群容器网络通讯方式"></a>2）k8s 集群容器网络通讯方式</h4><ul>
+<li>网络负载方式</li>
+</ul>
+<p>kube-proxy 组件启动参数控制（–proxy-module&#x3D;ipvs）<br>iptables：默认<br>ipvs：v1.11 版本及之后</p>
+<ul>
+<li>网络通讯方式</li>
+</ul>
+<p>underlay：flannel host-gw，calico bgp 等（需开启 ip_forword 内核参数）<br>overlay：flannel vxlan，calico ipip，flannel udp（一般不使用） 等</p>
+<h4 id="3）测试环境主机信息"><a href="#3）测试环境主机信息" class="headerlink" title="3）测试环境主机信息"></a>3）测试环境主机信息</h4><table>
+<thead>
+<tr>
+<th>宿主机 IP</th>
+<th>角色</th>
+<th>容器 CIDR</th>
+<th>CNI 网卡地址</th>
+<th>Flannel.1 vtep 设备</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>192.168.205.4</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>192.168.205.3</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>192.168.205.5</td>
+<td>master</td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>node1</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>node2</td>
+<td>10.42.0.0&#x2F;24</td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>10.42.1.0&#x2F;24</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>10.42.2.0&#x2F;24</td>
+<td>10.42.0.1</td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>10.42.1.1</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>10.42.2.1</td>
+<td>10.42.0.0</td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>10.42.1.0</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>10.42.2.0</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+</tbody></table>
+<h3 id="二、宿主机内网络"><a href="#二、宿主机内网络" class="headerlink" title="二、宿主机内网络"></a>二、宿主机内网络</h3><h4 id="1）docker-容器的四种网络类型"><a href="#1）docker-容器的四种网络类型" class="headerlink" title="1）docker 容器的四种网络类型"></a>1）docker 容器的四种网络类型</h4><ul>
+<li>bridge 模式（默认）：–net&#x3D;bridge</li>
+</ul>
+<p>宿主机创建 docker0 网卡，使用独立 IP 段，为每个容器分配改网段 IP，容器之间通过该网桥进行通信（类似二层交换机）</p>
+<blockquote>
+<img data-src="/posts/5d90/k8s-nw4.png" class>
+<p>自定义 bridge 网络：宿主机范围创建独立的 network namespace </p>
+<img data-src="/posts/5d90/k8s-nw5.png" class>
+</blockquote>
+<ul>
+<li>host 模式：–net&#x3D;host</li>
+</ul>
+<p>共享宿主机网络，容器暴露端口时占用宿主机端口。网络模式简单，性能较好，一般用于单容器服务。</p>
+<img data-src="/posts/5d90/k8s-nw6.png" class>
+
+<ul>
+<li>contaniner 模式：–net&#x3D;container:name or id</li>
+</ul>
+<p>指定新创建的容器共享已存在的容器 Network namespace（k8s 中 pod 即为多个容器共享 network namespace）。除了网络，文件系统 进程等都为隔离，容器间进程可以通过 lo 网卡通信</p>
+<img data-src="/posts/5d90/k8s-nw7.png" class>
+
+<ul>
+<li>none 模式：容器有独立的 Network namespace ，但没有任何网络配置，可自定义进行网络配置。一般用于 CPU 密集型任务，计算完成保留磁盘无需对外网络</li>
+</ul>
+<h4 id="2）docker-宿主环境中容器网络"><a href="#2）docker-宿主环境中容器网络" class="headerlink" title="2）docker 宿主环境中容器网络"></a>2）docker 宿主环境中容器网络</h4><ul>
+<li>每一个container都有一个network namespace，然后拥有container自己的网络设备，路由表，arp表，协议栈，iptable等，各个container的network namespace相互隔离。</li>
+<li>在宿主的default netwok nemespace中会有一个linux bridge设备，一般名称为docker0。</li>
+<li>每一个container对应一个veth pair设备，这个设备的一端在container的network namespace里，另一端attach到宿主networkwork namespace的docker0 linux bridge上。</li>
+<li>这样在宿主环境里，就好像有一个二层交换机(docker0 bridge)，把宿主内的所有container连接起来。所以，在宿主内的container都是可以直接相互访问的，而且是直连的方式</li>
+</ul>
+<img data-src="/posts/5d90/k8s-nw8.png" class>
+
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta prompt_">#</span><span class="language-bash"><span class="comment"># 相关命令</span></span></span><br><span class="line"><span class="meta prompt_">#</span><span class="language-bash">查看 bridge 网桥信息</span></span><br><span class="line"><span class="meta prompt_">#</span><span class="language-bash">k8s pod 伴生 infrastructure 容器，与基础容器共用 network namespace 与 veth pair</span></span><br><span class="line">brctl show</span><br><span class="line"><span class="meta prompt_"></span></span><br><span class="line"><span class="meta prompt_">#</span><span class="language-bash">查看 veth pair 设备信息</span></span><br><span class="line">ip addr</span><br><span class="line">ip -d link show</span><br><span class="line"><span class="meta prompt_"></span></span><br><span class="line"><span class="meta prompt_">#</span><span class="language-bash">查看路由表</span></span><br><span class="line">route -n</span><br><span class="line"><span class="meta prompt_"></span></span><br><span class="line"><span class="meta prompt_">#</span><span class="language-bash">查看 docker 容器信息</span></span><br><span class="line">docker ps/inspect/container</span><br></pre></td></tr></table></figure>
+
+<h3 id="三、Service：cluster-ip-实现原理"><a href="#三、Service：cluster-ip-实现原理" class="headerlink" title="三、Service：cluster ip 实现原理"></a>三、Service：cluster ip 实现原理</h3><h4 id="1）cluster-ip-如何访问"><a href="#1）cluster-ip-如何访问" class="headerlink" title="1）cluster ip 如何访问"></a>1）cluster ip 如何访问</h4><p>k8s 集群中服务需要相互访问，一般为之创建相应的 service，集群内部访问时一般使用 cluster ip。一个 cluster ip 后面会关联多个 endpoints（实际的 pod 地址）。对于 cluster ip 的访问，也就是实现了对 cluster ip 关联的多个 endpoints 负载均衡访问（负载方式为 iptables 或 ipvs）</p>
+<h4 id="2）iptables-方式"><a href="#2）iptables-方式" class="headerlink" title="2）iptables 方式"></a>2）iptables 方式</h4><ul>
+<li><p>查看 service 信息：cluster ip 以及关联的 endpoints ip</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta prompt_"># </span><span class="language-bash">kubectl describe service nginx-test</span></span><br><span class="line">Name:              nginx-test</span><br><span class="line">Namespace:         default</span><br><span class="line">Labels:            app=nginx-test</span><br><span class="line">Annotations:       &lt;none&gt;</span><br><span class="line">Selector:          app=nginx-test</span><br><span class="line">Type:              ClusterIP</span><br><span class="line">IP Family Policy:  SingleStack</span><br><span class="line">IP Families:       IPv4</span><br><span class="line">IP:                10.43.6.58</span><br><span class="line">IPs:               10.43.6.58</span><br><span class="line">Port:              80-80  80/TCP</span><br><span class="line">TargetPort:        80/TCP</span><br><span class="line">Endpoints:         10.42.1.6:80,10.42.2.6:80</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>查看宿主机 iptables </p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta prompt_"># </span><span class="language-bash">iptables -nvL -t nat |<span class="built_in">head</span></span></span><br><span class="line">Chain PREROUTING (policy ACCEPT 0 packets, 0 bytes)</span><br><span class="line">pkts bytes target     prot opt in     out     source               destination</span><br><span class="line">298 19090 KUBE-SERVICES  all  --  *      *       0.0.0.0/0            0.0.0.0/0            /* kubernetes service portals */</span><br><span class="line">202 12456 CNI-HOSTPORT-DNAT  all  --  *      *       0.0.0.0/0            0.0.0.0/0            ADDRTYPE match dst-type LOCAL</span><br></pre></td></tr></table></figure>
+<p>对于 PREROUTING chain 中，所有的流量都走到了 KUBE-SERVICES 这个 target 中。请注意 PREROUTING chain 是流量到达之后的第一个入口。如果在 pod 里运行命令 curl <a href="http://10.43.6.58，根据容器内部路由表，数据包应该是这样的流动：">http://10.43.6.58，根据容器内部路由表，数据包应该是这样的流动：</a></p>
+<ul>
+<li>在pod中，根据路由表发现cluster ip(<strong>10.43.6.58</strong>)走默认路由，选择了默认网关。</li>
+<li>在pod中，默认网关的ip地址就是宿主netwok namespace的 <strong>docker0 或 cni0</strong> 的ip地址，并且默认网关为直连路由。</li>
+<li>在pod中，根据路由表，使用eth0 device发送数据，eth0本质是veth pair在pod network namespace的一端，另一端attach在宿主netwok namespace的 <strong>docker0 或 cni0</strong> bridge上。</li>
+<li>veth pair，数据从pod network namespace的一端发出，进入到了attached到<strong>docker0 或 cni0</strong> bridge上的另一端。</li>
+<li><strong>docker0 或 cni0</strong> bridge收到数据之后，自然就来到了host network namesapce 的 PREROUTING chain</li>
+</ul>
+</li>
+<li><p>查看 KUBE-SERVICES target</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta prompt_"># </span><span class="language-bash">iptables -nvL -t nat | grep 10.43.6.58</span></span><br><span class="line">0     0 KUBE-SVC-7CWUT4JBGBRVUN2L  tcp  --  *      *       0.0.0.0/0            10.43.6.58           /* default/nginx-test:80-80 cluster IP */ tcp dpt:80</span><br><span class="line"><span class="meta prompt_"></span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">iptables -nvL -t nat | grep KUBE-SVC-7CWUT4JBGBRVUN2L -A 5</span></span><br><span class="line">Chain KUBE-SVC-7CWUT4JBGBRVUN2L (1 references)</span><br><span class="line">pkts bytes target     prot opt in     out     source               destination</span><br><span class="line">0     0 KUBE-SEP-U2YYZT2C3O6VM4EV  all  --  *      *       0.0.0.0/0            0.0.0.0/0            /* default/nginx-test:80-80 -&gt; 10.42.1.6:80 */ statistic mode random probability 0.50000000000</span><br><span class="line">0     0 KUBE-SEP-GWUIQWA2TNZI4ESX  all  --  *      *       0.0.0.0/0            0.0.0.0/0            /* default/nginx-test:80-80 -&gt; 10.42.2.6:80 */</span><br></pre></td></tr></table></figure>
+<p>在 KUBE-SERVICES target中我们可以看到目标地址为cluster ip 10.43.6.58 的匹配target 为 KUBE-SVC-7CWUT4JBGBRVUN2L。<br><strong>KUBE-SVC-7CWUT4JBGBRVUN2L 链信息：</strong></p>
+<ul>
+<li>存在两个target （对应两个 Pod ）KUBE-SEP-U2YYZT2C3O6VM4EV 和 KUBE-SEP-GWUIQWA2TNZI4ESX </li>
+<li>在 KUBE-SEP-U2YYZT2C3O6VM4EV 中有statistic mode random probability 0.5。0.5 利用了iptable内核随机模块，随机比率为0.5，也就是50%</li>
+<li>由于一半随机比率进入 KUBE-SEP-U2YYZT2C3O6VM4EV target， 因此另一个 target 的随机比率也为50%，实现负载均衡</li>
+</ul>
+</li>
+<li><p>查看 KUBE-SEP-U2YYZT2C3O6VM4EV 和 KUBE-SEP-GWUIQWA2TNZI4ESX </p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta prompt_"># </span><span class="language-bash">iptables -nvL -t nat | grep KUBE-SEP-U2YYZT2C3O6VM4EV -A 3</span></span><br><span class="line">Chain KUBE-SEP-U2YYZT2C3O6VM4EV (1 references)</span><br><span class="line">pkts bytes target     prot opt in     out     source               destination</span><br><span class="line">0     0 KUBE-MARK-MASQ  all  --  *      *       10.42.1.6            0.0.0.0/0            /* default/nginx-test:80-80 */</span><br><span class="line">0     0 DNAT       tcp  --  *      *       0.0.0.0/0            0.0.0.0/0            /* default/nginx-test:80-80 */ tcp to:10.42.1.6:80</span><br><span class="line"><span class="meta prompt_"></span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">iptables -nvL -t nat | grep KUBE-SEP-GWUIQWA2TNZI4ESX -A 3</span></span><br><span class="line">Chain KUBE-SEP-GWUIQWA2TNZI4ESX (1 references)</span><br><span class="line">pkts bytes target     prot opt in     out     source               destination</span><br><span class="line">0     0 KUBE-MARK-MASQ  all  --  *      *       10.42.2.6            0.0.0.0/0            /* default/nginx-test:80-80 */</span><br><span class="line">0     0 DNAT       tcp  --  *      *       0.0.0.0/0            0.0.0.0/0            /* default/nginx-test:80-80 */ tcp to:10.42.2.6:80</span><br></pre></td></tr></table></figure>
+<p>在这2个target中我们可以看到：</p>
+<ul>
+<li>分别做了MASQ操作，这个应该是出站engress流量(限定了source ip)，不是我们的入站ingress流量。</li>
+<li>做了DNAT操作，把原来的cluster ip给DANT转换成了pod的ip 10.42.1.6和10.42.2.6。把原来的port转换成了80 port</li>
+<li>经过这个一系列iptable的target我们的原始请求10.42.1.6:80就变成了10.42.1.6:80或者10.42.2.6:80，而且两者转变的机率各是50%。</li>
+<li>根据iptable，经过PREROUTING chain发现DNAT之后的10.42.1.6或者10.42.2.6不是本地的ip(这两个ip是pod的ip，当然不会在host network namespace里)。所以就走到了Forwarding chain中，根据host network namespace的路由表来决定下一跳地址</li>
+</ul>
+</li>
+</ul>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta prompt_"># </span><span class="language-bash">查看路由表信息</span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">ip route</span></span><br><span class="line">default via 192.168.205.1 dev enp0s1 proto dhcp src 192.168.205.4 metric 100</span><br><span class="line">10.42.0.0/24 dev cni0 proto kernel scope link src 10.42.0.1</span><br><span class="line">10.42.1.0/24 via 10.42.1.0 dev flannel.1 onlink</span><br><span class="line">10.42.2.0/24 via 10.42.2.0 dev flannel.1 onlink</span><br><span class="line">192.168.205.0/24 dev enp0s1 proto kernel scope link src 192.168.205.4 metric 100</span><br><span class="line">192.168.205.1 dev enp0s1 proto dhcp scope link src 192.168.205.4 metric 100</span><br><span class="line"><span class="meta prompt_"></span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">根据路由表规则10.42.1.6和10.42.2.6走 flannel.1 vtep 设备跨主机通信 node 节点上的 pod</span></span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>clusterip 类型 service 总结<ul>
+<li>流量从pod network namespace中走到host netwok namespace的docker0中。</li>
+<li>在host netwok namespace的<strong>PREROUTING chain</strong>中会经过一系列target。</li>
+<li>在这些target里根据iptable内核随机模块来实现匹配endpoint target，随机比率为均匀分配，实现均匀的负载均衡。内核实现负载均衡，无法自定义负载均衡算法。</li>
+<li>在endpoint target里实现了DNAT，也就是将目标地址cluster ip转化为实际的pod的ip。</li>
+<li>cluster ip是虚拟ip，不会和任何device绑定。</li>
+<li>需要host开启路由转发功能(net.ipv4.ip_forward &#x3D; 1)。</li>
+<li>数据包在host netwok namespace中经过转换以及DNAT之后，由host network namespace的路由表来决定下一跳地址</li>
+</ul>
+</li>
+</ul>
+<h4 id="3）ipvs-方式"><a href="#3）ipvs-方式" class="headerlink" title="3）ipvs 方式"></a>3）ipvs 方式</h4><ul>
+<li><a target="_blank" rel="noopener" href="https://mp.weixin.qq.com/s?__biz=MzI0MDE3MjAzMg==&mid=2648393263&idx=1&sn=d6f27c502a007aa8be7e75b17afac42f&chksm=f1310b40c64682563cfbfd0688deb0fc9569eca3b13dc721bfe0ad7992183cabfba354e02050&scene=178&cur_album_id=2123526506718003213#rd">https://mp.weixin.qq.com/s?__biz&#x3D;MzI0MDE3MjAzMg&#x3D;&#x3D;&amp;mid&#x3D;2648393263&amp;idx&#x3D;1&amp;sn&#x3D;d6f27c502a007aa8be7e75b17afac42f&amp;chksm&#x3D;f1310b40c64682563cfbfd0688deb0fc9569eca3b13dc721bfe0ad7992183cabfba354e02050&amp;scene&#x3D;178&amp;cur_album_id&#x3D;2123526506718003213#rd</a></li>
+<li><a target="_blank" rel="noopener" href="https://icloudnative.io/posts/ipvs-how-kubernetes-services-direct-traffic-to-pods/">https://icloudnative.io/posts/ipvs-how-kubernetes-services-direct-traffic-to-pods/</a></li>
+</ul>
+<h3 id="四、Service：nodeport-实现原理"><a href="#四、Service：nodeport-实现原理" class="headerlink" title="四、Service：nodeport 实现原理"></a>四、Service：nodeport 实现原理</h3><h4 id="1）nodeport-ip-如何访问"><a href="#1）nodeport-ip-如何访问" class="headerlink" title="1）nodeport ip 如何访问"></a>1）nodeport ip 如何访问</h4><p>通过访问宿主机端口 –&gt; cluster ip 路径（端口范围：30000-32767）</p>
+<h4 id="2）iptables-方式-1"><a href="#2）iptables-方式-1" class="headerlink" title="2）iptables 方式"></a>2）iptables 方式</h4><ul>
+<li><p>查看 service 信息</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta prompt_"># </span><span class="language-bash">kubectl describe service nginx-test</span></span><br><span class="line">Name:                     nginx-test</span><br><span class="line">Namespace:                default</span><br><span class="line">Labels:                   app=nginx-test</span><br><span class="line">Annotations:              &lt;none&gt;</span><br><span class="line">Selector:                 app=nginx-test</span><br><span class="line">Type:                     NodePort</span><br><span class="line">IP Family Policy:         SingleStack</span><br><span class="line">IP Families:              IPv4</span><br><span class="line">IP:                       10.43.6.58</span><br><span class="line">IPs:                      10.43.6.58</span><br><span class="line">Port:                     80-80  80/TCP</span><br><span class="line">TargetPort:               80/TCP</span><br><span class="line">NodePort:                 80-80  32506/TCP</span><br><span class="line">Endpoints:                10.42.1.6:80,10.42.2.6:80</span><br><span class="line">Session Affinity:         None</span><br><span class="line">External Traffic Policy:  Cluster</span><br><span class="line">Events:                   &lt;none&gt;</span><br></pre></td></tr></table></figure>
+<p>对node port类型的service来说，访问host的port就访问到了这个服务。所以从host网络角度来看，当host收到数据包的时候应该是进入host network namespace的PREROUTING chain中，查看host network namespace的PREROUTING chain。</p>
+</li>
+<li><p>查看宿主机 iptables</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta prompt_"># </span><span class="language-bash">iptables -nvL -t nat |<span class="built_in">head</span></span></span><br><span class="line">Chain PREROUTING (policy ACCEPT 0 packets, 0 bytes)</span><br><span class="line">pkts bytes target     prot opt in     out     source               destination</span><br><span class="line">323 20898 KUBE-SERVICES  all  --  *      *       0.0.0.0/0            0.0.0.0/0            /* kubernetes service portals */</span><br></pre></td></tr></table></figure>
+<p>根据规则，对于PREROUTING chain中，所有的流量都走到了KUBE-SERVICES这个target中。</p>
+</li>
+<li><p>查看 KUBE-SERVICES target</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta prompt_"># </span><span class="language-bash">iptables -nvL -t nat |grep KUBE-SERVICES -A 10</span></span><br><span class="line">Chain KUBE-SERVICES (2 references)</span><br><span class="line">pkts bytes target     prot opt in     out     source               destination</span><br><span class="line">0     0 KUBE-SVC-7CWUT4JBGBRVUN2L  tcp  --  *      *       0.0.0.0/0            10.43.6.58           /* default/nginx-test:80-80 cluster IP */ tcp dpt:80</span><br></pre></td></tr></table></figure>
+<p>在KUBE-SERVICES target中当访问 nginx-test-service 在host上的 32506 时候，根据规则匹配到了 KUBE-NODEPORTS 这个target。</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta prompt_"># </span><span class="language-bash">iptables -nvL -t nat |grep KUBE-NODEPORTS -A 3</span></span><br><span class="line">Chain KUBE-NODEPORTS (1 references)</span><br><span class="line">pkts bytes target     prot opt in     out     source               destination</span><br><span class="line">2   124 KUBE-EXT-7CWUT4JBGBRVUN2L  tcp  --  *      *       0.0.0.0/0            0.0.0.0/0            /* default/nginx-test:80-80 */ tcp dpt:32506</span><br></pre></td></tr></table></figure>
+<p>在KUBE-NODEPORTS target中可以看到当访问 32506 端口时到 KUBE-EXT-7CWUT4JBGBRVUN2L 这个 target </p>
+</li>
+<li><p>查看 KUBE-EXT-7CWUT4JBGBRVUN2L  target</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta prompt_"># </span><span class="language-bash">iptables -nvL -t nat |grep KUBE-EXT-7CWUT4JBGBRVUN2L -A 5</span></span><br><span class="line">Chain KUBE-EXT-7CWUT4JBGBRVUN2L (1 references)</span><br><span class="line"> pkts bytes target     prot opt in     out     source               destination</span><br><span class="line">    2   124 KUBE-MARK-MASQ  all  --  *      *       0.0.0.0/0            0.0.0.0/0            /* masquerade traffic for default/nginx-test:80-80 external destinations */</span><br><span class="line">    2   124 KUBE-SVC-7CWUT4JBGBRVUN2L  all  --  *      *       0.0.0.0/0            0.0.0.0/0</span><br><span class="line"><span class="meta prompt_"></span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">iptables -nvL -t nat |grep KUBE-MARK-MASQ -A 3</span></span><br><span class="line">Chain KUBE-MARK-MASQ (20 references)</span><br><span class="line"> pkts bytes target     prot opt in     out     source               destination</span><br><span class="line">    2   124 MARK       all  --  *      *       0.0.0.0/0            0.0.0.0/0            MARK or 0x4000</span><br><span class="line"><span class="meta prompt_"></span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">iptables -nvL -t nat |grep KUBE-SVC-7CWUT4JBGBRVUN2L -A 5</span></span><br><span class="line">Chain KUBE-SVC-7CWUT4JBGBRVUN2L (2 references)</span><br><span class="line"> pkts bytes target     prot opt in     out     source               destination</span><br><span class="line">    0     0 KUBE-MARK-MASQ  tcp  --  *      *      !10.42.0.0/16         10.43.6.58           /* default/nginx-test:80-80 cluster IP */ tcp dpt:80</span><br><span class="line">    1    64 KUBE-SEP-U2YYZT2C3O6VM4EV  all  --  *      *       0.0.0.0/0            0.0.0.0/0            /* default/nginx-test:80-80 -&gt; 10.42.1.6:80 */ statistic mode random probability 0.50000000000</span><br><span class="line">    1    60 KUBE-SEP-GWUIQWA2TNZI4ESX  all  --  *      *       0.0.0.0/0            0.0.0.0/0            /* default/nginx-test:80-80 -&gt; 10.42.2.6:80 */</span><br></pre></td></tr></table></figure>
+<p>在 KUBE-EXT-7CWUT4JBGBRVUN2L 中可以看到两个 target</p>
+<ul>
+<li>KUBE-MARK-MASQ 打标记，无 nat target</li>
+<li>KUBE-SVC-7CWUT4JBGBRVUN2L target 进入 cluster ip 规则，重复第三部分规则，最终流量进入 Pod</li>
+</ul>
+</li>
+<li><p>nodeport 类型 service 总结：</p>
+<ul>
+<li>在host netwok namespace的PREROUTING chain中会匹配KUBE-SERVICES target。</li>
+<li>在KUBE-SERVICES target会匹配KUBE-NODEPORTS target</li>
+<li>在KUBE-NODEPORTS target会根据prot来匹配KUBE-SVC-XXX target</li>
+<li>KUBE-SVC-XXX target就和第三部分中的cluster-ip类型service一样，最终流量进入到 Pod 中</li>
+</ul>
+</li>
+</ul>
+<h4 id="3）ipvs-方式-1"><a href="#3）ipvs-方式-1" class="headerlink" title="3）ipvs 方式"></a>3）ipvs 方式</h4><ul>
+<li><a target="_blank" rel="noopener" href="https://mp.weixin.qq.com/s?__biz=MzI0MDE3MjAzMg==&mid=2648393266&idx=1&sn=34d2a21b06d6e9ef4f4f7415f2cad567&chksm=f1310b5dc646824b45cbfc8cf25b0f2449f7223006b684da06ba58d95a2be7a3f0ad7aa6c4b9&scene=178&cur_album_id=2123526506718003213#rd">https://mp.weixin.qq.com/s?__biz&#x3D;MzI0MDE3MjAzMg&#x3D;&#x3D;&amp;mid&#x3D;2648393266&amp;idx&#x3D;1&amp;sn&#x3D;34d2a21b06d6e9ef4f4f7415f2cad567&amp;chksm&#x3D;f1310b5dc646824b45cbfc8cf25b0f2449f7223006b684da06ba58d95a2be7a3f0ad7aa6c4b9&amp;scene&#x3D;178&amp;cur_album_id&#x3D;2123526506718003213#rd</a></li>
+<li><a target="_blank" rel="noopener" href="https://icloudnative.io/posts/ipvs-how-kubernetes-services-direct-traffic-to-pods/">https://icloudnative.io/posts/ipvs-how-kubernetes-services-direct-traffic-to-pods/</a></li>
+</ul>
+<h3 id="五、Service：ipvs-与-iptables-对比"><a href="#五、Service：ipvs-与-iptables-对比" class="headerlink" title="五、Service：ipvs 与 iptables 对比"></a>五、Service：ipvs 与 iptables 对比</h3><blockquote>
+<p>基于 ipvs 的 k8s 网络负载要求：</p>
+<ul>
+<li>linux 内核高于2.4.x</li>
+<li>在 kube-proxy 网络组件中启动参数加入–proxy-mode&#x3D;ipvs</li>
+<li>安装 ipvsadm 工具（可选），用于操作管理 ipvs 规则</li>
+</ul>
+</blockquote>
+<ul>
+<li><p>两者都是采用linux内核模块完成负载均衡和endpoint的映射，所有操作都在内核空间完成，没有在应用程序的用户空间。</p>
+</li>
+<li><p>iptable方式依赖于linux netfilter&#x2F;iptable内核模块。</p>
+</li>
+<li><p>ipvs方式依赖linux netfilter&#x2F;iptable模块，ipset模块，ipvs模块。</p>
+</li>
+<li><p>iptable方式中，host宿主中ipatble的entry数目会随着service和对应endpoints的数目增多而增多。举个例子，比如有10个cluster ip类型的service，每个service有6个endpoints。那么在KUBE-SERVICES target中至少有10个entries(KUBE-SVC-XXX)与10个service对应，每个KUBE-SVC-XXX target中会有6个KUBE-SEP-XXX与6个endpoints来对应，每个KUBE-SEP-XXX会有2个enrties来分别做mark masq和DNAT，这样算起来至少有10<em>6</em>2&#x3D;120个entries在iptable中。试想如果application中service和endpoints数目巨大，iptable entries也是非常庞大的，在一定情况下有可能带来性能上的问题。</p>
+</li>
+<li><p>ipvs方式中host宿主中iptable的entry数目是固定的，因为iptable做匹配的时候会利用ipset(KUBE-CLUSTER-IP或者KUBE-NODE-PORT-TCP)来匹配，service的数目决定了ipset的大小，并不会影响iptable的大小。这样就解决了iptable模式下，entries随着service和endpoints的增多而增多的问题。</p>
+</li>
+<li><p>对于负载均衡，iptable方式采用random模块来完成负载均衡，ipvs方式支持多种负载均衡，例如round-robin，least connection，source hash等（可参考<a target="_blank" rel="noopener" href="http://www.linuxvirtualserver.org/%EF%BC%89%EF%BC%8C%E5%B9%B6%E4%B8%94%E7%94%B1kubelet%E5%90%AF%E5%8A%A8%E5%8F%82%E6%95%B0--ipvs-scheduler%E6%8E%A7%E5%88%B6%E3%80%82">http://www.linuxvirtualserver.org/），并且由kubelet启动参数--ipvs-scheduler控制。</a></p>
+</li>
+<li><p>对于目标地址的映射，iptable方式采用linux原生的DNAT，ipvs方式则利用ipvs模块完成。</p>
+</li>
+<li><p>ipvs方式会在host netwok namespace中创建网络设备kube-ipvs0，并且绑定了所有的cluster ip，这样保证了cluster-ip类型的service数据进入INPUT chain，从而让ipvs来完成负载均衡和目标地址的映射。</p>
+</li>
+<li><p>iptable方式不会在host netwok namespace中创建额外的网络设备。</p>
+</li>
+<li><p>iptable方式数据在host network namespace的chain中的路径是：PREROUTING–&gt;FORWARDING–&gt;POSTROUTING 在PREROUTING chain中完成负载均衡，mark masq和目标地址映射。</p>
+</li>
+<li><p>ipvs方式数据在host network namespace的chain中的路径是：PREROUTING–&gt;INPUT–&gt;POSTROUTING 在PREROUTING chain中完成mark masq SNAT，在INPUT chain利用ipvs完成负载均衡和目标地址映射。</p>
+</li>
+<li><p>iptable和ipvs方式在完成负载均衡和目标地址映射后都会根据host network namespace的路由表做下一跳路由选择。</p>
+</li>
+</ul>
+<h3 id="六、跨主机网络通信：flannel-组件"><a href="#六、跨主机网络通信：flannel-组件" class="headerlink" title="六、跨主机网络通信：flannel 组件"></a>六、跨主机网络通信：flannel 组件</h3><h4 id="1）flannel-underlay-网络：host-gw-方式"><a href="#1）flannel-underlay-网络：host-gw-方式" class="headerlink" title="1）flannel underlay 网络：host-gw 方式"></a>1）flannel underlay 网络：host-gw 方式</h4><p><strong>underlay 网络概念与配置</strong></p>
+<ul>
+<li><p>概念：underlay 网络在通讯过程没有额外封包，通过将容器的宿主机作为路由实现数据包转包</p>
+</li>
+<li><p>配置方式：略</p>
+</li>
+</ul>
+<p><strong>service 与 Pod 对应信息</strong></p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta prompt_"># </span><span class="language-bash">kubectl describe service nginx-test</span></span><br><span class="line">Name:              nginx-test</span><br><span class="line">Namespace:         default</span><br><span class="line">Labels:            app=nginx-test</span><br><span class="line">Annotations:       &lt;none&gt;</span><br><span class="line">Selector:          app=nginx-test</span><br><span class="line">Type:              ClusterIP</span><br><span class="line">IP Family Policy:  SingleStack</span><br><span class="line">IP Families:       IPv4</span><br><span class="line">IP:                10.43.6.58</span><br><span class="line">IPs:               10.43.6.58</span><br><span class="line">Port:              80-80  80/TCP</span><br><span class="line">TargetPort:        80/TCP</span><br><span class="line">Endpoints:         10.42.0.65:80,10.42.1.9:80</span><br><span class="line">Session Affinity:  None</span><br><span class="line">Events:            &lt;none&gt;</span><br><span class="line"><span class="meta prompt_"></span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">kubectl get pod -owide</span></span><br><span class="line">NAME                          READY   STATUS    RESTARTS      AGE   IP           NODE     NOMINATED NODE   READINESS GATES</span><br><span class="line">nginx-test-7646687cc4-n8s9s   1/1     Running   6 (60m ago)   26d   10.42.0.65   master   &lt;none&gt;           &lt;none&gt;</span><br><span class="line">nginx-test-7646687cc4-z8xnq   1/1     Running   0             47s   10.42.1.9    node1    &lt;none&gt;           &lt;none&gt;</span><br></pre></td></tr></table></figure>
+
+<p><strong>数据包走向分析，从10.42.0.65请求10.42.1.9</strong></p>
+<ul>
+<li>数据包从源 pod 到宿主机</li>
+</ul>
+<p>当在pod <strong>10.42.0.65</strong>里向pod <strong>10.42.1.9</strong>里发送数据包的时候，pod <strong>10.42.0.65</strong>的网卡是veth的一个端点。根据pod network namespace中的路由规则，数据一定是发送到<strong>10.42.0.1</strong>，也就是宿主network namespace的cni0 linux bridge设备。由于pod <strong>10.42.0.65</strong>网卡veth另一个端点attach在cni0 bridge设备上，所以数据被cni0 bride接收，也就是数据从pod的network namesapce流动到了host的network namespace里。</p>
+<ul>
+<li>数据包在源 pod 宿主机中的路由</li>
+</ul>
+<p>由于数据包的目标ip地址是<strong>10.42.1.9</strong>，而源pod <strong>10.42.0.65</strong>的宿主ip是<strong>192.168.205.4</strong>。宿主机上开启了转发功能(net.ipv4.ip_forward &#x3D; 1)，所以主机发现目标ip <strong>10.42.1.9</strong>不是自己的ip时候，就对这个数据包做路由转发。查看宿主<strong>192.168.205.4</strong>的路由表</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta prompt_"># </span><span class="language-bash">ip addr |grep 192.168.205.4</span></span><br><span class="line">    inet 192.168.205.4/24 metric 100 brd 192.168.205.255 scope global dynamic enp0s1</span><br><span class="line"><span class="meta prompt_"></span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">ip route</span></span><br><span class="line">10.42.1.0/24 via 192.168.205.3 enp0s1 ...</span><br></pre></td></tr></table></figure>
+<p>在路由表里发现<strong>10.42.1.0&#x2F;24</strong>网段的数据下一跳是<strong>192.168.205.3</strong>，也就是目标pod <strong>10.42.1.9</strong>的宿主机器。所以进行arp目标mac地址封包，将数据发往<strong>192.168.205.3</strong>。注意目标pod的下一跳地址是目标pod所在的host，也就是说数据会从原始pod所在的host通过下一跳发往目标pod所在的host。即是原始pod的host必须和目标pod的host在同一个二层网络里，因为只有这样才可以下一跳路由可达。这个也是flannel的underlay网络host gw方式的限制，既要求所有的k8s worker node节点都在同一个二层网络里(可以认为是在同一个ip子网)。</p>
+<ul>
+<li>数据包在目标 pod 宿主机中的路由</li>
+</ul>
+<p>当数据包路由到目标pod <strong>10.42.1.9</strong>的host <strong>192.168.205.3</strong>的时候(通过二层交换)，目标pod宿主机上开启了转发功能(net.ipv4.ip_forward &#x3D; 1)，所以主机发现目标ip <strong>10.42.1.9 <strong>不是自己的ip时候，就对这个数据包做路由转发。查看宿主</strong>192.168.205.3</strong>的路由表</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta prompt_"># </span><span class="language-bash">ip addr |grep 192.168.205.3</span></span><br><span class="line">    inet 192.168.205.3/24 metric 100 brd 192.168.205.255 scope global dynamic enp0s1</span><br><span class="line"><span class="meta prompt_"></span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">ip route</span></span><br><span class="line">10.42.1.0/24 dev cni0 proto kernel scope link src 10.42.1.1</span><br></pre></td></tr></table></figure>
+<p>在路由表里发现<strong>10.42.1.0&#x2F;24</strong>网段的数据下一跳是直连路由，由设备cni0 网卡转发。cni 网卡 <strong>10.42.1.1</strong> 作为linux bridge，会把数据通过veth pair从host network namespace发送到目标pod的<strong>10.42.1.9</strong>的network namespace里。然后由内核交给应用程序处理，从而完成了pod到pod的通讯。可以使用 kubectl debug 查看路由经过节点</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta prompt_"># </span><span class="language-bash">kubectl debug -it nginx-test-7646687cc4-z8xnq --image=busybox -- /bin/sh</span></span><br><span class="line"><span class="meta prompt_"></span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">ip addr</span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">traceroute 10.42.1.9</span></span><br></pre></td></tr></table></figure>
+
+<p><strong>flannel underlay（host-gw 方式）总结</strong></p>
+<ul>
+<li>从源pod的network namespace到host network namespace的cni0 linux bridge上。</li>
+<li>在源pod所在的host里做三层路由选择，下一跳地址为目标pod所在的host。</li>
+<li>数据包从源pod所在的host发送到目标pod所在的host。（二层 mac 封装数据包）</li>
+<li>在目标pod所在的host里做三层路由选择，本地直连路由到目标pod里。</li>
+<li>要求所有的节点必须开启路由转发功能(net.ipv4.ip_forward &#x3D; 1)</li>
+<li>要求所有的节点都在同一个二层网络里，来完成目标pod所在host的下一跳路由</li>
+</ul>
+<h4 id="2）flannel-overlay-网络：vxlan-方式"><a href="#2）flannel-overlay-网络：vxlan-方式" class="headerlink" title="2）flannel overlay 网络：vxlan 方式"></a>2）flannel overlay 网络：vxlan 方式</h4><p><strong>overlay 网络概念与配置</strong></p>
+<ul>
+<li>概念</li>
+</ul>
+<p>vxlan 是一种overlay 网络技术，意在利用在三层网络之上构建二层网络。对于二层网络一般采用 vlan 技术来隔离，不过 vlan 在数据包里总共4个字节，有12bit用来标识不同的二层网络，这样总共可以有4000多个 vlan。而 vxlan header有8个字节，有24bit用来标识不同的二层网络，这样总共是1600多万个 vxlan。<a target="_blank" rel="noopener" href="https://tools.ietf.org/html/rfc7348">vxlan详解</a></p>
+<ul>
+<li>配置方式：<a target="_blank" rel="noopener" href="https://mp.weixin.qq.com/s?__biz=MzI0MDE3MjAzMg==&mid=2648393268&idx=1&sn=ea7df945f11a57619a81df8599bcbe99&chksm=f1310b5bc646824daaf9ac6cb2dec4b8c8f54fdf4753b5379db991c88e4e5951ec928b9da2d9&scene=178&cur_album_id=2123526506718003213#rd">参考</a></li>
+</ul>
+<p>1.使用 vxlan 配置集群时，因为 vxlan 利用 udp 包的 payload 封装二层 eth 包，mtu 值从1500变为1450。<br>2.vxlan 利用 udp 封包，etcd 配置 udp 使用8472端口接收数据，需要在所有节点放行8472 udp port 。</p>
+<p><strong>service 与 Pod 对应信息</strong></p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta prompt_"># </span><span class="language-bash">kubectl describe service nginx-test</span></span><br><span class="line">Name:              nginx-test</span><br><span class="line">Namespace:         default</span><br><span class="line">Labels:            app=nginx-test</span><br><span class="line">Annotations:       &lt;none&gt;</span><br><span class="line">Selector:          app=nginx-test</span><br><span class="line">Type:              ClusterIP</span><br><span class="line">IP Family Policy:  SingleStack</span><br><span class="line">IP Families:       IPv4</span><br><span class="line">IP:                10.43.6.58</span><br><span class="line">IPs:               10.43.6.58</span><br><span class="line">Port:              80-80  80/TCP</span><br><span class="line">TargetPort:        80/TCP</span><br><span class="line">Endpoints:         10.42.0.65:80,10.42.1.9:80</span><br><span class="line">Session Affinity:  None</span><br><span class="line">Events:            &lt;none&gt;</span><br><span class="line"><span class="meta prompt_"></span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">kubectl get pod -owide</span></span><br><span class="line">NAME                          READY   STATUS    RESTARTS      AGE   IP           NODE     NOMINATED NODE   READINESS GATES</span><br><span class="line">nginx-test-7646687cc4-n8s9s   1/1     Running   6 (60m ago)   26d   10.42.0.65   master   &lt;none&gt;           &lt;none&gt;</span><br><span class="line">nginx-test-7646687cc4-z8xnq   1/1     Running   0             47s   10.42.1.9    node1    &lt;none&gt;           &lt;none&gt;</span><br></pre></td></tr></table></figure>
+
+<p><strong>kubectl debug 查看路由走向与网络，进入 pod 10.42.0.65</strong></p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta prompt_">#</span><span class="language-bash">kubectl debug -it nginx-test-7646687cc4-n8s9s --image=busybox -- /bin/sh</span></span><br><span class="line">/ # ping -c 3 10.42.1.9</span><br><span class="line">PING 10.42.1.9 (10.42.1.9): 56 data bytes</span><br><span class="line">64 bytes from 10.42.1.9: seq=0 ttl=62 time=1.447 ms</span><br><span class="line">64 bytes from 10.42.1.9: seq=1 ttl=62 time=2.732 ms</span><br><span class="line">64 bytes from 10.42.1.9: seq=2 ttl=62 time=0.880 ms</span><br><span class="line">/ # traceroute -n 10.42.1.9</span><br><span class="line">traceroute to 10.42.1.9 (10.42.1.9), 30 hops max, 46 byte packets</span><br><span class="line"> 1  10.42.0.1  0.027 ms  0.012 ms  0.009 ms</span><br><span class="line"> 2  10.42.1.0  1.761 ms  1.440 ms  1.085 ms</span><br><span class="line"> 3  10.42.1.9  1.453 ms  0.979 ms  0.976 ms</span><br></pre></td></tr></table></figure>
+
+<p><strong>数据包走向分析，从10.42.0.65请求10.42.1.9</strong></p>
+<ul>
+<li>数据在 pod namespace network 中路由</li>
+</ul>
+<p>ip为<strong>10.42.0.65</strong>的pod从自己的network namespace访问pod <strong>10.42.1.9</strong>，根据<strong>10.42.0.65</strong> pod network namespace的路由表，数据进入了<strong>10.42.0.65</strong> pod的宿主<strong>192.168.205.4</strong>的network namespace中的linux bridge cni0。查看宿主机路由信息</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta prompt_"># </span><span class="language-bash">ip addr |grep 192.168.205.4</span></span><br><span class="line">    inet 192.168.205.4/24 metric 100 brd 192.168.205.255 scope global dynamic enp0s1</span><br><span class="line"><span class="meta prompt_"></span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">ip route</span></span><br><span class="line">10.42.1.0/24 via 10.42.1.0 dev flannel.1 onlink</span><br></pre></td></tr></table></figure>
+<p><strong>10.42.1.0&#x2F;24</strong>网段的访问下一跳ip地址是<strong>10.42.1.0</strong>，用flannel.1设备发送。flannel.1设备就是 flannel 启动的时候根据vxlan类型网络在宿主上创建的，它属于vxlan设备，会完成对二层eth以太数据包到udp数据包的封装与拆封。其中的”.1”代表vxlan这个二层网络id号为1，也对应了vxlan网络在etcd里的配置。这个时候数据包源ip为<strong>10.42.0.65</strong>，目标ip为<strong>10.42.1.9</strong>，源mac为pod <strong>10.42.0.65</strong> network namespace中veth设备mac，目标mac为下一跳ip **10.42.1.0&#x2F;32 **的mac。</p>
+<ul>
+<li>查看 vtep 端点 mac 地址以及转发接口信息</li>
+</ul>
+<p>查看 mac 地址信息：在pod <strong>10.42.0.65</strong>的宿主<strong>192.168.205.4</strong>上通过arp表查询<strong>10.42.1.0&#x2F;32</strong>的mac地址为 62:c8:a9:ce:ca:4e</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta prompt_"># </span><span class="language-bash">ip addr |grep 192.168.205.4</span></span><br><span class="line">    inet 192.168.205.4/24 metric 100 brd 192.168.205.255 scope global dynamic enp0s1</span><br><span class="line"><span class="meta prompt_"></span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">ip neighbo |grep 10.42.1.0</span></span><br><span class="line">10.42.1.0 dev flannel.1 lladdr 62:c8:a9:ce:ca:4e PERMANENT</span><br><span class="line"><span class="meta prompt_"></span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">ip neighbo show dev flannel.1</span></span><br><span class="line">10.42.1.0 lladdr 62:c8:a9:ce:ca:4e PERMANENT</span><br><span class="line">10.42.2.0 lladdr ca:cb:1f:99:10:97 PERMANENT</span><br></pre></td></tr></table></figure>
+<p>查看 mac 地址转发信息：由于flannel.1设备是vxlan设备，会有转发接口与它的mac对应，继续在pod <strong>10.42.0.65</strong>的宿主<strong>192.168.205.4</strong>上查询flannel.1设备的mac转发接口。</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta prompt_"># </span><span class="language-bash">ip addr |grep 192.168.205.4</span></span><br><span class="line">    inet 192.168.205.4/24 metric 100 brd 192.168.205.255 scope global dynamic enp0s1</span><br><span class="line"><span class="meta prompt_"></span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">bridge fdb show |grep 62:c8:a9:ce:ca:4e</span></span><br><span class="line">62:c8:a9:ce:ca:4e dev flannel.1 dst 192.168.205.3 self permanent</span><br><span class="line"><span class="meta prompt_"></span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">bridge fdb show dev flannel.1</span></span><br><span class="line">62:c8:a9:ce:ca:4e dst 192.168.205.3 self permanent</span><br><span class="line">ee:87:b2:4a:fd:62 dst 192.168.205.5 self permanent</span><br></pre></td></tr></table></figure>
+<p>可以看到 flannel.1设备mac地址 <strong>62:c8:a9:ce:ca:4e</strong> 对应的转发接口为 <strong>192.168.205.3</strong>，代表flannel.1设备将会把原始二层数据包(源ip为<strong>10.42.0.65</strong>，目标ip为<strong>10.42.1.9</strong>，源mac为 pod <strong>10.42.0.65</strong> network namespace中veth设备mac，目标mac为<strong>10.42.1.0&#x2F;32</strong> mac)做为 upd 的 payload 发给 **192.168.205.3 **的 **8472 **端口。目标pod **10.42.1.9 **的宿主机确实是 <strong>192.168.205.3</strong>，而且其上的flannel.1设备同样会对8472端口的数据进行upd解包。</p>
+<ul>
+<li><p>flannel.1 设备处理 udp 封包与解包</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta prompt_"># </span><span class="language-bash">ip addr |grep 192.168.205.4</span></span><br><span class="line">    inet 192.168.205.4/24 metric 100 brd 192.168.205.255 scope global dynamic enp0s1</span><br><span class="line"><span class="meta prompt_"></span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">route -n</span></span><br><span class="line">Kernel IP routing table</span><br><span class="line">Destination     Gateway         Genmask         Flags Metric Ref    Use Iface</span><br><span class="line">0.0.0.0         192.168.205.1   0.0.0.0         UG    100    0        0 enp0s1</span><br><span class="line">192.168.205.0   0.0.0.0         255.255.255.0   U     100    0        0 enp0s1</span><br><span class="line">192.168.205.1   0.0.0.0         255.255.255.255 UH    100    0        0 enp0s1</span><br></pre></td></tr></table></figure>
+<p>flannel.1 设备 udp 封包：从pod **10.42.0.65 **的宿主 <strong>192.168.205.4</strong> 的路由表得知发往 <strong>192.168.205.0&#x2F;24</strong> 网段为直连路由，使用宿主网络设备 enp0s1 发送。所以对于：</p>
+<ul>
+<li>外层udp包：源ip为<strong>192.168.205.4</strong>，目标ip为<strong>192.168.205.3</strong>，源mac为<strong>192.168.205.4</strong> mac，目标mac为<strong>192.168.205.3</strong> mac。目标端口为8472，vxlan id为1.</li>
+<li>内层二层以太包：源ip为<strong>10.42.0.65</strong>，目标ip为<strong>10.42.1.9</strong>，源mac为pod <strong>10.42.0.65</strong> network namespace中veth设备mac，目标mac为<strong>10.42.1.0&#x2F;32</strong> mac</li>
+<li>完成封包以后根据宿主路由表发向目标节点 <strong>192.168.205.3</strong></li>
+</ul>
+</li>
+</ul>
+<p>flannel.1 设备 udp 解包：宿主机 **192.168.205.3 **接收到数据包后</p>
+<ul>
+<li><p>目标节点<strong>192.168.205.3</strong>的8472端口接收到udp包之后，发现数据包里有vxlan id标识为1。由于linux内核支持vxlan，所以协议栈可以通过vxlan id判断这是一个vxlan数据报文，并且vxlan为1。然后找到宿主机器上vxlan id为1的vxlan设备处理，就是<strong>192.168.205.3</strong>上的flannel.1设备。</p>
+</li>
+<li><p>flannel.1收到数据之后开始对vxlan udp报文拆包，去掉upd报文的ip，port，mac信息后得到内部的payload，发现是一个二层报文。</p>
+</li>
+<li><p>对于这个二层报文继续拆包，得到里面的源ip是<strong>10.42.0.65</strong>，目标ip是<strong>10.42.1.9</strong>。</p>
+</li>
+<li><p>根据<strong>192.168.205.3</strong>上路由表，将数据由linux bridge cni0做本地转发，cni0 作为 linux bridge 利用 veth pair 将数据转发到目标 pod <strong>10.42.1.9</strong></p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta prompt_"># </span><span class="language-bash">ip addr |grep 192.168.205.3</span></span><br><span class="line">    inet 192.168.205.3/24 metric 100 brd 192.168.205.255 scope global dynamic enp0s1</span><br><span class="line"><span class="meta prompt_"></span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">route -n</span></span><br><span class="line">Destination     Gateway         Genmask         Flags Metric Ref    Use Iface</span><br><span class="line">10.42.1.0       0.0.0.0         255.255.255.0   U     0      0        0 cni0</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>宿主host的路由表的写入 与 flannel.1设备mac转发接口表的写入（fdb 转发）</p>
+</li>
+</ul>
+<p>因为所有的host都运行flannel服务，而flannel连接etcd存储中心，所以每个host就知道自己的子网地址cidr是什么，也知道在这个cidr中自己的flannel.1设备ip地址和mac地址，同时也知道了其它host的子网cidr以及flannel.1设备ip地址和mac地址。而知道了这些信息，就可以在flannel启动的时候写入到路由表和fdb中了，以 **192.168.205.4 **宿主为例：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta prompt_">~# </span><span class="language-bash">ip addr |grep 192.168.205.4</span></span><br><span class="line">    inet 192.168.205.4/24 metric 100 brd 192.168.205.255 scope global dynamic enp0s1</span><br><span class="line"><span class="meta prompt_"></span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">bridge fdb show dev flannel.1</span></span><br><span class="line">62:c8:a9:ce:ca:4e dst 192.168.205.3 self permanent</span><br><span class="line">ee:87:b2:4a:fd:62 dst 192.168.205.5 self permanent</span><br><span class="line"><span class="meta prompt_"></span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">etcdctl ....</span></span><br></pre></td></tr></table></figure>
+
+<p><strong>flannel overlay（vxlan 方式）总结</strong></p>
+<ul>
+<li>每个宿主都有名字为flannel.x的vxlan网络设备来完成对于vxlan数据的udp封包与拆包，upd数据在宿主的8472端口上(端口值可配置)处理。</li>
+<li>数据从pod的network namespace进入到host的network namespace中。</li>
+<li>根据host network namespace中的路由表，下一跳ip为目标vxlan设备的ip，并且由当前host的flannel.x设备发送。</li>
+<li>根据host network namespace中的apr表找到下一跳ip的mac地址。</li>
+<li>根据host network namespace中fbd找到下一跳ip的mac地址对应的转发ip。</li>
+<li>当前host的flannel.x设备根据下一跳ip的mac地址对应的转发ip和本地路由表进行upd封包，这个时候：<ul>
+<li>外层udp包：源ip为当前host ip，目标ip为mac转发表中匹配的ip，源mac为前host ip的mac，目标mac为fdb中匹配ip的mac。目标端口为8472(可配置)，vxlan id为1(可配置).</li>
+<li>内层二层以太帧包：源ip为源pod ip，目标ip为目标pod ip，源mac为源pod mac，目标mac为host network namespace中路由表里下一跳ip的mac(一般为目标pod对应的host中flannel.x设备ip)。</li>
+</ul>
+</li>
+<li>数据包由当前host路由到目标节点host。</li>
+<li>目标节点host的8472端口接收到udp包之后，发现数据包里有vxlan id标识.。然后根据linux vxlan协议，在目标宿主机器上找到与数据报文中vxlan id对应的vxlan设备，将数据交由其处理。</li>
+<li>vxlan设备收到数据之后开始对vxlan udp报文拆包，去掉upd报文的ip，port，mac信息后得到内部的payload，发现是一个二层报文。然后继续对这个二层报文拆包，得到里面的源pod ip和目标pod ip。</li>
+<li>根据目标节点host上路由表，将数据由linux bridge cni0做本地转发。</li>
+<li>数据由linux bridge cni0利用veth pair转发到目标pod。</li>
+<li>每个宿主host的flannel服务启动的时候读取etcd中的vxlan配置信息，在宿主host的路由表和mac转发接口表fdb里写入相应数据。</li>
+</ul>
+<h4 id="3）flannel-underlay-与-overlay-网络对比"><a href="#3）flannel-underlay-与-overlay-网络对比" class="headerlink" title="3）flannel underlay 与 overlay 网络对比"></a>3）flannel underlay 与 overlay 网络对比</h4><ul>
+<li>都要求host宿主开启网络转发功能(net.ipv4.ip_forward &#x3D; 1)。</li>
+<li>flannel underlay网络没有数据包的额外封包与拆包，效率会更高一些。</li>
+<li>对于flannel underlay网络要求所有的worker node都在同一个二层网络里，从而完成目标pod的下一跳路由。即underlay网络worker node不能跨子网。</li>
+<li>flannel vxlan overlay 网络有封包与拆包，并且外层包都是 udp 包。因此 worker node只要三层路由可达就好，支持worker node能跨子网。</li>
+<li>flannel vxlan overlay网络内层包是二层以太包，基于linux vxlan设备</li>
+<li>flannel underlay网络和flannel vxlan overlay网络所有数据包都由操作系统内核空间处理，没有用户空间的应用程序参与。</li>
+</ul>
+<blockquote>
+<h4 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h4><p>1、k8s 集群网络：<br><a target="_blank" rel="noopener" href="https://mp.weixin.qq.com/mp/appmsgalbum?__biz=MzI0MDE3MjAzMg==&action=getalbum&album_id=2123526506718003213&scene=173&from_msgid=2648393229&from_itemidx=1&count=3&nolastread=1#wechat_redirect">https://mp.weixin.qq.com/mp/appmsgalbum?__biz&#x3D;MzI0MDE3MjAzMg&#x3D;&#x3D;&amp;action&#x3D;getalbum&amp;album_id&#x3D;2123526506718003213&amp;scene&#x3D;173&amp;from_msgid&#x3D;2648393229&amp;from_itemidx&#x3D;1&amp;count&#x3D;3&amp;nolastread&#x3D;1#wechat_redirect</a><br>2、iptables 详解：<br><a target="_blank" rel="noopener" href="https://lixiangyun.gitbook.io/iptables_doc_zh_cn/">https://lixiangyun.gitbook.io/iptables_doc_zh_cn&#x2F;</a><br><a target="_blank" rel="noopener" href="https://www.jianshu.com/p/ee4ee15d3658">https://www.jianshu.com/p/ee4ee15d3658</a><br>3、Docker 网络类型：<a target="_blank" rel="noopener" href="https://developer.aliyun.com/article/974008#slide-4">https://developer.aliyun.com/article/974008#slide-4</a><br>4、ipvs 工作模式原理：<a target="_blank" rel="noopener" href="https://icloudnative.io/posts/ipvs-how-kubernetes-services-direct-traffic-to-pods/">https://icloudnative.io/posts/ipvs-how-kubernetes-services-direct-traffic-to-pods/</a></p>
+</blockquote>
+
+    </div>
+
+    
+    
+    
+        
+
+<div>
+<ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>本文作者： </strong>Yakir
+  </li>
+  <li class="post-copyright-link">
+    <strong>本文链接：</strong>
+    <a href="https://359sun.top/posts/5d90.html" title="K8S-网络">https://359sun.top/posts/5d90.html</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" rel="noopener" target="_blank"><i class="fab fa-fw fa-creative-commons"></i>BY-NC-SA</a> 许可协议。转载请注明出处！
+  </li>
+</ul>
+</div>
+
+        
+
+  <div class="followme">
+    <p>欢迎关注我的其它发布渠道</p>
+
+    <div class="social-list">
+
+        <div class="social-item">
+          <a target="_blank" class="social-link" href="/atom.xml">
+            <span class="icon">
+              <i class="fa fa-rss"></i>
+            </span>
+
+            <span class="label">RSS</span>
+          </a>
+        </div>
+    </div>
+  </div>
+
+
+      <footer class="post-footer">
+          
+          <div class="post-tags">
+              <!-- <a href="/tags/k8s/" rel="tag"><i class="fa fa-tag"></i> K8S</a> -->
+              <a href="/tags/k8s/" rel="tag"><i class="fa fa-tag"></i> K8S</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/posts/b8bc.html" rel="prev" title="Openssl 原理与操作">
+      <i class="fa fa-chevron-left"></i> Openssl 原理与操作
+    </a></div>
+      <div class="post-nav-item"></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+    <div class="comments" id="gitalk-container"></div>
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%B8%80%E3%80%81%E7%AE%80%E4%BB%8B"><span class="nav-text">一、简介</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#1%EF%BC%89%E5%AE%B9%E5%99%A8%E7%BD%91%E7%BB%9C%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5"><span class="nav-text">1）容器网络基本概念</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2%EF%BC%89k8s-%E9%9B%86%E7%BE%A4%E5%AE%B9%E5%99%A8%E7%BD%91%E7%BB%9C%E9%80%9A%E8%AE%AF%E6%96%B9%E5%BC%8F"><span class="nav-text">2）k8s 集群容器网络通讯方式</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#3%EF%BC%89%E6%B5%8B%E8%AF%95%E7%8E%AF%E5%A2%83%E4%B8%BB%E6%9C%BA%E4%BF%A1%E6%81%AF"><span class="nav-text">3）测试环境主机信息</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BA%8C%E3%80%81%E5%AE%BF%E4%B8%BB%E6%9C%BA%E5%86%85%E7%BD%91%E7%BB%9C"><span class="nav-text">二、宿主机内网络</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#1%EF%BC%89docker-%E5%AE%B9%E5%99%A8%E7%9A%84%E5%9B%9B%E7%A7%8D%E7%BD%91%E7%BB%9C%E7%B1%BB%E5%9E%8B"><span class="nav-text">1）docker 容器的四种网络类型</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2%EF%BC%89docker-%E5%AE%BF%E4%B8%BB%E7%8E%AF%E5%A2%83%E4%B8%AD%E5%AE%B9%E5%99%A8%E7%BD%91%E7%BB%9C"><span class="nav-text">2）docker 宿主环境中容器网络</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%B8%89%E3%80%81Service%EF%BC%9Acluster-ip-%E5%AE%9E%E7%8E%B0%E5%8E%9F%E7%90%86"><span class="nav-text">三、Service：cluster ip 实现原理</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#1%EF%BC%89cluster-ip-%E5%A6%82%E4%BD%95%E8%AE%BF%E9%97%AE"><span class="nav-text">1）cluster ip 如何访问</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2%EF%BC%89iptables-%E6%96%B9%E5%BC%8F"><span class="nav-text">2）iptables 方式</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#3%EF%BC%89ipvs-%E6%96%B9%E5%BC%8F"><span class="nav-text">3）ipvs 方式</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%9B%9B%E3%80%81Service%EF%BC%9Anodeport-%E5%AE%9E%E7%8E%B0%E5%8E%9F%E7%90%86"><span class="nav-text">四、Service：nodeport 实现原理</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#1%EF%BC%89nodeport-ip-%E5%A6%82%E4%BD%95%E8%AE%BF%E9%97%AE"><span class="nav-text">1）nodeport ip 如何访问</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2%EF%BC%89iptables-%E6%96%B9%E5%BC%8F-1"><span class="nav-text">2）iptables 方式</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#3%EF%BC%89ipvs-%E6%96%B9%E5%BC%8F-1"><span class="nav-text">3）ipvs 方式</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BA%94%E3%80%81Service%EF%BC%9Aipvs-%E4%B8%8E-iptables-%E5%AF%B9%E6%AF%94"><span class="nav-text">五、Service：ipvs 与 iptables 对比</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%85%AD%E3%80%81%E8%B7%A8%E4%B8%BB%E6%9C%BA%E7%BD%91%E7%BB%9C%E9%80%9A%E4%BF%A1%EF%BC%9Aflannel-%E7%BB%84%E4%BB%B6"><span class="nav-text">六、跨主机网络通信：flannel 组件</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#1%EF%BC%89flannel-underlay-%E7%BD%91%E7%BB%9C%EF%BC%9Ahost-gw-%E6%96%B9%E5%BC%8F"><span class="nav-text">1）flannel underlay 网络：host-gw 方式</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2%EF%BC%89flannel-overlay-%E7%BD%91%E7%BB%9C%EF%BC%9Avxlan-%E6%96%B9%E5%BC%8F"><span class="nav-text">2）flannel overlay 网络：vxlan 方式</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#3%EF%BC%89flannel-underlay-%E4%B8%8E-overlay-%E7%BD%91%E7%BB%9C%E5%AF%B9%E6%AF%94"><span class="nav-text">3）flannel underlay 与 overlay 网络对比</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%8F%82%E8%80%83"><span class="nav-text">参考</span></a></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Yakir"
+      src="/images/avatar.jpg">
+  <p class="site-author-name" itemprop="name">Yakir</p>
+  <div class="site-description" itemprop="description">Yakir Blog</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">19</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">4</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">8</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/yakir3" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;yakir3" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="/atom.xml" title="RSS → &#x2F;atom.xml"><i class="fa fa-rss fa-fw"></i>RSS</a>
+      </span>
+  </div>
+
+
+
+  <div class="links-of-blogroll motion-element links-of-blogroll-block">
+    <div class="links-of-blogroll-title">
+      <!-- modify icon to fire by szw -->
+      <i class="fa fa-history fa-" aria-hidden="true"></i>
+      近期文章
+    </div>
+    <ul class="links-of-blogroll-list">
+      
+      
+        <li class="recent_posts_li">
+          <!--<a href="/" title="" target="_blank"></a>-->
+        </li>
+      
+        <li class="recent_posts_li">
+          <!--<a href="/" title="" target="_blank"></a>-->
+        </li>
+      
+        <li class="recent_posts_li">
+          <!--<a href="/" title="" target="_blank"></a>-->
+        </li>
+      
+    </ul>
+  </div>
+
+
+
+
+      </div>
+        <div class="back-to-top motion-element">
+          <i class="fa fa-arrow-up"></i>
+          <span>0%</span>
+        </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2023</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Yakir</span>
+</div>
+  <div class="powered-by">Powered by Hexo Next
+  </div>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/jquery@3/dist/jquery.min.js"></script>
+  <script src="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/lozad@1/dist/lozad.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+<link rel="stylesheet" href="//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.css">
+
+<script>
+NexT.utils.loadComments(document.querySelector('#gitalk-container'), () => {
+  NexT.utils.getScript('//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.js', () => {
+    var gitalk = new Gitalk({
+      clientID    : 'dc69ab400b19bd3a1bab',
+      clientSecret: '5a20b4b4faa303672257572d4df0be83b97061cb',
+      repo        : 'yakir3.github.io',
+      owner       : 'yakir3',
+      admin       : ['yakir3'],
+      id          : 'cf741a02b3c5f3996b03b0a15e8f8c8b',
+        language: 'zh-CN',
+      distractionFreeMode: true
+    });
+    gitalk.render('gitalk-container');
+  }, window.Gitalk);
+});
+</script>
+
+</body>
+</html>

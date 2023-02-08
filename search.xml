@@ -9,118 +9,6 @@
 ]]></content>
   </entry>
   <entry>
-    <title>VPC 网络规划案例</title>
-    <url>/posts/64a8.html</url>
-    <content><![CDATA[<link rel="stylesheet" class="aplayer-secondary-style-marker" href="/assets/css/APlayer.min.css"><script src="/assets/js/APlayer.min.js" class="aplayer-secondary-script-marker"></script><script class="meting-secondary-script-marker" src="/assets/js/Meting.min.js"></script><h3 id="网段规划概述"><a href="#网段规划概述" class="headerlink" title="网段规划概述"></a>网段规划概述</h3><h4 id="1）规划网段的目的"><a href="#1）规划网段的目的" class="headerlink" title="1）规划网段的目的"></a>1）规划网段的目的</h4><ul>
-<li>方便查看管理，相当于对某一个&#x2F;多个IDC 机房的IP 规划，根据IP 地址可以一目了然的判断出归属。</li>
-<li>便于同集群&#x2F;VPC 内网段判断网络、路由走向、以及网络隔离策略（白名单）。</li>
-<li>区分多VPC&#x2F;网络 环境，方便在打通网络时区分子网网段。</li>
-</ul>
-<h4 id="2）规范化设计的方式"><a href="#2）规范化设计的方式" class="headerlink" title="2）规范化设计的方式"></a>2）规范化设计的方式</h4><p>首先需要分清两类，是否有ACK 等集群类资源单独规划：</p>
-<ol>
-<li>如无集群资源（即只有RDS、ECS 等常规资源），按正常内网网段定义VPC与交换机即可</li>
-<li>有集群资源，最好划分单独交换机部署常规资源，<strong>独立交换机</strong>部署集群资源。</li>
-</ol>
-<span id="more"></span>
-
-<p>由于线上部署，或者未来趋势 基本云上都会已集群方式存在，因此只讨论第二种方式。<br>网段设计规范：</p>
-<ul>
-<li>VPC可使用的私网网段：192.168.0.0&#x2F;16、10.0.0.0&#x2F;8、172.16.0.0&#x2F;12及其子网，每个专有网络只能指定一个网段。</li>
-<li>交换机可使用的网段：需要&lt;&#x3D; VPC网段（子集）</li>
-</ul>
-<img data-src="/posts/64a8/vpc1.png" class>
-
-<ul>
-<li>VPC数量：创建多个VPC 时尽量使用不同网段</li>
-<li>集群数量：同账号下部署多集群时尽量使用不同网段</li>
-<li>如有ACK 集群资源时，需判断集群网络插件模式<ul>
-<li>非Terway 插件时，需要三个私网网段，如：10.1.0.0&#x2F;16（VPC-vswitch）、192.168.0.0&#x2F;24（Pod 使用）、192.168.10.0&#x2F;24（Service 使用）</li>
-<li>使用Terway 插件时，需要两个私网网段，如：10.16.0.0&#x2F;8（VPC-vswitch + Pod）、192.168.0.0&#x2F;24（Service 使用）</li>
-</ul>
-</li>
-</ul>
-<h4 id="个人建议"><a href="#个人建议" class="headerlink" title="**个人建议"></a>**个人建议</h4><ul>
-<li><p>同账号下（同环境）选择 192.168.0.0&#x2F;16、10.0.0.0&#x2F;0、172.16.0.0&#x2F;12 进行VPC 创建组网。</p>
-<ul>
-<li>不同集群与云产品资源之间使用子交换机分割。</li>
-<li>使用云产品白名单或其他网络插件做网络隔离策略。</li>
-</ul>
-</li>
-<li><p>不同账号（如日常、线上）可复用同网段进行组网（一般不存在跨环境调用）。</p>
-</li>
-<li><p>当前环境网络组网信息（建议后续都使用Terway 插件）：</p>
-<ul>
-<li><p>日常环境网络架构</p>
-<img data-src="/posts/64a8/vpc2.png" class>
-</li>
-<li><p>线上网络架构（集群与集群、集群与云产品，通过私网的交换机网段进行隔离）</p>
-</li>
-</ul>
-</li>
-</ul>
-<img data-src="/posts/64a8/vpc3.png" class>
-
-
-<h3 id="线上实际案例"><a href="#线上实际案例" class="headerlink" title="线上实际案例"></a>线上实际案例</h3><h4 id="1）案例1"><a href="#1）案例1" class="headerlink" title="1）案例1"></a>1）案例1</h4><img data-src="/posts/64a8/vpc4.png" class>
-
-<ul>
-<li>VPC：10.0.0.0&#x2F;8 （复用线上VPC）</li>
-<li>交换机：新建4 台交换机<ul>
-<li>test-swc-10_200_0_0_20  （可用区 1）</li>
-<li>test-swc-10_200_16_0_20 （可用区 2）</li>
-<li>test-swc-10_200_64_0_19 （可用区 1）</li>
-<li>test-swc-10_200_96_0_19 （可用区 2）</li>
-</ul>
-</li>
-<li>集群CIDR规划<ul>
-<li>Node CIDR：<ul>
-<li>10.200.0.0&#x2F;20</li>
-<li>10.200.16.0&#x2F;20</li>
-</ul>
-</li>
-<li>Pod CIDR：<ul>
-<li>10.200.64.0&#x2F;19</li>
-<li>10.200.96.0&#x2F;19</li>
-</ul>
-</li>
-<li>Service CIDR：<ul>
-<li>172.31.0.0&#x2F;16<blockquote>
-<p>注意：</p>
-<ul>
-<li>Node 和Pod 交换机如要高可用选择不同可用区时，需要每个可用区都有Node 和Pod 可使用的交换机。</li>
-<li>Service 网段不能与VPC 网段 及VPC 内已有Kubernetes 集群使用的网段重复。</li>
-</ul>
-</blockquote>
-</li>
-</ul>
-</li>
-</ul>
-</li>
-</ul>
-<h4 id="2）相关文档与工具"><a href="#2）相关文档与工具" class="headerlink" title="2）相关文档与工具"></a>2）相关文档与工具</h4><ul>
-<li><p><a href="https://help.aliyun.com/document_detail/189596.html">云企业网工作原理与操作</a></p>
-</li>
-<li><p>VPN网关原理与操作：</p>
-<ul>
-<li><a href="https://cloud.tencent.com/developer/article/1824924">IPSec VPN 技术原理</a></li>
-<li><a href="https://help.aliyun.com/document_detail/65072.html">阿里云官方操作文档</a></li>
-</ul>
-</li>
-<li><p><a href="https://www.bejson.com/convert/subnetmask/">子网计算在线工具</a></p>
-</li>
-<li><p>架构图</p>
-</li>
-</ul>
-<p><img data-src="https://intranetproxy.alipay.com/skylark/lark/0/2022/png/21956377/1646207048171-c0f5a83d-b982-4e85-ab78-f724882be069.png#clientId=ufadced67-c1c1-4&from=ui&id=u1dc1cab7&margin=%5Bobject%20Object%5D&name=%E6%80%BB%E4%BD%93%E7%BD%91%E7%BB%9C%E6%9E%B6%E6%9E%84.png&originHeight=1993&originWidth=4131&originalType=binary&ratio=1&size=515776&status=done&style=none&taskId=uffed0b55-26c9-4f1d-b577-67c4f6f81ec" alt="总体网络架构.png"></p>
-]]></content>
-      <categories>
-        <category>网络</category>
-      </categories>
-      <tags>
-        <tag>阿里云</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>ACK 集群日志接入 SLS</title>
     <url>/posts/4a2a.html</url>
     <content><![CDATA[<link rel="stylesheet" class="aplayer-secondary-style-marker" href="/assets/css/APlayer.min.css"><script src="/assets/js/APlayer.min.js" class="aplayer-secondary-script-marker"></script><script class="meting-secondary-script-marker" src="/assets/js/Meting.min.js"></script><h2 id="一、接入前提"><a href="#一、接入前提" class="headerlink" title="一、接入前提"></a>一、接入前提</h2><p><strong>ACK 集群开启日志服务组件Logtail</strong></p>
@@ -243,41 +131,6 @@
       </tags>
   </entry>
   <entry>
-    <title>Docker 学习记录</title>
-    <url>/posts/c06e.html</url>
-    <content><![CDATA[<link rel="stylesheet" class="aplayer-secondary-style-marker" href="/assets/css/APlayer.min.css"><script src="/assets/js/APlayer.min.js" class="aplayer-secondary-script-marker"></script><script class="meting-secondary-script-marker" src="/assets/js/Meting.min.js"></script><h3 id="一、Docker-基本原理"><a href="#一、Docker-基本原理" class="headerlink" title="一、Docker 基本原理"></a>一、Docker 基本原理</h3><h4 id="1-docker-基本概念"><a href="#1-docker-基本概念" class="headerlink" title="1.docker 基本概念"></a>1.docker 基本概念</h4><p>Docker Client： 客户端<br>Docker Daemon：服务端<br>Docker Images：镜像（只读 CD）<br>Docker Registry： 镜像仓库<br>Docker Container：实际运行服务的容器，通过 Images 启动（可以认为 Container 提供硬件环境，使用 Images 提供好的系统盘，加上项目代码，即可运行服务）</p>
-<span id="more"></span>
-<img data-src="/posts/c06e/docker1.png" class>
-<img data-src="/posts/c06e/docker2.png" class>
-<img data-src="/posts/c06e/docker3.png" class>
-
-<p>为什么使用Docker</p>
-<ul>
-<li>应用整体交付：一致的运行环境，DevOps。</li>
-<li>资源利用率高。</li>
-<li>更快的启动时间：应用扩容。</li>
-</ul>
-<h4 id="2-Dockerfile-编写规范"><a href="#2-Dockerfile-编写规范" class="headerlink" title="2.Dockerfile 编写规范"></a>2.Dockerfile 编写规范</h4><ol>
-<li>使用统一的 base 镜像。</li>
-<li>动静分离（基础稳定内容放在底层）。</li>
-<li>最小原则（镜像只打包必需的东西）。</li>
-<li>一个原则（每个镜像只有一个功能，交互通过网络，模块化管理）。</li>
-<li>使用更少的层，减少每层的内容。</li>
-<li>不要在 Dockerfile 单独修改文件权限（entrypoint &#x2F; 拷贝+修改权限同时操作）。</li>
-<li>利用 cache 加快构建速度。</li>
-<li>版本控制和自动构建（放入 git 版本控制中，自动构建镜像，构建参数&#x2F;变量给予文档说明）。</li>
-<li>使用 .dockerignore 文件（排除文件和目录）</li>
-</ol>
-<p><a href="https://docs.docker.com/engine/reference/builder/">Dockerfile 指令介绍</a></p>
-]]></content>
-      <categories>
-        <category>CNCF</category>
-      </categories>
-      <tags>
-        <tag>Docker</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>阿里云-RAM 与 STS 权限</title>
     <url>/posts/fdc.html</url>
     <content><![CDATA[<link rel="stylesheet" class="aplayer-secondary-style-marker" href="/assets/css/APlayer.min.css"><script src="/assets/js/APlayer.min.js" class="aplayer-secondary-script-marker"></script><script class="meting-secondary-script-marker" src="/assets/js/Meting.min.js"></script><h3 id="一、前言"><a href="#一、前言" class="headerlink" title="一、前言"></a>一、前言</h3><p>当通过OpenApi接口来调用云资源时（即替代控制台的操作），当前的方式有两种：</p>
@@ -326,7 +179,7 @@
 <li>OSS官方推荐使用 阿里云账号 方式：<a href="https://help.aliyun.com/document_detail/100624.html">https://help.aliyun.com/document_detail&#x2F;100624.html</a></li>
 </ul>
 </blockquote>
-<h3 id="三、创建STS角色，自定义授权OSS功能测试"><a href="#三、创建STS角色，自定义授权OSS功能测试" class="headerlink" title="三、创建STS角色，自定义授权OSS功能测试"></a>三、创建STS角色，自定义授权OSS功能测试</h3><p>1）测试账号信息<br>账号：<a href="mailto:&#x64;&#101;&#118;&#111;&#112;&#115;&#95;&#x74;&#101;&#x73;&#116;&#x40;&#120;&#120;&#120;&#46;&#x6f;&#x6e;&#x61;&#x6c;&#105;&#121;&#117;&#110;&#46;&#x63;&#x6f;&#109;">&#x64;&#101;&#118;&#111;&#112;&#115;&#95;&#x74;&#101;&#x73;&#116;&#x40;&#120;&#120;&#120;&#46;&#x6f;&#x6e;&#x61;&#x6c;&#105;&#121;&#117;&#110;&#46;&#x63;&#x6f;&#109;</a><br>AK：xxxxx<br>SK：xxxxx<br>ARN：acs:ram::xxxxx:role&#x2F;xxx-sts<br>OSS Bucket名称：oss-test<br>OSS授权目录：dir111&#x2F;dir111_secondline1&#x2F;</p>
+<h3 id="三、创建STS角色，自定义授权OSS功能测试"><a href="#三、创建STS角色，自定义授权OSS功能测试" class="headerlink" title="三、创建STS角色，自定义授权OSS功能测试"></a>三、创建STS角色，自定义授权OSS功能测试</h3><p>1）测试账号信息<br>账号：<a href="mailto:&#100;&#101;&#118;&#111;&#x70;&#x73;&#x5f;&#x74;&#x65;&#x73;&#116;&#64;&#x78;&#x78;&#x78;&#x2e;&#x6f;&#110;&#x61;&#108;&#x69;&#x79;&#117;&#110;&#x2e;&#99;&#111;&#109;">&#100;&#101;&#118;&#111;&#x70;&#x73;&#x5f;&#x74;&#x65;&#x73;&#116;&#64;&#x78;&#x78;&#x78;&#x2e;&#x6f;&#110;&#x61;&#108;&#x69;&#x79;&#117;&#110;&#x2e;&#99;&#111;&#109;</a><br>AK：xxxxx<br>SK：xxxxx<br>ARN：acs:ram::xxxxx:role&#x2F;xxx-sts<br>OSS Bucket名称：oss-test<br>OSS授权目录：dir111&#x2F;dir111_secondline1&#x2F;</p>
 <p>2）进行授权</p>
 <ul>
 <li>创建RAM用户（子账号），生成AK SK （此步骤忽略）</li>
@@ -386,6 +239,257 @@
 ]]></content>
       <tags>
         <tag>阿里云</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>Docker 学习记录</title>
+    <url>/posts/c06e.html</url>
+    <content><![CDATA[<link rel="stylesheet" class="aplayer-secondary-style-marker" href="/assets/css/APlayer.min.css"><script src="/assets/js/APlayer.min.js" class="aplayer-secondary-script-marker"></script><script class="meting-secondary-script-marker" src="/assets/js/Meting.min.js"></script><h3 id="一、Docker-基本原理"><a href="#一、Docker-基本原理" class="headerlink" title="一、Docker 基本原理"></a>一、Docker 基本原理</h3><h4 id="1-docker-基本概念"><a href="#1-docker-基本概念" class="headerlink" title="1.docker 基本概念"></a>1.docker 基本概念</h4><p>Docker Client： 客户端<br>Docker Daemon：服务端<br>Docker Images：镜像（只读 CD）<br>Docker Registry： 镜像仓库<br>Docker Container：实际运行服务的容器，通过 Images 启动（可以认为 Container 提供硬件环境，使用 Images 提供好的系统盘，加上项目代码，即可运行服务）</p>
+<span id="more"></span>
+<img data-src="/posts/c06e/docker1.png" class>
+<img data-src="/posts/c06e/docker2.png" class>
+<img data-src="/posts/c06e/docker3.png" class>
+
+<p>为什么使用Docker</p>
+<ul>
+<li>应用整体交付：一致的运行环境，DevOps。</li>
+<li>资源利用率高。</li>
+<li>更快的启动时间：应用扩容。</li>
+</ul>
+<h4 id="2-Dockerfile-编写规范"><a href="#2-Dockerfile-编写规范" class="headerlink" title="2.Dockerfile 编写规范"></a>2.Dockerfile 编写规范</h4><ol>
+<li>使用统一的 base 镜像。</li>
+<li>动静分离（基础稳定内容放在底层）。</li>
+<li>最小原则（镜像只打包必需的东西）。</li>
+<li>一个原则（每个镜像只有一个功能，交互通过网络，模块化管理）。</li>
+<li>使用更少的层，减少每层的内容。</li>
+<li>不要在 Dockerfile 单独修改文件权限（entrypoint &#x2F; 拷贝+修改权限同时操作）。</li>
+<li>利用 cache 加快构建速度。</li>
+<li>版本控制和自动构建（放入 git 版本控制中，自动构建镜像，构建参数&#x2F;变量给予文档说明）。</li>
+<li>使用 .dockerignore 文件（排除文件和目录）</li>
+</ol>
+<p><a href="https://docs.docker.com/engine/reference/builder/">Dockerfile 指令介绍</a></p>
+]]></content>
+      <categories>
+        <category>CNCF</category>
+      </categories>
+      <tags>
+        <tag>Docker</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>VPC 网络规划案例</title>
+    <url>/posts/64a8.html</url>
+    <content><![CDATA[<link rel="stylesheet" class="aplayer-secondary-style-marker" href="/assets/css/APlayer.min.css"><script src="/assets/js/APlayer.min.js" class="aplayer-secondary-script-marker"></script><script class="meting-secondary-script-marker" src="/assets/js/Meting.min.js"></script><h3 id="网段规划概述"><a href="#网段规划概述" class="headerlink" title="网段规划概述"></a>网段规划概述</h3><h4 id="1）规划网段的目的"><a href="#1）规划网段的目的" class="headerlink" title="1）规划网段的目的"></a>1）规划网段的目的</h4><ul>
+<li>方便查看管理，相当于对某一个&#x2F;多个IDC 机房的IP 规划，根据IP 地址可以一目了然的判断出归属。</li>
+<li>便于同集群&#x2F;VPC 内网段判断网络、路由走向、以及网络隔离策略（白名单）。</li>
+<li>区分多VPC&#x2F;网络 环境，方便在打通网络时区分子网网段。</li>
+</ul>
+<h4 id="2）规范化设计的方式"><a href="#2）规范化设计的方式" class="headerlink" title="2）规范化设计的方式"></a>2）规范化设计的方式</h4><p>首先需要分清两类，是否有ACK 等集群类资源单独规划：</p>
+<ol>
+<li>如无集群资源（即只有RDS、ECS 等常规资源），按正常内网网段定义VPC与交换机即可</li>
+<li>有集群资源，最好划分单独交换机部署常规资源，<strong>独立交换机</strong>部署集群资源。</li>
+</ol>
+<span id="more"></span>
+
+<p>由于线上部署，或者未来趋势 基本云上都会已集群方式存在，因此只讨论第二种方式。<br>网段设计规范：</p>
+<ul>
+<li>VPC可使用的私网网段：192.168.0.0&#x2F;16、10.0.0.0&#x2F;8、172.16.0.0&#x2F;12及其子网，每个专有网络只能指定一个网段。</li>
+<li>交换机可使用的网段：需要&lt;&#x3D; VPC网段（子集）</li>
+</ul>
+<img data-src="/posts/64a8/vpc1.png" class>
+
+<ul>
+<li>VPC数量：创建多个VPC 时尽量使用不同网段</li>
+<li>集群数量：同账号下部署多集群时尽量使用不同网段</li>
+<li>如有ACK 集群资源时，需判断集群网络插件模式<ul>
+<li>非Terway 插件时，需要三个私网网段，如：10.1.0.0&#x2F;16（VPC-vswitch）、192.168.0.0&#x2F;24（Pod 使用）、192.168.10.0&#x2F;24（Service 使用）</li>
+<li>使用Terway 插件时，需要两个私网网段，如：10.16.0.0&#x2F;8（VPC-vswitch + Pod）、192.168.0.0&#x2F;24（Service 使用）</li>
+</ul>
+</li>
+</ul>
+<h4 id="个人建议"><a href="#个人建议" class="headerlink" title="**个人建议"></a>**个人建议</h4><ul>
+<li><p>同账号下（同环境）选择 192.168.0.0&#x2F;16、10.0.0.0&#x2F;0、172.16.0.0&#x2F;12 进行VPC 创建组网。</p>
+<ul>
+<li>不同集群与云产品资源之间使用子交换机分割。</li>
+<li>使用云产品白名单或其他网络插件做网络隔离策略。</li>
+</ul>
+</li>
+<li><p>不同账号（如日常、线上）可复用同网段进行组网（一般不存在跨环境调用）。</p>
+</li>
+<li><p>当前环境网络组网信息（建议后续都使用Terway 插件）：</p>
+<ul>
+<li><p>日常环境网络架构</p>
+<img data-src="/posts/64a8/vpc2.png" class>
+</li>
+<li><p>线上网络架构（集群与集群、集群与云产品，通过私网的交换机网段进行隔离）</p>
+</li>
+</ul>
+</li>
+</ul>
+<img data-src="/posts/64a8/vpc3.png" class>
+
+
+<h3 id="线上实际案例"><a href="#线上实际案例" class="headerlink" title="线上实际案例"></a>线上实际案例</h3><h4 id="1）案例1"><a href="#1）案例1" class="headerlink" title="1）案例1"></a>1）案例1</h4><img data-src="/posts/64a8/vpc4.png" class>
+
+<ul>
+<li>VPC：10.0.0.0&#x2F;8 （复用线上VPC）</li>
+<li>交换机：新建4 台交换机<ul>
+<li>test-swc-10_200_0_0_20  （可用区 1）</li>
+<li>test-swc-10_200_16_0_20 （可用区 2）</li>
+<li>test-swc-10_200_64_0_19 （可用区 1）</li>
+<li>test-swc-10_200_96_0_19 （可用区 2）</li>
+</ul>
+</li>
+<li>集群CIDR规划<ul>
+<li>Node CIDR：<ul>
+<li>10.200.0.0&#x2F;20</li>
+<li>10.200.16.0&#x2F;20</li>
+</ul>
+</li>
+<li>Pod CIDR：<ul>
+<li>10.200.64.0&#x2F;19</li>
+<li>10.200.96.0&#x2F;19</li>
+</ul>
+</li>
+<li>Service CIDR：<ul>
+<li>172.31.0.0&#x2F;16<blockquote>
+<p>注意：</p>
+<ul>
+<li>Node 和Pod 交换机如要高可用选择不同可用区时，需要每个可用区都有Node 和Pod 可使用的交换机。</li>
+<li>Service 网段不能与VPC 网段 及VPC 内已有Kubernetes 集群使用的网段重复。</li>
+</ul>
+</blockquote>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<h4 id="2）相关文档与工具"><a href="#2）相关文档与工具" class="headerlink" title="2）相关文档与工具"></a>2）相关文档与工具</h4><ul>
+<li><p><a href="https://help.aliyun.com/document_detail/189596.html">云企业网工作原理与操作</a></p>
+</li>
+<li><p>VPN网关原理与操作：</p>
+<ul>
+<li><a href="https://cloud.tencent.com/developer/article/1824924">IPSec VPN 技术原理</a></li>
+<li><a href="https://help.aliyun.com/document_detail/65072.html">阿里云官方操作文档</a></li>
+</ul>
+</li>
+<li><p><a href="https://www.bejson.com/convert/subnetmask/">子网计算在线工具</a></p>
+</li>
+<li><p>架构图</p>
+</li>
+</ul>
+<p><img data-src="https://intranetproxy.alipay.com/skylark/lark/0/2022/png/21956377/1646207048171-c0f5a83d-b982-4e85-ab78-f724882be069.png#clientId=ufadced67-c1c1-4&from=ui&id=u1dc1cab7&margin=%5Bobject%20Object%5D&name=%E6%80%BB%E4%BD%93%E7%BD%91%E7%BB%9C%E6%9E%B6%E6%9E%84.png&originHeight=1993&originWidth=4131&originalType=binary&ratio=1&size=515776&status=done&style=none&taskId=uffed0b55-26c9-4f1d-b577-67c4f6f81ec" alt="总体网络架构.png"></p>
+]]></content>
+      <categories>
+        <category>网络</category>
+      </categories>
+      <tags>
+        <tag>阿里云</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>流量网关方案与灰度发布</title>
+    <url>/posts/dc02.html</url>
+    <content><![CDATA[<link rel="stylesheet" class="aplayer-secondary-style-marker" href="/assets/css/APlayer.min.css"><script src="/assets/js/APlayer.min.js" class="aplayer-secondary-script-marker"></script><script class="meting-secondary-script-marker" src="/assets/js/Meting.min.js"></script><h3 id="流量网关方案与灰度发布方式"><a href="#流量网关方案与灰度发布方式" class="headerlink" title="流量网关方案与灰度发布方式"></a>流量网关方案与灰度发布方式</h3><h4 id="一、阿里云原生-Ingress-方式"><a href="#一、阿里云原生-Ingress-方式" class="headerlink" title="一、阿里云原生 Ingress 方式"></a>一、阿里云原生 Ingress 方式</h4><p><strong>前置要求</strong></p>
+<ol>
+<li>集群已安装 Ingress 组件</li>
+<li>明确灰度发布规则（使用 cookie 值匹配 A&#x2F;B 测试规则）</li>
+</ol>
+<p><strong>操作步骤</strong></p>
+<ol>
+<li>部署新旧版本 Deployment 和 Service</li>
+</ol>
+<p>通过 Edas 创建新应用，并暴露 service（无需 SLB 暴露）。已 app1 应用为例：</p>
+<table>
+<thead>
+<tr>
+<th><strong>资源</strong></th>
+<th><strong>旧版本</strong></th>
+<th><strong>新版本</strong></th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Edas 应用</td>
+<td>app1-test</td>
+<td>app1-new-test</td>
+</tr>
+<tr>
+<td>Deployment</td>
+<td>app1-test-group-x-xxx</td>
+<td>app1-new-test-group-x-xxx</td>
+</tr>
+<tr>
+<td>Service</td>
+<td>app1-svc</td>
+<td>app1-new-svc</td>
+</tr>
+</tbody></table>
+<span id="more"></span>
+
+<ol start="2">
+<li><p>配置 ingress</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">apiVersion: networking.k8s.io/v1</span><br><span class="line">kind: Ingress</span><br><span class="line">metadata:</span><br><span class="line">  annotations:</span><br><span class="line">    # 匹配规则：正则匹配 cookie 值</span><br><span class="line">    nginx.ingress.kubernetes.io/service-match: |</span><br><span class="line">      new-nginx: cookie(&quot;foo&quot;, /^aBc123.*/)</span><br><span class="line">  name: gray-release</span><br><span class="line">  namespace: default</span><br><span class="line">spec:</span><br><span class="line">  rules:</span><br><span class="line">  - host: www.yakir.com</span><br><span class="line">    http:</span><br><span class="line">      paths:</span><br><span class="line">      # 旧版本服务</span><br><span class="line">      - backend:</span><br><span class="line">          service:</span><br><span class="line">            name: old-nginx</span><br><span class="line">            port:</span><br><span class="line">              number: 80</span><br><span class="line">        path: /</span><br><span class="line">        pathType: ImplementationSpecific</span><br><span class="line">      # 新版本服务</span><br><span class="line">      - backend:</span><br><span class="line">          service:</span><br><span class="line">            name: new-nginx</span><br><span class="line">            port:</span><br><span class="line">              number: 80</span><br><span class="line">        path: /</span><br><span class="line">        pathType: ImplementationSpecific</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>验证请求<br>略</p>
+</li>
+</ol>
+<h4 id="二、Istio-网关方式"><a href="#二、Istio-网关方式" class="headerlink" title="二、Istio 网关方式"></a>二、Istio 网关方式</h4><p><strong>前置要求</strong></p>
+<ol>
+<li><p>集群部署 istio </p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line"># 下载 istio</span><br><span class="line">curl -L https://istio.io/downloadIstio | sh -</span><br><span class="line"></span><br><span class="line"># 进入 istio 目录，执行安装命令</span><br><span class="line">cd istio-1.13.3/</span><br><span class="line">./bin/istioctl install --set profile=demo</span><br><span class="line"></span><br><span class="line"># 查看可安装的环境（default 用于生产环境，demo 用于测试）</span><br><span class="line">./bin/istioctl profile list</span><br><span class="line">Istio configuration profiles:</span><br><span class="line">    default</span><br><span class="line">    demo</span><br><span class="line">    empty</span><br><span class="line">    external</span><br><span class="line">    minimal</span><br><span class="line">    openshift</span><br><span class="line">    preview</span><br><span class="line">    remote</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+</li>
+<li><p>明确灰度发布规则（使用 cookie 值匹配 A&#x2F;B 测试规则）</p>
+</li>
+</ol>
+<p><strong>操作步骤</strong></p>
+<ol>
+<li><p>部署新旧版本 Deployment 和 Service</p>
+</li>
+<li><p>配置 istio 网关与匹配规则</p>
+</li>
+</ol>
+<p>istio-gateway.yaml 文件内容，执行 kubectl apply -f istio-gateway.yaml &amp;&amp; kubectl apply -f virtualservice.yaml 创建相关资源。</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">apiVersion: networking.istio.io/v1alpha3</span><br><span class="line">kind: Gateway</span><br><span class="line">metadata:</span><br><span class="line">  name: istio-gateway-test</span><br><span class="line">spec:</span><br><span class="line">  selector:</span><br><span class="line">    istio: ingressgateway # use istio default controller</span><br><span class="line">  servers:</span><br><span class="line">  - port:</span><br><span class="line">      number: 80</span><br><span class="line">      name: http</span><br><span class="line">      protocol: HTTP</span><br><span class="line">    tls:</span><br><span class="line">      httpsRedirect: true</span><br><span class="line">    hosts:</span><br><span class="line">    - &quot;*.yakir.com&quot;</span><br><span class="line">  - port:</span><br><span class="line">      number: 443</span><br><span class="line">      name: https</span><br><span class="line">      protocol: HTTPS</span><br><span class="line">    tls:</span><br><span class="line">      mode: SIMPLE</span><br><span class="line">      credentialName: yakir-com.cert</span><br><span class="line">    hosts:</span><br><span class="line">    - &quot;*.yakir.com&quot;</span><br></pre></td></tr></table></figure>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">apiVersion: networking.istio.io/v1alpha3</span><br><span class="line">kind: VirtualService</span><br><span class="line">metadata:</span><br><span class="line">  name: virtual-service-test</span><br><span class="line">spec:</span><br><span class="line">  hosts:</span><br><span class="line">  - yakir.yakir.com</span><br><span class="line">  gateways:</span><br><span class="line">  - istio-gateway-test</span><br><span class="line">  http:</span><br><span class="line">  - match:</span><br><span class="line">    - headers:</span><br><span class="line">        cookie:</span><br><span class="line">          regex: &quot;^(.*?;)?(foo=aBc123.*)(;.*)?$&quot;</span><br><span class="line">    route:</span><br><span class="line">    - destination:</span><br><span class="line">        host: new-nginx-svc</span><br><span class="line">        port:</span><br><span class="line">          number: 80</span><br><span class="line">  - route:</span><br><span class="line">    - destination:</span><br><span class="line">        host: old-nginx-svc</span><br><span class="line">        port:</span><br><span class="line">          number: 80</span><br></pre></td></tr></table></figure>
+
+<ol start="3">
+<li>验证请求<br>略</li>
+</ol>
+<blockquote>
+<p>istio 配置 https 证书：</p>
+<ol>
+<li>导入 yakir.com 证书（可通过控制台或 kubectl cli 方式导入）<br>控制台方式：配置管理 -&gt; 保密字典 中点击创建，填入 crt、key、名称，选择 TLS 证书类型，点击确定导入证书密钥。</li>
+<li>istio gateway 资源开启 https 配置，选择 secret 方式导入 （见上述配置文件）</li>
+</ol>
+</blockquote>
+<h4 id="应用调整为灰度发布策略操作方式"><a href="#应用调整为灰度发布策略操作方式" class="headerlink" title="应用调整为灰度发布策略操作方式"></a>应用调整为灰度发布策略操作方式</h4><p>第一种方式：保留两套应用实现</p>
+<ul>
+<li><p>新建 CI&#x2F;CD 流水线 + Edas 应用 + Service，即同时保留两套应用（如日常环境 app1-test、app1-test-new）</p>
+</li>
+<li><p>在网关入口处，将 app1 域名流量按照规则匹配到两个应用 Service（默认规则流量进入稳定版应用对应的 Service，匹配到 cookie 值规则的流量进入新版本应用对应的 Service）</p>
+</li>
+<li><p>应用 owner 操作：将应用域名解析修改到 WAF 解析（回源为实际 ingress 或 istio 网关地址）</p>
+</li>
+</ul>
+<p><del>第二种方式：复用一套应用，通过分批发布方式？（暂无法实现）</del></p>
+<ul>
+<li>通过分批发布可以保留两个新旧版本 Deployment ，使用同一个Service。通过 DestinationRule 规则匹配不同流量流入不同 Deployment，实现灰度流量分流。</li>
+</ul>
+<p>问题点：每次需要手动获取发布的新旧版本 Deployment 的 label 值，更新 DestinationRule 规则。</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">apiVersion: networking.istio.io/v1alpha3</span><br><span class="line">kind: VirtualService</span><br><span class="line">metadata:</span><br><span class="line">  name: virtual-service-test</span><br><span class="line">spec:</span><br><span class="line">  hosts:</span><br><span class="line">  - yakir.yakir.com</span><br><span class="line">  gateways:</span><br><span class="line">  - istio-gateway-test</span><br><span class="line">  http:</span><br><span class="line">  # 路由规则目标使用同一个 host，通过 subsets 子集来区分流量走向</span><br><span class="line">  - match:</span><br><span class="line">    - headers:</span><br><span class="line">        cookie:</span><br><span class="line">          regex: &quot;^(.*?;)?(foo=aBc123.*)(;.*)?$&quot;</span><br><span class="line">    route:</span><br><span class="line">    - destination:</span><br><span class="line">        host: test-nginx-svc</span><br><span class="line">        subset: new</span><br><span class="line">        port:</span><br><span class="line">          number: 80</span><br><span class="line">  - route:</span><br><span class="line">    - destination:</span><br><span class="line">        host: test-nginx-svc</span><br><span class="line">        subset: old</span><br><span class="line">        port:</span><br><span class="line">          number: 80</span><br></pre></td></tr></table></figure>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">kind: DestinationRule</span><br><span class="line">metadata:</span><br><span class="line">  name: destination-rule-test</span><br><span class="line">spec:</span><br><span class="line">  host: test-nginx-svc</span><br><span class="line">  # 使用 label 值来区别流量流入的 Deployment</span><br><span class="line">  subsets:</span><br><span class="line">  - name: old</span><br><span class="line">    labels:</span><br><span class="line">      edas.oam.acversion: &quot;3&quot;</span><br><span class="line">  - name: new</span><br><span class="line">    labels:</span><br><span class="line">      edas.oam.acversion: &quot;4&quot;</span><br></pre></td></tr></table></figure>
+
+
+<h4 id="其他"><a href="#其他" class="headerlink" title="***其他"></a>***其他</h4><p><strong>注意事项</strong><br>可观测性：新增 CRD 资源，开启 ingress 日志。<br>istio 高可用性保证？<br>兜底方案： SLB 兜底？</p>
+<p><strong>参考文档</strong><br>阿里云 Ingress：<a href="https://help.aliyun.com/document_detail/200941.html#section-t2t-eik-oyr">https://help.aliyun.com/document_detail&#x2F;200941.html#section-t2t-eik-oyr</a><br>Istio 官网：<a href="https://istio.io/latest/zh/docs/concepts/traffic-management/">https://istio.io/latest/zh/docs/concepts/traffic-management/</a></p>
+]]></content>
+      <categories>
+        <category>CNCF</category>
+      </categories>
+      <tags>
+        <tag>阿里云</tag>
+        <tag>Istio</tag>
       </tags>
   </entry>
   <entry>
@@ -538,6 +642,240 @@
       </tags>
   </entry>
   <entry>
+    <title>K8S &amp; ACK 学习记录</title>
+    <url>/posts/754e.html</url>
+    <content><![CDATA[<link rel="stylesheet" class="aplayer-secondary-style-marker" href="/assets/css/APlayer.min.css"><script src="/assets/js/APlayer.min.js" class="aplayer-secondary-script-marker"></script><script class="meting-secondary-script-marker" src="/assets/js/Meting.min.js"></script><h3 id="一、ACK集群网络规划"><a href="#一、ACK集群网络规划" class="headerlink" title="一、ACK集群网络规划"></a>一、ACK集群网络规划</h3><p><a href="https://help.aliyun.com/document_detail/86500.html">https://help.aliyun.com/document_detail&#x2F;86500.html</a></p>
+<h3 id="二、RBAC授权"><a href="#二、RBAC授权" class="headerlink" title="二、RBAC授权"></a>二、RBAC授权</h3><p><a href="https://yuque.antfin.com/kifo8h/nee5aa/mvx5t5">https://yuque.antfin.com/kifo8h/nee5aa/mvx5t5</a></p>
+<h3 id="三、网络"><a href="#三、网络" class="headerlink" title="三、网络"></a>三、网络</h3><h4 id="容器网络CNI"><a href="#容器网络CNI" class="headerlink" title="容器网络CNI"></a>容器网络CNI</h4><p><a href="https://help.aliyun.com/document_detail/195424.html">https://help.aliyun.com/document_detail&#x2F;195424.html</a></p>
+<span id="more"></span>
+
+<h4 id="Service：将一组容器暴露访问接入点，可负载均衡"><a href="#Service：将一组容器暴露访问接入点，可负载均衡" class="headerlink" title="Service：将一组容器暴露访问接入点，可负载均衡"></a>Service：将一组容器暴露访问接入点，可负载均衡</h4><ul>
+<li><p><strong>ClusterIP</strong>：在集群内部IP上公开服务。选择此值使服务只能从集群中访问。（默认创建的 ServiceType）</p>
+</li>
+<li><p><strong>NodePort</strong>：在每个Node的IP上公开静态端口（NodePort）服务。将自动创建NodePort服务到ClusterIP服务的路由。可以通过请求：来从群集外部请求NodePort服务。</p>
+</li>
+<li><p><strong>LoadBalancer</strong>：使用云提供商的负载均衡器在外部公开服务。将自动创建外部负载均衡器到NodePort和ClusterIP服务的路由</p>
+</li>
+<li><p><strong>Headless Service</strong>：在Service属性中指定clusterIP字段为None类型。采用Headless Service类型后，Service将没有固定的虚拟IP地址，客户端访问Service的域名时会通过DNS返回所有的后端Pod实例的IP地址，客户端需要采用DNS负载均衡来实现对后端的负载均衡</p>
+</li>
+<li><p><strong>ExternalName</strong>：将集群外部的域名映射到集群内部的Service上，例如将外部的数据库域名映射到集群内部的Service名，那么就能在集群内部通过Service名直接访问。</p>
+</li>
+</ul>
+<blockquote>
+<p><strong>集群信息：</strong></p>
+<ul>
+<li>集群CIDR（Master、Node ECS实例IP）：172.16.0.0&#x2F;16 </li>
+<li>Pod CIDR：10.16.0.0&#x2F;12</li>
+<li>Service CIDR：10.32.0.0&#x2F;16</li>
+</ul>
+<p><strong>Service信息：</strong></p>
+<ul>
+<li>暴露ClusterIP：10.32.230.55</li>
+<li>内部端点：reos-app-file-base-svc:80 TCP</li>
+</ul>
+</blockquote>
+<p><strong>Pod 信息（两个副本）：</strong></p>
+<blockquote>
+<ul>
+<li>IP：10.16.1.41、10.16.3.227</li>
+<li>容器内部启动端口：8080</li>
+</ul>
+</blockquote>
+<p><strong>NodePort信息（两个Node节点、使用ClusterIP模式时没有该信息）：</strong></p>
+<blockquote>
+<ul>
+<li>NodeIP：172.16.9.150、172.16.9.64</li>
+<li>公开的静态端口：30152、30144</li>
+</ul>
+</blockquote>
+<p><strong>LoadBanlancer 信息（公网或私网）：</strong></p>
+<blockquote>
+<ul>
+<li>暴露公网IP：112.124.13.114</li>
+<li>外部端点：112.124.13.114:80</li>
+</ul>
+<p><strong>此时，可通过四种方式进行应用的请求（最终流量到达一致，都会到容器内部）：</strong></p>
+<ol>
+<li>集群内部请求 ServiceIP：10.32.230.55:80 或 reos-app-file-base-svc:80（解析需Coredns组件）</li>
+<li>集群内部请求 PodIP（随时变化，一般不使用）：10.16.1.41:8080 或 10.16.3.227:8080</li>
+<li>集群内部或外部请求 NodeIP：172.16.9.150:30152 或 172.16.9.64:30144</li>
+<li>集群内部或外部请求 SLB IP：112.124.13.114:80 （注意集群内部访问时要修改外部策略 local –&gt; Cluster）</li>
+</ol>
+<p><strong>查看端点信息：kubectl get endpoints&#x2F;xxxxx -owide</strong></p>
+</blockquote>
+<img data-src="/posts/754e/k8s1.png" class>
+
+
+<h4 id="Ingress：将集群内的-Service-对外暴露7层的访问接入点"><a href="#Ingress：将集群内的-Service-对外暴露7层的访问接入点" class="headerlink" title="Ingress：将集群内的 Service 对外暴露7层的访问接入点"></a>Ingress：将集群内的 Service 对外暴露7层的访问接入点</h4><p>如：前后端使用 &#x2F;static&#x2F; 、 &#x2F;apis&#x2F; 的不同 URL ，使用 Ingress 匹配规则并进行对应后端的反向代理</p>
+<img data-src="/posts/754e/k8s2.png" class>
+
+<h4 id="Coredns：服务发现DNS，实现不同部署环境访问同样的访问入口"><a href="#Coredns：服务发现DNS，实现不同部署环境访问同样的访问入口" class="headerlink" title="Coredns：服务发现DNS，实现不同部署环境访问同样的访问入口"></a>Coredns：服务发现DNS，实现不同部署环境访问同样的访问入口</h4><ul>
+<li>通过 Service 的服务名解析出 ClusterIP</li>
+<li>通过 StatefulSet 的 Pod 名解析出 Pod 的 IP</li>
+</ul>
+<h4 id="其他"><a href="#其他" class="headerlink" title="其他"></a>其他</h4><ul>
+<li>相关阿里云资源：<a href="https://help.aliyun.com/product/27706.html">VPC</a>、<a href="https://help.aliyun.com/product/27537.html">SLB</a></li>
+<li><a href="https://help.aliyun.com/document_detail/97467.html">Terway 与 Flannel对比</a></li>
+</ul>
+<h3 id="四、存储"><a href="#四、存储" class="headerlink" title="四、存储"></a>四、存储</h3><img data-src="/posts/754e/k8s3.png" class>
+<h4 id="容器存储接口CSI-Plugin-组件"><a href="#容器存储接口CSI-Plugin-组件" class="headerlink" title="容器存储接口CSI-Plugin 组件"></a>容器存储接口CSI-Plugin 组件</h4><ul>
+<li>云盘存储卷</li>
+<li>容器网络文件系统</li>
+<li>NAS 存储卷</li>
+<li>OSS 存储卷</li>
+<li>CPFS 存储卷</li>
+<li>本地存储卷</li>
+<li>容器存储监控&amp;运维</li>
+</ul>
+<h4 id="存储FlexVolume-组件"><a href="#存储FlexVolume-组件" class="headerlink" title="存储FlexVolume 组件"></a>存储FlexVolume 组件</h4><ul>
+<li>云盘存储卷</li>
+<li>NAS 存储卷</li>
+<li>OSS 存储卷</li>
+<li>CPFS 存储卷</li>
+<li>持久化存储卷声明</li>
+</ul>
+<h3 id="五、应用"><a href="#五、应用" class="headerlink" title="五、应用"></a>五、应用</h3><h4 id="工作负载"><a href="#工作负载" class="headerlink" title="工作负载"></a>工作负载</h4><ul>
+<li>无状态工作 Deployment</li>
+<li>有状态工作 StatefulSet<ul>
+<li>特性：Pod 一致性、稳定的持久化存储、稳定的网络标志（hostname）、稳定的次序（副本的数字序号）</li>
+</ul>
+</li>
+<li>守护进程集 DaemenSet<ul>
+<li>保证每个节点上都运行一个容器副本</li>
+<li>部署集群日志、监控或其他系统管理应用</li>
+</ul>
+</li>
+<li>任务 Job<ul>
+<li>仅执行一次性任务，保证批处理任务一个或多个 Pod 成功结束</li>
+<li>支持的Job类型：非并行、固定结束次数、工作队列并行Job、固定结束次数的并行Job</li>
+</ul>
+</li>
+<li>定时任务 CronJob<ul>
+<li>执行周期性和重复性任务（如备份操作或发送邮件），通过时间调度</li>
+</ul>
+</li>
+<li>容器组<ul>
+<li>Pod：最小部署单元，由单个容器（实际docker 容器）或几个紧耦合的容器组成</li>
+</ul>
+</li>
+<li>自定义资源<ul>
+<li>自定义资源定义拓展 K8S API</li>
+<li>查看集群中所有API 组和包含的资源类型</li>
+</ul>
+</li>
+</ul>
+<h4 id="镜像（ACR仓库）"><a href="#镜像（ACR仓库）" class="headerlink" title="镜像（ACR仓库）"></a>镜像（ACR仓库）</h4><ul>
+<li>镜像签名组件：kritis-validation-hook</li>
+<li>镜像免密拉取组件：aliyun-acr-credential-helper</li>
+</ul>
+<h4 id="配置项-Configmap-与保密字典-Secret"><a href="#配置项-Configmap-与保密字典-Secret" class="headerlink" title="配置项 Configmap 与保密字典 Secret"></a>配置项 Configmap 与保密字典 Secret</h4><ul>
+<li>配置项管理和使用<ul>
+<li>控制台&#x2F;YAML  创建管理Configmap 资源</li>
+<li>使用：设置Pod 环境变量、设置命令行参数、数据卷中使用</li>
+</ul>
+</li>
+<li>保密字典管理和使用<ul>
+<li>控制台&#x2F;YAML 创建管理Secret 资源</li>
+<li>使用：设置Pod 环境变量、数据卷中使用</li>
+</ul>
+</li>
+</ul>
+<h4 id="应用调度与部署"><a href="#应用调度与部署" class="headerlink" title="应用调度与部署"></a>应用调度与部署</h4><ul>
+<li>调度应用Pod 至指定节点：通过设置节点<strong>标签</strong>，配置nodeSelector 强制约束Pod 调度到指定节点（控制台给节点添加标签，然后Pod 启动的YAML 模板 spec –&gt; nodeSelector –&gt; gourp 配置为新增的标签名）</li>
+<li>Descheduler 组件对集群Pod 调度优化（通过策略设置）<ul>
+<li>删除重复Pod，确保只有一个Pod 与同一节点运行的ReplicaSet、Replication Controller、StatefulSet、Job 关联</li>
+<li>删除违反Pod 间反亲和性的Pod</li>
+<li>驱逐其他节点Pod 到未充分利用的节点</li>
+<li>删除重启次数过多的Pod</li>
+</ul>
+</li>
+<li>应用触发器重新部署应用：控制台生成触发器URL，通过请求URL 触发重新部署（可通过curl 或集成开发语言）</li>
+<li>Helm 应用部署<ul>
+<li>Chart：Helm包，包含运行应用所需的镜像、依赖和资源定义、集群中服务定义，类似APT 的dpkg 或YUM 的rpm 文件。</li>
+<li>Release：运行Chart 的实例。同一集群Chart 可以安装多次，每次安装都会创建一个release（如一个MySQL Chart 安装两次，就会在服务器上产生两个release 版本的数据库）。</li>
+<li>Repository： 用于发布和存储Chart 的存储库。</li>
+<li>Helm 组件：Helm CLI 客户端工具、Tiller 服务端组件、Repository 存储库（HTTP协议访问）。</li>
+</ul>
+</li>
+<li>控制台方式&#x2F;YAML方式 部署、发布和监控应用</li>
+</ul>
+<h4 id="使用AHAS对应用进行高可用防护"><a href="#使用AHAS对应用进行高可用防护" class="headerlink" title="使用AHAS对应用进行高可用防护"></a>使用AHAS对应用进行高可用防护</h4><p><a href="https://help.aliyun.com/document_detail/193575.html">https://help.aliyun.com/document_detail&#x2F;193575.html</a></p>
+<h3 id="六、组件"><a href="#六、组件" class="headerlink" title="六、组件"></a>六、组件</h3><h4 id="核心组件"><a href="#核心组件" class="headerlink" title="核心组件"></a>核心组件</h4><ul>
+<li><p>系统组件</p>
+<ul>
+<li>Kube API Server：集群总线和入口网关。</li>
+<li>Kube Controller Manager：集群内部资源管理器。</li>
+<li>Cloud Controller Manager：提供集群与阿里云基础产品对接能力，如 CLB、VPC等。<h4 id="应用管理"><a href="#应用管理" class="headerlink" title="应用管理"></a>应用管理</h4></li>
+</ul>
+</li>
+<li><p>可选组件</p>
+<ul>
+<li>appcenter：提供统一管理多集群应用部署和应用生命周期的应用中心组件。</li>
+<li>progressive-delivery-tool：提供应用渐进式灰度发布的组件。<h4 id="日志与监控"><a href="#日志与监控" class="headerlink" title="日志与监控"></a>日志与监控</h4></li>
+</ul>
+</li>
+<li><p>系统组件</p>
+<ul>
+<li>alicloud-monitor-controller：ACK提供对接云监控的系统组件。</li>
+<li>metrics-server：ACK基于社区开源监控组件进行改造和增强的监控采集和离线组件，并提供Metrics API进行数据消费，提供HPA的能力。</li>
+</ul>
+</li>
+<li><p>可选组件</p>
+<ul>
+<li>ack-node-problem-detector：ACK基于社区开源项目进行改造和增强的集群节点异常事件监控组件，以及对接第三方监控平台功能的组件。</li>
+<li>ags-metrics-collector：为基因计算客户使用的监控服务组件，可以通过该组件监控基因工作流中各个节点资源使用的详细信息。</li>
+<li>ack-arms-prometheus：使用ARMS Prometheus实现容器服务集群监控。</li>
+<li>logtail-ds：使用日志服务采集Kubernetes容器日志。</li>
+<li>logtail-windows：ACK集群上使用的容器日志收集插件，用于在阿里云上配合SLS服务对Windows容器进行日志收集。<h4 id="存储"><a href="#存储" class="headerlink" title="存储"></a>存储</h4></li>
+</ul>
+</li>
+<li><p>可选组件</p>
+<ul>
+<li>csi-plugin：支持数据卷的挂载、卸载功能。创建集群时，如果选择CSI插件实现阿里云存储的接入能力的话，默认安装该组件。</li>
+<li>csi-provisioner：支持数据卷的自动创建能力。创建集群时，如果选择CSI插件实现阿里云存储的接入能力的话，默认安装该组件。</li>
+<li>storage-operator：用于管理存储组件的生命周期。</li>
+<li>alicloud-disk-controller：支持自动创建云盘卷。</li>
+<li>Flexvolume：社区较早实现的存储卷扩展机制。Flexvolume支持数据卷的挂载、卸载功能。创建集群时，如果选择Flexvolume插件实现阿里云存储的接入能力的话，默认安装该组件。</li>
+</ul>
+</li>
+</ul>
+<h4 id="网络"><a href="#网络" class="headerlink" title="网络"></a>网络</h4><ul>
+<li>系统组件<ul>
+<li>CoreDNS：ACK集群中默认采用的DNS服务发现插件，其遵循Kubernetes DNS-Based Service Discovery规范。</li>
+<li>Nginx Ingress Controller：Nginx Ingress Controller解析Ingress的转发规则。Ingress Controller收到请求，匹配Ingress转发规则转发到后端Service。</li>
+<li>managed-kube-proxy-windows：ACK托管版集群上使用的容器化kube-proxy，用于管理Windows节点上Service的访问入口，包括集群内Pod到Service的访问和集群外访问Service。</li>
+</ul>
+</li>
+<li>可选组件<ul>
+<li>Terway :  阿里云开源的基于专有网络VPC的容器网络接口CNI插件，支持基于Kubernetes标准的网络策略（NetworkPolicy）来定义容器间的访问策略。创建集群时，如果选择Terway网络插件实现集群内部网络互通的话，默认安装该组件。</li>
+<li>Flannel：容器网络接口CNI插件，在阿里云上使用的Flannel网络模式采用阿里云VPC模式。创建集群时，如果选择Flannel网络插件实现集群内部网络互通的话，默认安装该组件。</li>
+<li>ACK NodeLocal DNSCache：基于社区开源项目NodeLocal DNSCache的一套DNS本地缓存解决方案。</li>
+<li>kube-flannel-ds-windows：ACK托管版集群上使用的容器网络插件，用于构建适合Windows容器通讯的L2Bridge集群网络。</li>
+</ul>
+</li>
+</ul>
+<img data-src="/posts/754e/k8s4.png" class>
+
+<h4 id="安全"><a href="#安全" class="headerlink" title="安全"></a><a href="https://help.aliyun.com/document_detail/277412.html#title-nq4-jps-k41">安全</a></h4><h4 id="其他-1"><a href="#其他-1" class="headerlink" title="其他"></a><a href="https://help.aliyun.com/document_detail/277412.html#title-iib-fx3-2hl">其他</a></h4><h3 id="七、其他"><a href="#七、其他" class="headerlink" title="七、其他"></a>七、其他</h3><h4 id="K8S-集群-NetworkPolicy-策略"><a href="#K8S-集群-NetworkPolicy-策略" class="headerlink" title="K8S 集群 NetworkPolicy 策略"></a><a href="https://yuque.antfin.com/kifo8h/nee5aa/bzg9vq">K8S 集群 NetworkPolicy 策略</a></h4><ul>
+<li>Pod 和 Pod 通信通过三个标识符组合来辨识：</li>
+</ul>
+<p>1、其他被允许的 Pods（Pod 无法阻塞自身的访问）<br>2、被允许的 namespace<br>3、IP 组块 （Pod 本身所在的 Node 和 Pod  IP通信默认允许通信）</p>
+<ul>
+<li>默认情况下，Pod 非隔离。 被 NetworkPolicy 选中进入隔离状态。</li>
+<li>NetworkPolicy 策略不会冲突，累积策略。多个策略作用于一个Pod时，Pod 的入站&#x2F;出站策略取所有策略的并集</li>
+<li>两个 Pod 之间通信时，需要源端Pod上的出站（Egress）规则和目标端 Pod 上的入站（Ingress）规则都要允许该流量。</li>
+<li>ACK只支持 Terway 网络模式，不支持 Flannel 网络模式</li>
+</ul>
+]]></content>
+      <categories>
+        <category>CNCF</category>
+      </categories>
+      <tags>
+        <tag>阿里云</tag>
+        <tag>K8S</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>Git Flow 工作流</title>
     <url>/posts/539.html</url>
     <content><![CDATA[<link rel="stylesheet" class="aplayer-secondary-style-marker" href="/assets/css/APlayer.min.css"><script src="/assets/js/APlayer.min.js" class="aplayer-secondary-script-marker"></script><script class="meting-secondary-script-marker" src="/assets/js/Meting.min.js"></script><h3 id="一、gitflow：版本分支管理策略（相当于对git的包装）"><a href="#一、gitflow：版本分支管理策略（相当于对git的包装）" class="headerlink" title="一、gitflow：版本分支管理策略（相当于对git的包装）"></a>一、gitflow：版本分支管理策略（相当于对git的包装）</h3><ol>
@@ -666,110 +1004,6 @@
       </categories>
       <tags>
         <tag>git</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>流量网关方案与灰度发布</title>
-    <url>/posts/dc02.html</url>
-    <content><![CDATA[<link rel="stylesheet" class="aplayer-secondary-style-marker" href="/assets/css/APlayer.min.css"><script src="/assets/js/APlayer.min.js" class="aplayer-secondary-script-marker"></script><script class="meting-secondary-script-marker" src="/assets/js/Meting.min.js"></script><h3 id="流量网关方案与灰度发布方式"><a href="#流量网关方案与灰度发布方式" class="headerlink" title="流量网关方案与灰度发布方式"></a>流量网关方案与灰度发布方式</h3><h4 id="一、阿里云原生-Ingress-方式"><a href="#一、阿里云原生-Ingress-方式" class="headerlink" title="一、阿里云原生 Ingress 方式"></a>一、阿里云原生 Ingress 方式</h4><p><strong>前置要求</strong></p>
-<ol>
-<li>集群已安装 Ingress 组件</li>
-<li>明确灰度发布规则（使用 cookie 值匹配 A&#x2F;B 测试规则）</li>
-</ol>
-<p><strong>操作步骤</strong></p>
-<ol>
-<li>部署新旧版本 Deployment 和 Service</li>
-</ol>
-<p>通过 Edas 创建新应用，并暴露 service（无需 SLB 暴露）。已 app1 应用为例：</p>
-<table>
-<thead>
-<tr>
-<th><strong>资源</strong></th>
-<th><strong>旧版本</strong></th>
-<th><strong>新版本</strong></th>
-</tr>
-</thead>
-<tbody><tr>
-<td>Edas 应用</td>
-<td>app1-test</td>
-<td>app1-new-test</td>
-</tr>
-<tr>
-<td>Deployment</td>
-<td>app1-test-group-x-xxx</td>
-<td>app1-new-test-group-x-xxx</td>
-</tr>
-<tr>
-<td>Service</td>
-<td>app1-svc</td>
-<td>app1-new-svc</td>
-</tr>
-</tbody></table>
-<span id="more"></span>
-
-<ol start="2">
-<li><p>配置 ingress</p>
-<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">apiVersion: networking.k8s.io/v1</span><br><span class="line">kind: Ingress</span><br><span class="line">metadata:</span><br><span class="line">  annotations:</span><br><span class="line">    # 匹配规则：正则匹配 cookie 值</span><br><span class="line">    nginx.ingress.kubernetes.io/service-match: |</span><br><span class="line">      new-nginx: cookie(&quot;foo&quot;, /^aBc123.*/)</span><br><span class="line">  name: gray-release</span><br><span class="line">  namespace: default</span><br><span class="line">spec:</span><br><span class="line">  rules:</span><br><span class="line">  - host: www.yakir.com</span><br><span class="line">    http:</span><br><span class="line">      paths:</span><br><span class="line">      # 旧版本服务</span><br><span class="line">      - backend:</span><br><span class="line">          service:</span><br><span class="line">            name: old-nginx</span><br><span class="line">            port:</span><br><span class="line">              number: 80</span><br><span class="line">        path: /</span><br><span class="line">        pathType: ImplementationSpecific</span><br><span class="line">      # 新版本服务</span><br><span class="line">      - backend:</span><br><span class="line">          service:</span><br><span class="line">            name: new-nginx</span><br><span class="line">            port:</span><br><span class="line">              number: 80</span><br><span class="line">        path: /</span><br><span class="line">        pathType: ImplementationSpecific</span><br></pre></td></tr></table></figure>
-</li>
-<li><p>验证请求<br>略</p>
-</li>
-</ol>
-<h4 id="二、Istio-网关方式"><a href="#二、Istio-网关方式" class="headerlink" title="二、Istio 网关方式"></a>二、Istio 网关方式</h4><p><strong>前置要求</strong></p>
-<ol>
-<li><p>集群部署 istio </p>
-<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line"># 下载 istio</span><br><span class="line">curl -L https://istio.io/downloadIstio | sh -</span><br><span class="line"></span><br><span class="line"># 进入 istio 目录，执行安装命令</span><br><span class="line">cd istio-1.13.3/</span><br><span class="line">./bin/istioctl install --set profile=demo</span><br><span class="line"></span><br><span class="line"># 查看可安装的环境（default 用于生产环境，demo 用于测试）</span><br><span class="line">./bin/istioctl profile list</span><br><span class="line">Istio configuration profiles:</span><br><span class="line">    default</span><br><span class="line">    demo</span><br><span class="line">    empty</span><br><span class="line">    external</span><br><span class="line">    minimal</span><br><span class="line">    openshift</span><br><span class="line">    preview</span><br><span class="line">    remote</span><br><span class="line"></span><br></pre></td></tr></table></figure>
-</li>
-<li><p>明确灰度发布规则（使用 cookie 值匹配 A&#x2F;B 测试规则）</p>
-</li>
-</ol>
-<p><strong>操作步骤</strong></p>
-<ol>
-<li><p>部署新旧版本 Deployment 和 Service</p>
-</li>
-<li><p>配置 istio 网关与匹配规则</p>
-</li>
-</ol>
-<p>istio-gateway.yaml 文件内容，执行 kubectl apply -f istio-gateway.yaml &amp;&amp; kubectl apply -f virtualservice.yaml 创建相关资源。</p>
-<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">apiVersion: networking.istio.io/v1alpha3</span><br><span class="line">kind: Gateway</span><br><span class="line">metadata:</span><br><span class="line">  name: istio-gateway-test</span><br><span class="line">spec:</span><br><span class="line">  selector:</span><br><span class="line">    istio: ingressgateway # use istio default controller</span><br><span class="line">  servers:</span><br><span class="line">  - port:</span><br><span class="line">      number: 80</span><br><span class="line">      name: http</span><br><span class="line">      protocol: HTTP</span><br><span class="line">    tls:</span><br><span class="line">      httpsRedirect: true</span><br><span class="line">    hosts:</span><br><span class="line">    - &quot;*.yakir.com&quot;</span><br><span class="line">  - port:</span><br><span class="line">      number: 443</span><br><span class="line">      name: https</span><br><span class="line">      protocol: HTTPS</span><br><span class="line">    tls:</span><br><span class="line">      mode: SIMPLE</span><br><span class="line">      credentialName: yakir-com.cert</span><br><span class="line">    hosts:</span><br><span class="line">    - &quot;*.yakir.com&quot;</span><br></pre></td></tr></table></figure>
-<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">apiVersion: networking.istio.io/v1alpha3</span><br><span class="line">kind: VirtualService</span><br><span class="line">metadata:</span><br><span class="line">  name: virtual-service-test</span><br><span class="line">spec:</span><br><span class="line">  hosts:</span><br><span class="line">  - yakir.yakir.com</span><br><span class="line">  gateways:</span><br><span class="line">  - istio-gateway-test</span><br><span class="line">  http:</span><br><span class="line">  - match:</span><br><span class="line">    - headers:</span><br><span class="line">        cookie:</span><br><span class="line">          regex: &quot;^(.*?;)?(foo=aBc123.*)(;.*)?$&quot;</span><br><span class="line">    route:</span><br><span class="line">    - destination:</span><br><span class="line">        host: new-nginx-svc</span><br><span class="line">        port:</span><br><span class="line">          number: 80</span><br><span class="line">  - route:</span><br><span class="line">    - destination:</span><br><span class="line">        host: old-nginx-svc</span><br><span class="line">        port:</span><br><span class="line">          number: 80</span><br></pre></td></tr></table></figure>
-
-<ol start="3">
-<li>验证请求<br>略</li>
-</ol>
-<blockquote>
-<p>istio 配置 https 证书：</p>
-<ol>
-<li>导入 yakir.com 证书（可通过控制台或 kubectl cli 方式导入）<br>控制台方式：配置管理 -&gt; 保密字典 中点击创建，填入 crt、key、名称，选择 TLS 证书类型，点击确定导入证书密钥。</li>
-<li>istio gateway 资源开启 https 配置，选择 secret 方式导入 （见上述配置文件）</li>
-</ol>
-</blockquote>
-<h4 id="应用调整为灰度发布策略操作方式"><a href="#应用调整为灰度发布策略操作方式" class="headerlink" title="应用调整为灰度发布策略操作方式"></a>应用调整为灰度发布策略操作方式</h4><p>第一种方式：保留两套应用实现</p>
-<ul>
-<li><p>新建 CI&#x2F;CD 流水线 + Edas 应用 + Service，即同时保留两套应用（如日常环境 app1-test、app1-test-new）</p>
-</li>
-<li><p>在网关入口处，将 app1 域名流量按照规则匹配到两个应用 Service（默认规则流量进入稳定版应用对应的 Service，匹配到 cookie 值规则的流量进入新版本应用对应的 Service）</p>
-</li>
-<li><p>应用 owner 操作：将应用域名解析修改到 WAF 解析（回源为实际 ingress 或 istio 网关地址）</p>
-</li>
-</ul>
-<p><del>第二种方式：复用一套应用，通过分批发布方式？（暂无法实现）</del></p>
-<ul>
-<li>通过分批发布可以保留两个新旧版本 Deployment ，使用同一个Service。通过 DestinationRule 规则匹配不同流量流入不同 Deployment，实现灰度流量分流。</li>
-</ul>
-<p>问题点：每次需要手动获取发布的新旧版本 Deployment 的 label 值，更新 DestinationRule 规则。</p>
-<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">apiVersion: networking.istio.io/v1alpha3</span><br><span class="line">kind: VirtualService</span><br><span class="line">metadata:</span><br><span class="line">  name: virtual-service-test</span><br><span class="line">spec:</span><br><span class="line">  hosts:</span><br><span class="line">  - yakir.yakir.com</span><br><span class="line">  gateways:</span><br><span class="line">  - istio-gateway-test</span><br><span class="line">  http:</span><br><span class="line">  # 路由规则目标使用同一个 host，通过 subsets 子集来区分流量走向</span><br><span class="line">  - match:</span><br><span class="line">    - headers:</span><br><span class="line">        cookie:</span><br><span class="line">          regex: &quot;^(.*?;)?(foo=aBc123.*)(;.*)?$&quot;</span><br><span class="line">    route:</span><br><span class="line">    - destination:</span><br><span class="line">        host: test-nginx-svc</span><br><span class="line">        subset: new</span><br><span class="line">        port:</span><br><span class="line">          number: 80</span><br><span class="line">  - route:</span><br><span class="line">    - destination:</span><br><span class="line">        host: test-nginx-svc</span><br><span class="line">        subset: old</span><br><span class="line">        port:</span><br><span class="line">          number: 80</span><br></pre></td></tr></table></figure>
-<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">kind: DestinationRule</span><br><span class="line">metadata:</span><br><span class="line">  name: destination-rule-test</span><br><span class="line">spec:</span><br><span class="line">  host: test-nginx-svc</span><br><span class="line">  # 使用 label 值来区别流量流入的 Deployment</span><br><span class="line">  subsets:</span><br><span class="line">  - name: old</span><br><span class="line">    labels:</span><br><span class="line">      edas.oam.acversion: &quot;3&quot;</span><br><span class="line">  - name: new</span><br><span class="line">    labels:</span><br><span class="line">      edas.oam.acversion: &quot;4&quot;</span><br></pre></td></tr></table></figure>
-
-
-<h4 id="其他"><a href="#其他" class="headerlink" title="***其他"></a>***其他</h4><p><strong>注意事项</strong><br>可观测性：新增 CRD 资源，开启 ingress 日志。<br>istio 高可用性保证？<br>兜底方案： SLB 兜底？</p>
-<p><strong>参考文档</strong><br>阿里云 Ingress：<a href="https://help.aliyun.com/document_detail/200941.html#section-t2t-eik-oyr">https://help.aliyun.com/document_detail&#x2F;200941.html#section-t2t-eik-oyr</a><br>Istio 官网：<a href="https://istio.io/latest/zh/docs/concepts/traffic-management/">https://istio.io/latest/zh/docs/concepts/traffic-management/</a></p>
-]]></content>
-      <categories>
-        <category>CNCF</category>
-      </categories>
-      <tags>
-        <tag>阿里云</tag>
-        <tag>Istio</tag>
       </tags>
   </entry>
   <entry>
@@ -1077,236 +1311,419 @@
       </tags>
   </entry>
   <entry>
-    <title>K8S &amp; ACK 学习记录</title>
-    <url>/posts/754e.html</url>
-    <content><![CDATA[<link rel="stylesheet" class="aplayer-secondary-style-marker" href="/assets/css/APlayer.min.css"><script src="/assets/js/APlayer.min.js" class="aplayer-secondary-script-marker"></script><script class="meting-secondary-script-marker" src="/assets/js/Meting.min.js"></script><h3 id="一、ACK集群网络规划"><a href="#一、ACK集群网络规划" class="headerlink" title="一、ACK集群网络规划"></a>一、ACK集群网络规划</h3><p><a href="https://help.aliyun.com/document_detail/86500.html">https://help.aliyun.com/document_detail&#x2F;86500.html</a></p>
-<h3 id="二、RBAC授权"><a href="#二、RBAC授权" class="headerlink" title="二、RBAC授权"></a>二、RBAC授权</h3><p><a href="https://yuque.antfin.com/kifo8h/nee5aa/mvx5t5">https://yuque.antfin.com/kifo8h/nee5aa/mvx5t5</a></p>
-<h3 id="三、网络"><a href="#三、网络" class="headerlink" title="三、网络"></a>三、网络</h3><h4 id="容器网络CNI"><a href="#容器网络CNI" class="headerlink" title="容器网络CNI"></a>容器网络CNI</h4><p><a href="https://help.aliyun.com/document_detail/195424.html">https://help.aliyun.com/document_detail&#x2F;195424.html</a></p>
-<span id="more"></span>
-
-<h4 id="Service：将一组容器暴露访问接入点，可负载均衡"><a href="#Service：将一组容器暴露访问接入点，可负载均衡" class="headerlink" title="Service：将一组容器暴露访问接入点，可负载均衡"></a>Service：将一组容器暴露访问接入点，可负载均衡</h4><ul>
-<li><p><strong>ClusterIP</strong>：在集群内部IP上公开服务。选择此值使服务只能从集群中访问。（默认创建的 ServiceType）</p>
-</li>
-<li><p><strong>NodePort</strong>：在每个Node的IP上公开静态端口（NodePort）服务。将自动创建NodePort服务到ClusterIP服务的路由。可以通过请求：来从群集外部请求NodePort服务。</p>
-</li>
-<li><p><strong>LoadBalancer</strong>：使用云提供商的负载均衡器在外部公开服务。将自动创建外部负载均衡器到NodePort和ClusterIP服务的路由</p>
-</li>
-<li><p><strong>Headless Service</strong>：在Service属性中指定clusterIP字段为None类型。采用Headless Service类型后，Service将没有固定的虚拟IP地址，客户端访问Service的域名时会通过DNS返回所有的后端Pod实例的IP地址，客户端需要采用DNS负载均衡来实现对后端的负载均衡</p>
-</li>
-<li><p><strong>ExternalName</strong>：将集群外部的域名映射到集群内部的Service上，例如将外部的数据库域名映射到集群内部的Service名，那么就能在集群内部通过Service名直接访问。</p>
+    <title>K8S-网络</title>
+    <url>/posts/5d90.html</url>
+    <content><![CDATA[<link rel="stylesheet" class="aplayer-secondary-style-marker" href="/assets/css/APlayer.min.css"><script src="/assets/js/APlayer.min.js" class="aplayer-secondary-script-marker"></script><script class="meting-secondary-script-marker" src="/assets/js/Meting.min.js"></script><h3 id="一、简介"><a href="#一、简介" class="headerlink" title="一、简介"></a>一、简介</h3><h4 id="1）容器网络基本概念"><a href="#1）容器网络基本概念" class="headerlink" title="1）容器网络基本概念"></a>1）容器网络基本概念</h4><ul>
+<li>Linux Network Namespace<ul>
+<li>linux 网络设备：network interface device，loopback device，bridge device，veth device，tun&#x2F;tap device，vxlan device，ip tunnel device 等等可完成网络数据包收发，提供额外修改数据包功能设备</li>
+<li>linux 路由表（三层 ip 包路由寻址功能），arp 表（提供 ip 对应的 mac 信息），fdb（提供基于 mac 转发功能中 mac 地址对应的网络接口） 等</li>
+<li>linux 协议栈：对网络协议包的封装与解析，如二层 ethernet 包，三层 ip icmp包，四层 tcp&#x2F;udp 包等</li>
+<li>linux iptable：基于内核模块 netfilter 完成对 linux 的 firewall 管理，例如控制 ingress 与 engress，nat 地址转换，端口映射等<span id="more"></span></li>
+</ul>
 </li>
 </ul>
+<img data-src="/posts/5d90/k8s-nw1.png" class>
 <blockquote>
-<p><strong>集群信息：</strong></p>
+<p>linux 不仅仅只有 network namespace 用来进行网络隔离，还有 pid namespace 用来隔离进程，user namespace 用来隔离用户，mount namespace 用来隔离挂载点，ipc namespace 用来隔离信号量和共享内存等，uts namespace 用来隔离主机名和域名。<br>配合 cgroup 控制组，限制 cpu，memory，io 等资源。构成容器的底层实现</p>
+</blockquote>
 <ul>
-<li>集群CIDR（Master、Node ECS实例IP）：172.16.0.0&#x2F;16 </li>
-<li>Pod CIDR：10.16.0.0&#x2F;12</li>
-<li>Service CIDR：10.32.0.0&#x2F;16</li>
+<li>Linux Bridge Device</li>
 </ul>
-<p><strong>Service信息：</strong></p>
+<p>linux 网桥设备，可以附加 attach 多个 linux 从设备。类似于一个内部虚拟二层交换机，可以进行二层数据包广播。但是注意的是linux bridge设备可以有自己的ip地址。也就是说，多个linux网络设备attach到一个bridge上，那么这些网络设备的ip地址将会失效(只有二层功能)，当一个设备收到数据包的时候，bridge会把数据包转发到其它所有attach到bridge上的从设备，从而实现广播的效果。</p>
+<img data-src="/posts/5d90/k8s-nw2.png" class>
+
 <ul>
-<li>暴露ClusterIP：10.32.230.55</li>
-<li>内部端点：reos-app-file-base-svc:80 TCP</li>
+<li>Linux Veth Device</li>
+</ul>
+<p>总是成对出现，一对 peer 两个端点，数据包从一个 peer 流入并流出到另一个 peer。veth pair 可以跨 network namespace。</p>
+<img data-src="/posts/5d90/k8s-nw3.png" class>
+
+<h4 id="2）k8s-集群容器网络通讯方式"><a href="#2）k8s-集群容器网络通讯方式" class="headerlink" title="2）k8s 集群容器网络通讯方式"></a>2）k8s 集群容器网络通讯方式</h4><ul>
+<li>网络负载方式</li>
+</ul>
+<p>kube-proxy 组件启动参数控制（–proxy-module&#x3D;ipvs）<br>iptables：默认<br>ipvs：v1.11 版本及之后</p>
+<ul>
+<li>网络通讯方式</li>
+</ul>
+<p>underlay：flannel host-gw，calico bgp 等（需开启 ip_forword 内核参数）<br>overlay：flannel vxlan，calico ipip，flannel udp（一般不使用） 等</p>
+<h4 id="3）测试环境主机信息"><a href="#3）测试环境主机信息" class="headerlink" title="3）测试环境主机信息"></a>3）测试环境主机信息</h4><table>
+<thead>
+<tr>
+<th>宿主机 IP</th>
+<th>角色</th>
+<th>容器 CIDR</th>
+<th>CNI 网卡地址</th>
+<th>Flannel.1 vtep 设备</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>192.168.205.4</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>192.168.205.3</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>192.168.205.5</td>
+<td>master</td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>node1</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>node2</td>
+<td>10.42.0.0&#x2F;24</td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>10.42.1.0&#x2F;24</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>10.42.2.0&#x2F;24</td>
+<td>10.42.0.1</td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>10.42.1.1</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>10.42.2.1</td>
+<td>10.42.0.0</td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>10.42.1.0</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>10.42.2.0</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+</tbody></table>
+<h3 id="二、宿主机内网络"><a href="#二、宿主机内网络" class="headerlink" title="二、宿主机内网络"></a>二、宿主机内网络</h3><h4 id="1）docker-容器的四种网络类型"><a href="#1）docker-容器的四种网络类型" class="headerlink" title="1）docker 容器的四种网络类型"></a>1）docker 容器的四种网络类型</h4><ul>
+<li>bridge 模式（默认）：–net&#x3D;bridge</li>
+</ul>
+<p>宿主机创建 docker0 网卡，使用独立 IP 段，为每个容器分配改网段 IP，容器之间通过该网桥进行通信（类似二层交换机）</p>
+<blockquote>
+<img data-src="/posts/5d90/k8s-nw4.png" class>
+<p>自定义 bridge 网络：宿主机范围创建独立的 network namespace </p>
+<img data-src="/posts/5d90/k8s-nw5.png" class>
+</blockquote>
+<ul>
+<li>host 模式：–net&#x3D;host</li>
+</ul>
+<p>共享宿主机网络，容器暴露端口时占用宿主机端口。网络模式简单，性能较好，一般用于单容器服务。</p>
+<img data-src="/posts/5d90/k8s-nw6.png" class>
+
+<ul>
+<li>contaniner 模式：–net&#x3D;container:name or id</li>
+</ul>
+<p>指定新创建的容器共享已存在的容器 Network namespace（k8s 中 pod 即为多个容器共享 network namespace）。除了网络，文件系统 进程等都为隔离，容器间进程可以通过 lo 网卡通信</p>
+<img data-src="/posts/5d90/k8s-nw7.png" class>
+
+<ul>
+<li>none 模式：容器有独立的 Network namespace ，但没有任何网络配置，可自定义进行网络配置。一般用于 CPU 密集型任务，计算完成保留磁盘无需对外网络</li>
+</ul>
+<h4 id="2）docker-宿主环境中容器网络"><a href="#2）docker-宿主环境中容器网络" class="headerlink" title="2）docker 宿主环境中容器网络"></a>2）docker 宿主环境中容器网络</h4><ul>
+<li>每一个container都有一个network namespace，然后拥有container自己的网络设备，路由表，arp表，协议栈，iptable等，各个container的network namespace相互隔离。</li>
+<li>在宿主的default netwok nemespace中会有一个linux bridge设备，一般名称为docker0。</li>
+<li>每一个container对应一个veth pair设备，这个设备的一端在container的network namespace里，另一端attach到宿主networkwork namespace的docker0 linux bridge上。</li>
+<li>这样在宿主环境里，就好像有一个二层交换机(docker0 bridge)，把宿主内的所有container连接起来。所以，在宿主内的container都是可以直接相互访问的，而且是直连的方式</li>
+</ul>
+<img data-src="/posts/5d90/k8s-nw8.png" class>
+
+<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line"><span class="meta prompt_">#</span><span class="language-bash"><span class="comment"># 相关命令</span></span></span><br><span class="line"><span class="meta prompt_">#</span><span class="language-bash">查看 bridge 网桥信息</span></span><br><span class="line"><span class="meta prompt_">#</span><span class="language-bash">k8s pod 伴生 infrastructure 容器，与基础容器共用 network namespace 与 veth pair</span></span><br><span class="line">brctl show</span><br><span class="line"><span class="meta prompt_"></span></span><br><span class="line"><span class="meta prompt_">#</span><span class="language-bash">查看 veth pair 设备信息</span></span><br><span class="line">ip addr</span><br><span class="line">ip -d link show</span><br><span class="line"><span class="meta prompt_"></span></span><br><span class="line"><span class="meta prompt_">#</span><span class="language-bash">查看路由表</span></span><br><span class="line">route -n</span><br><span class="line"><span class="meta prompt_"></span></span><br><span class="line"><span class="meta prompt_">#</span><span class="language-bash">查看 docker 容器信息</span></span><br><span class="line">docker ps/inspect/container</span><br></pre></td></tr></table></figure>
+
+<h3 id="三、Service：cluster-ip-实现原理"><a href="#三、Service：cluster-ip-实现原理" class="headerlink" title="三、Service：cluster ip 实现原理"></a>三、Service：cluster ip 实现原理</h3><h4 id="1）cluster-ip-如何访问"><a href="#1）cluster-ip-如何访问" class="headerlink" title="1）cluster ip 如何访问"></a>1）cluster ip 如何访问</h4><p>k8s 集群中服务需要相互访问，一般为之创建相应的 service，集群内部访问时一般使用 cluster ip。一个 cluster ip 后面会关联多个 endpoints（实际的 pod 地址）。对于 cluster ip 的访问，也就是实现了对 cluster ip 关联的多个 endpoints 负载均衡访问（负载方式为 iptables 或 ipvs）</p>
+<h4 id="2）iptables-方式"><a href="#2）iptables-方式" class="headerlink" title="2）iptables 方式"></a>2）iptables 方式</h4><ul>
+<li><p>查看 service 信息：cluster ip 以及关联的 endpoints ip</p>
+<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line"><span class="meta prompt_"># </span><span class="language-bash">kubectl describe service nginx-test</span></span><br><span class="line">Name:              nginx-test</span><br><span class="line">Namespace:         default</span><br><span class="line">Labels:            app=nginx-test</span><br><span class="line">Annotations:       &lt;none&gt;</span><br><span class="line">Selector:          app=nginx-test</span><br><span class="line">Type:              ClusterIP</span><br><span class="line">IP Family Policy:  SingleStack</span><br><span class="line">IP Families:       IPv4</span><br><span class="line">IP:                10.43.6.58</span><br><span class="line">IPs:               10.43.6.58</span><br><span class="line">Port:              80-80  80/TCP</span><br><span class="line">TargetPort:        80/TCP</span><br><span class="line">Endpoints:         10.42.1.6:80,10.42.2.6:80</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>查看宿主机 iptables </p>
+<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line"><span class="meta prompt_"># </span><span class="language-bash">iptables -nvL -t nat |<span class="built_in">head</span></span></span><br><span class="line">Chain PREROUTING (policy ACCEPT 0 packets, 0 bytes)</span><br><span class="line">pkts bytes target     prot opt in     out     source               destination</span><br><span class="line">298 19090 KUBE-SERVICES  all  --  *      *       0.0.0.0/0            0.0.0.0/0            /* kubernetes service portals */</span><br><span class="line">202 12456 CNI-HOSTPORT-DNAT  all  --  *      *       0.0.0.0/0            0.0.0.0/0            ADDRTYPE match dst-type LOCAL</span><br></pre></td></tr></table></figure>
+<p>对于 PREROUTING chain 中，所有的流量都走到了 KUBE-SERVICES 这个 target 中。请注意 PREROUTING chain 是流量到达之后的第一个入口。如果在 pod 里运行命令 curl <a href="http://10.43.6.58，根据容器内部路由表，数据包应该是这样的流动：">http://10.43.6.58，根据容器内部路由表，数据包应该是这样的流动：</a></p>
+<ul>
+<li>在pod中，根据路由表发现cluster ip(<strong>10.43.6.58</strong>)走默认路由，选择了默认网关。</li>
+<li>在pod中，默认网关的ip地址就是宿主netwok namespace的 <strong>docker0 或 cni0</strong> 的ip地址，并且默认网关为直连路由。</li>
+<li>在pod中，根据路由表，使用eth0 device发送数据，eth0本质是veth pair在pod network namespace的一端，另一端attach在宿主netwok namespace的 <strong>docker0 或 cni0</strong> bridge上。</li>
+<li>veth pair，数据从pod network namespace的一端发出，进入到了attached到<strong>docker0 或 cni0</strong> bridge上的另一端。</li>
+<li><strong>docker0 或 cni0</strong> bridge收到数据之后，自然就来到了host network namesapce 的 PREROUTING chain</li>
+</ul>
+</li>
+<li><p>查看 KUBE-SERVICES target</p>
+<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line"><span class="meta prompt_"># </span><span class="language-bash">iptables -nvL -t nat | grep 10.43.6.58</span></span><br><span class="line">0     0 KUBE-SVC-7CWUT4JBGBRVUN2L  tcp  --  *      *       0.0.0.0/0            10.43.6.58           /* default/nginx-test:80-80 cluster IP */ tcp dpt:80</span><br><span class="line"><span class="meta prompt_"></span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">iptables -nvL -t nat | grep KUBE-SVC-7CWUT4JBGBRVUN2L -A 5</span></span><br><span class="line">Chain KUBE-SVC-7CWUT4JBGBRVUN2L (1 references)</span><br><span class="line">pkts bytes target     prot opt in     out     source               destination</span><br><span class="line">0     0 KUBE-SEP-U2YYZT2C3O6VM4EV  all  --  *      *       0.0.0.0/0            0.0.0.0/0            /* default/nginx-test:80-80 -&gt; 10.42.1.6:80 */ statistic mode random probability 0.50000000000</span><br><span class="line">0     0 KUBE-SEP-GWUIQWA2TNZI4ESX  all  --  *      *       0.0.0.0/0            0.0.0.0/0            /* default/nginx-test:80-80 -&gt; 10.42.2.6:80 */</span><br></pre></td></tr></table></figure>
+<p>在 KUBE-SERVICES target中我们可以看到目标地址为cluster ip 10.43.6.58 的匹配target 为 KUBE-SVC-7CWUT4JBGBRVUN2L。<br><strong>KUBE-SVC-7CWUT4JBGBRVUN2L 链信息：</strong></p>
+<ul>
+<li>存在两个target （对应两个 Pod ）KUBE-SEP-U2YYZT2C3O6VM4EV 和 KUBE-SEP-GWUIQWA2TNZI4ESX </li>
+<li>在 KUBE-SEP-U2YYZT2C3O6VM4EV 中有statistic mode random probability 0.5。0.5 利用了iptable内核随机模块，随机比率为0.5，也就是50%</li>
+<li>由于一半随机比率进入 KUBE-SEP-U2YYZT2C3O6VM4EV target， 因此另一个 target 的随机比率也为50%，实现负载均衡</li>
+</ul>
+</li>
+<li><p>查看 KUBE-SEP-U2YYZT2C3O6VM4EV 和 KUBE-SEP-GWUIQWA2TNZI4ESX </p>
+<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line"><span class="meta prompt_"># </span><span class="language-bash">iptables -nvL -t nat | grep KUBE-SEP-U2YYZT2C3O6VM4EV -A 3</span></span><br><span class="line">Chain KUBE-SEP-U2YYZT2C3O6VM4EV (1 references)</span><br><span class="line">pkts bytes target     prot opt in     out     source               destination</span><br><span class="line">0     0 KUBE-MARK-MASQ  all  --  *      *       10.42.1.6            0.0.0.0/0            /* default/nginx-test:80-80 */</span><br><span class="line">0     0 DNAT       tcp  --  *      *       0.0.0.0/0            0.0.0.0/0            /* default/nginx-test:80-80 */ tcp to:10.42.1.6:80</span><br><span class="line"><span class="meta prompt_"></span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">iptables -nvL -t nat | grep KUBE-SEP-GWUIQWA2TNZI4ESX -A 3</span></span><br><span class="line">Chain KUBE-SEP-GWUIQWA2TNZI4ESX (1 references)</span><br><span class="line">pkts bytes target     prot opt in     out     source               destination</span><br><span class="line">0     0 KUBE-MARK-MASQ  all  --  *      *       10.42.2.6            0.0.0.0/0            /* default/nginx-test:80-80 */</span><br><span class="line">0     0 DNAT       tcp  --  *      *       0.0.0.0/0            0.0.0.0/0            /* default/nginx-test:80-80 */ tcp to:10.42.2.6:80</span><br></pre></td></tr></table></figure>
+<p>在这2个target中我们可以看到：</p>
+<ul>
+<li>分别做了MASQ操作，这个应该是出站engress流量(限定了source ip)，不是我们的入站ingress流量。</li>
+<li>做了DNAT操作，把原来的cluster ip给DANT转换成了pod的ip 10.42.1.6和10.42.2.6。把原来的port转换成了80 port</li>
+<li>经过这个一系列iptable的target我们的原始请求10.42.1.6:80就变成了10.42.1.6:80或者10.42.2.6:80，而且两者转变的机率各是50%。</li>
+<li>根据iptable，经过PREROUTING chain发现DNAT之后的10.42.1.6或者10.42.2.6不是本地的ip(这两个ip是pod的ip，当然不会在host network namespace里)。所以就走到了Forwarding chain中，根据host network namespace的路由表来决定下一跳地址</li>
+</ul>
+</li>
+</ul>
+<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line"><span class="meta prompt_"># </span><span class="language-bash">查看路由表信息</span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">ip route</span></span><br><span class="line">default via 192.168.205.1 dev enp0s1 proto dhcp src 192.168.205.4 metric 100</span><br><span class="line">10.42.0.0/24 dev cni0 proto kernel scope link src 10.42.0.1</span><br><span class="line">10.42.1.0/24 via 10.42.1.0 dev flannel.1 onlink</span><br><span class="line">10.42.2.0/24 via 10.42.2.0 dev flannel.1 onlink</span><br><span class="line">192.168.205.0/24 dev enp0s1 proto kernel scope link src 192.168.205.4 metric 100</span><br><span class="line">192.168.205.1 dev enp0s1 proto dhcp scope link src 192.168.205.4 metric 100</span><br><span class="line"><span class="meta prompt_"></span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">根据路由表规则10.42.1.6和10.42.2.6走 flannel.1 vtep 设备跨主机通信 node 节点上的 pod</span></span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>clusterip 类型 service 总结<ul>
+<li>流量从pod network namespace中走到host netwok namespace的docker0中。</li>
+<li>在host netwok namespace的<strong>PREROUTING chain</strong>中会经过一系列target。</li>
+<li>在这些target里根据iptable内核随机模块来实现匹配endpoint target，随机比率为均匀分配，实现均匀的负载均衡。内核实现负载均衡，无法自定义负载均衡算法。</li>
+<li>在endpoint target里实现了DNAT，也就是将目标地址cluster ip转化为实际的pod的ip。</li>
+<li>cluster ip是虚拟ip，不会和任何device绑定。</li>
+<li>需要host开启路由转发功能(net.ipv4.ip_forward &#x3D; 1)。</li>
+<li>数据包在host netwok namespace中经过转换以及DNAT之后，由host network namespace的路由表来决定下一跳地址</li>
+</ul>
+</li>
+</ul>
+<h4 id="3）ipvs-方式"><a href="#3）ipvs-方式" class="headerlink" title="3）ipvs 方式"></a>3）ipvs 方式</h4><ul>
+<li><a href="https://mp.weixin.qq.com/s?__biz=MzI0MDE3MjAzMg==&mid=2648393263&idx=1&sn=d6f27c502a007aa8be7e75b17afac42f&chksm=f1310b40c64682563cfbfd0688deb0fc9569eca3b13dc721bfe0ad7992183cabfba354e02050&scene=178&cur_album_id=2123526506718003213#rd">https://mp.weixin.qq.com/s?__biz&#x3D;MzI0MDE3MjAzMg&#x3D;&#x3D;&amp;mid&#x3D;2648393263&amp;idx&#x3D;1&amp;sn&#x3D;d6f27c502a007aa8be7e75b17afac42f&amp;chksm&#x3D;f1310b40c64682563cfbfd0688deb0fc9569eca3b13dc721bfe0ad7992183cabfba354e02050&amp;scene&#x3D;178&amp;cur_album_id&#x3D;2123526506718003213#rd</a></li>
+<li><a href="https://icloudnative.io/posts/ipvs-how-kubernetes-services-direct-traffic-to-pods/">https://icloudnative.io/posts/ipvs-how-kubernetes-services-direct-traffic-to-pods/</a></li>
+</ul>
+<h3 id="四、Service：nodeport-实现原理"><a href="#四、Service：nodeport-实现原理" class="headerlink" title="四、Service：nodeport 实现原理"></a>四、Service：nodeport 实现原理</h3><h4 id="1）nodeport-ip-如何访问"><a href="#1）nodeport-ip-如何访问" class="headerlink" title="1）nodeport ip 如何访问"></a>1）nodeport ip 如何访问</h4><p>通过访问宿主机端口 –&gt; cluster ip 路径（端口范围：30000-32767）</p>
+<h4 id="2）iptables-方式-1"><a href="#2）iptables-方式-1" class="headerlink" title="2）iptables 方式"></a>2）iptables 方式</h4><ul>
+<li><p>查看 service 信息</p>
+<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line"><span class="meta prompt_"># </span><span class="language-bash">kubectl describe service nginx-test</span></span><br><span class="line">Name:                     nginx-test</span><br><span class="line">Namespace:                default</span><br><span class="line">Labels:                   app=nginx-test</span><br><span class="line">Annotations:              &lt;none&gt;</span><br><span class="line">Selector:                 app=nginx-test</span><br><span class="line">Type:                     NodePort</span><br><span class="line">IP Family Policy:         SingleStack</span><br><span class="line">IP Families:              IPv4</span><br><span class="line">IP:                       10.43.6.58</span><br><span class="line">IPs:                      10.43.6.58</span><br><span class="line">Port:                     80-80  80/TCP</span><br><span class="line">TargetPort:               80/TCP</span><br><span class="line">NodePort:                 80-80  32506/TCP</span><br><span class="line">Endpoints:                10.42.1.6:80,10.42.2.6:80</span><br><span class="line">Session Affinity:         None</span><br><span class="line">External Traffic Policy:  Cluster</span><br><span class="line">Events:                   &lt;none&gt;</span><br></pre></td></tr></table></figure>
+<p>对node port类型的service来说，访问host的port就访问到了这个服务。所以从host网络角度来看，当host收到数据包的时候应该是进入host network namespace的PREROUTING chain中，查看host network namespace的PREROUTING chain。</p>
+</li>
+<li><p>查看宿主机 iptables</p>
+<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line"><span class="meta prompt_"># </span><span class="language-bash">iptables -nvL -t nat |<span class="built_in">head</span></span></span><br><span class="line">Chain PREROUTING (policy ACCEPT 0 packets, 0 bytes)</span><br><span class="line">pkts bytes target     prot opt in     out     source               destination</span><br><span class="line">323 20898 KUBE-SERVICES  all  --  *      *       0.0.0.0/0            0.0.0.0/0            /* kubernetes service portals */</span><br></pre></td></tr></table></figure>
+<p>根据规则，对于PREROUTING chain中，所有的流量都走到了KUBE-SERVICES这个target中。</p>
+</li>
+<li><p>查看 KUBE-SERVICES target</p>
+<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line"><span class="meta prompt_"># </span><span class="language-bash">iptables -nvL -t nat |grep KUBE-SERVICES -A 10</span></span><br><span class="line">Chain KUBE-SERVICES (2 references)</span><br><span class="line">pkts bytes target     prot opt in     out     source               destination</span><br><span class="line">0     0 KUBE-SVC-7CWUT4JBGBRVUN2L  tcp  --  *      *       0.0.0.0/0            10.43.6.58           /* default/nginx-test:80-80 cluster IP */ tcp dpt:80</span><br></pre></td></tr></table></figure>
+<p>在KUBE-SERVICES target中当访问 nginx-test-service 在host上的 32506 时候，根据规则匹配到了 KUBE-NODEPORTS 这个target。</p>
+<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line"><span class="meta prompt_"># </span><span class="language-bash">iptables -nvL -t nat |grep KUBE-NODEPORTS -A 3</span></span><br><span class="line">Chain KUBE-NODEPORTS (1 references)</span><br><span class="line">pkts bytes target     prot opt in     out     source               destination</span><br><span class="line">2   124 KUBE-EXT-7CWUT4JBGBRVUN2L  tcp  --  *      *       0.0.0.0/0            0.0.0.0/0            /* default/nginx-test:80-80 */ tcp dpt:32506</span><br></pre></td></tr></table></figure>
+<p>在KUBE-NODEPORTS target中可以看到当访问 32506 端口时到 KUBE-EXT-7CWUT4JBGBRVUN2L 这个 target </p>
+</li>
+<li><p>查看 KUBE-EXT-7CWUT4JBGBRVUN2L  target</p>
+<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line"><span class="meta prompt_"># </span><span class="language-bash">iptables -nvL -t nat |grep KUBE-EXT-7CWUT4JBGBRVUN2L -A 5</span></span><br><span class="line">Chain KUBE-EXT-7CWUT4JBGBRVUN2L (1 references)</span><br><span class="line"> pkts bytes target     prot opt in     out     source               destination</span><br><span class="line">    2   124 KUBE-MARK-MASQ  all  --  *      *       0.0.0.0/0            0.0.0.0/0            /* masquerade traffic for default/nginx-test:80-80 external destinations */</span><br><span class="line">    2   124 KUBE-SVC-7CWUT4JBGBRVUN2L  all  --  *      *       0.0.0.0/0            0.0.0.0/0</span><br><span class="line"><span class="meta prompt_"></span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">iptables -nvL -t nat |grep KUBE-MARK-MASQ -A 3</span></span><br><span class="line">Chain KUBE-MARK-MASQ (20 references)</span><br><span class="line"> pkts bytes target     prot opt in     out     source               destination</span><br><span class="line">    2   124 MARK       all  --  *      *       0.0.0.0/0            0.0.0.0/0            MARK or 0x4000</span><br><span class="line"><span class="meta prompt_"></span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">iptables -nvL -t nat |grep KUBE-SVC-7CWUT4JBGBRVUN2L -A 5</span></span><br><span class="line">Chain KUBE-SVC-7CWUT4JBGBRVUN2L (2 references)</span><br><span class="line"> pkts bytes target     prot opt in     out     source               destination</span><br><span class="line">    0     0 KUBE-MARK-MASQ  tcp  --  *      *      !10.42.0.0/16         10.43.6.58           /* default/nginx-test:80-80 cluster IP */ tcp dpt:80</span><br><span class="line">    1    64 KUBE-SEP-U2YYZT2C3O6VM4EV  all  --  *      *       0.0.0.0/0            0.0.0.0/0            /* default/nginx-test:80-80 -&gt; 10.42.1.6:80 */ statistic mode random probability 0.50000000000</span><br><span class="line">    1    60 KUBE-SEP-GWUIQWA2TNZI4ESX  all  --  *      *       0.0.0.0/0            0.0.0.0/0            /* default/nginx-test:80-80 -&gt; 10.42.2.6:80 */</span><br></pre></td></tr></table></figure>
+<p>在 KUBE-EXT-7CWUT4JBGBRVUN2L 中可以看到两个 target</p>
+<ul>
+<li>KUBE-MARK-MASQ 打标记，无 nat target</li>
+<li>KUBE-SVC-7CWUT4JBGBRVUN2L target 进入 cluster ip 规则，重复第三部分规则，最终流量进入 Pod</li>
+</ul>
+</li>
+<li><p>nodeport 类型 service 总结：</p>
+<ul>
+<li>在host netwok namespace的PREROUTING chain中会匹配KUBE-SERVICES target。</li>
+<li>在KUBE-SERVICES target会匹配KUBE-NODEPORTS target</li>
+<li>在KUBE-NODEPORTS target会根据prot来匹配KUBE-SVC-XXX target</li>
+<li>KUBE-SVC-XXX target就和第三部分中的cluster-ip类型service一样，最终流量进入到 Pod 中</li>
+</ul>
+</li>
+</ul>
+<h4 id="3）ipvs-方式-1"><a href="#3）ipvs-方式-1" class="headerlink" title="3）ipvs 方式"></a>3）ipvs 方式</h4><ul>
+<li><a href="https://mp.weixin.qq.com/s?__biz=MzI0MDE3MjAzMg==&mid=2648393266&idx=1&sn=34d2a21b06d6e9ef4f4f7415f2cad567&chksm=f1310b5dc646824b45cbfc8cf25b0f2449f7223006b684da06ba58d95a2be7a3f0ad7aa6c4b9&scene=178&cur_album_id=2123526506718003213#rd">https://mp.weixin.qq.com/s?__biz&#x3D;MzI0MDE3MjAzMg&#x3D;&#x3D;&amp;mid&#x3D;2648393266&amp;idx&#x3D;1&amp;sn&#x3D;34d2a21b06d6e9ef4f4f7415f2cad567&amp;chksm&#x3D;f1310b5dc646824b45cbfc8cf25b0f2449f7223006b684da06ba58d95a2be7a3f0ad7aa6c4b9&amp;scene&#x3D;178&amp;cur_album_id&#x3D;2123526506718003213#rd</a></li>
+<li><a href="https://icloudnative.io/posts/ipvs-how-kubernetes-services-direct-traffic-to-pods/">https://icloudnative.io/posts/ipvs-how-kubernetes-services-direct-traffic-to-pods/</a></li>
+</ul>
+<h3 id="五、Service：ipvs-与-iptables-对比"><a href="#五、Service：ipvs-与-iptables-对比" class="headerlink" title="五、Service：ipvs 与 iptables 对比"></a>五、Service：ipvs 与 iptables 对比</h3><blockquote>
+<p>基于 ipvs 的 k8s 网络负载要求：</p>
+<ul>
+<li>linux 内核高于2.4.x</li>
+<li>在 kube-proxy 网络组件中启动参数加入–proxy-mode&#x3D;ipvs</li>
+<li>安装 ipvsadm 工具（可选），用于操作管理 ipvs 规则</li>
 </ul>
 </blockquote>
-<p><strong>Pod 信息（两个副本）：</strong></p>
+<ul>
+<li><p>两者都是采用linux内核模块完成负载均衡和endpoint的映射，所有操作都在内核空间完成，没有在应用程序的用户空间。</p>
+</li>
+<li><p>iptable方式依赖于linux netfilter&#x2F;iptable内核模块。</p>
+</li>
+<li><p>ipvs方式依赖linux netfilter&#x2F;iptable模块，ipset模块，ipvs模块。</p>
+</li>
+<li><p>iptable方式中，host宿主中ipatble的entry数目会随着service和对应endpoints的数目增多而增多。举个例子，比如有10个cluster ip类型的service，每个service有6个endpoints。那么在KUBE-SERVICES target中至少有10个entries(KUBE-SVC-XXX)与10个service对应，每个KUBE-SVC-XXX target中会有6个KUBE-SEP-XXX与6个endpoints来对应，每个KUBE-SEP-XXX会有2个enrties来分别做mark masq和DNAT，这样算起来至少有10<em>6</em>2&#x3D;120个entries在iptable中。试想如果application中service和endpoints数目巨大，iptable entries也是非常庞大的，在一定情况下有可能带来性能上的问题。</p>
+</li>
+<li><p>ipvs方式中host宿主中iptable的entry数目是固定的，因为iptable做匹配的时候会利用ipset(KUBE-CLUSTER-IP或者KUBE-NODE-PORT-TCP)来匹配，service的数目决定了ipset的大小，并不会影响iptable的大小。这样就解决了iptable模式下，entries随着service和endpoints的增多而增多的问题。</p>
+</li>
+<li><p>对于负载均衡，iptable方式采用random模块来完成负载均衡，ipvs方式支持多种负载均衡，例如round-robin，least connection，source hash等（可参考<a href="http://www.linuxvirtualserver.org/%EF%BC%89%EF%BC%8C%E5%B9%B6%E4%B8%94%E7%94%B1kubelet%E5%90%AF%E5%8A%A8%E5%8F%82%E6%95%B0--ipvs-scheduler%E6%8E%A7%E5%88%B6%E3%80%82">http://www.linuxvirtualserver.org/），并且由kubelet启动参数--ipvs-scheduler控制。</a></p>
+</li>
+<li><p>对于目标地址的映射，iptable方式采用linux原生的DNAT，ipvs方式则利用ipvs模块完成。</p>
+</li>
+<li><p>ipvs方式会在host netwok namespace中创建网络设备kube-ipvs0，并且绑定了所有的cluster ip，这样保证了cluster-ip类型的service数据进入INPUT chain，从而让ipvs来完成负载均衡和目标地址的映射。</p>
+</li>
+<li><p>iptable方式不会在host netwok namespace中创建额外的网络设备。</p>
+</li>
+<li><p>iptable方式数据在host network namespace的chain中的路径是：PREROUTING–&gt;FORWARDING–&gt;POSTROUTING 在PREROUTING chain中完成负载均衡，mark masq和目标地址映射。</p>
+</li>
+<li><p>ipvs方式数据在host network namespace的chain中的路径是：PREROUTING–&gt;INPUT–&gt;POSTROUTING 在PREROUTING chain中完成mark masq SNAT，在INPUT chain利用ipvs完成负载均衡和目标地址映射。</p>
+</li>
+<li><p>iptable和ipvs方式在完成负载均衡和目标地址映射后都会根据host network namespace的路由表做下一跳路由选择。</p>
+</li>
+</ul>
+<h3 id="六、跨主机网络通信：flannel-组件"><a href="#六、跨主机网络通信：flannel-组件" class="headerlink" title="六、跨主机网络通信：flannel 组件"></a>六、跨主机网络通信：flannel 组件</h3><h4 id="1）flannel-underlay-网络：host-gw-方式"><a href="#1）flannel-underlay-网络：host-gw-方式" class="headerlink" title="1）flannel underlay 网络：host-gw 方式"></a>1）flannel underlay 网络：host-gw 方式</h4><p><strong>underlay 网络概念与配置</strong></p>
+<ul>
+<li><p>概念：underlay 网络在通讯过程没有额外封包，通过将容器的宿主机作为路由实现数据包转包</p>
+</li>
+<li><p>配置方式：略</p>
+</li>
+</ul>
+<p><strong>service 与 Pod 对应信息</strong></p>
+<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line"><span class="meta prompt_"># </span><span class="language-bash">kubectl describe service nginx-test</span></span><br><span class="line">Name:              nginx-test</span><br><span class="line">Namespace:         default</span><br><span class="line">Labels:            app=nginx-test</span><br><span class="line">Annotations:       &lt;none&gt;</span><br><span class="line">Selector:          app=nginx-test</span><br><span class="line">Type:              ClusterIP</span><br><span class="line">IP Family Policy:  SingleStack</span><br><span class="line">IP Families:       IPv4</span><br><span class="line">IP:                10.43.6.58</span><br><span class="line">IPs:               10.43.6.58</span><br><span class="line">Port:              80-80  80/TCP</span><br><span class="line">TargetPort:        80/TCP</span><br><span class="line">Endpoints:         10.42.0.65:80,10.42.1.9:80</span><br><span class="line">Session Affinity:  None</span><br><span class="line">Events:            &lt;none&gt;</span><br><span class="line"><span class="meta prompt_"></span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">kubectl get pod -owide</span></span><br><span class="line">NAME                          READY   STATUS    RESTARTS      AGE   IP           NODE     NOMINATED NODE   READINESS GATES</span><br><span class="line">nginx-test-7646687cc4-n8s9s   1/1     Running   6 (60m ago)   26d   10.42.0.65   master   &lt;none&gt;           &lt;none&gt;</span><br><span class="line">nginx-test-7646687cc4-z8xnq   1/1     Running   0             47s   10.42.1.9    node1    &lt;none&gt;           &lt;none&gt;</span><br></pre></td></tr></table></figure>
+
+<p><strong>数据包走向分析，从10.42.0.65请求10.42.1.9</strong></p>
+<ul>
+<li>数据包从源 pod 到宿主机</li>
+</ul>
+<p>当在pod <strong>10.42.0.65</strong>里向pod <strong>10.42.1.9</strong>里发送数据包的时候，pod <strong>10.42.0.65</strong>的网卡是veth的一个端点。根据pod network namespace中的路由规则，数据一定是发送到<strong>10.42.0.1</strong>，也就是宿主network namespace的cni0 linux bridge设备。由于pod <strong>10.42.0.65</strong>网卡veth另一个端点attach在cni0 bridge设备上，所以数据被cni0 bride接收，也就是数据从pod的network namesapce流动到了host的network namespace里。</p>
+<ul>
+<li>数据包在源 pod 宿主机中的路由</li>
+</ul>
+<p>由于数据包的目标ip地址是<strong>10.42.1.9</strong>，而源pod <strong>10.42.0.65</strong>的宿主ip是<strong>192.168.205.4</strong>。宿主机上开启了转发功能(net.ipv4.ip_forward &#x3D; 1)，所以主机发现目标ip <strong>10.42.1.9</strong>不是自己的ip时候，就对这个数据包做路由转发。查看宿主<strong>192.168.205.4</strong>的路由表</p>
+<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line"><span class="meta prompt_"># </span><span class="language-bash">ip addr |grep 192.168.205.4</span></span><br><span class="line">    inet 192.168.205.4/24 metric 100 brd 192.168.205.255 scope global dynamic enp0s1</span><br><span class="line"><span class="meta prompt_"></span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">ip route</span></span><br><span class="line">10.42.1.0/24 via 192.168.205.3 enp0s1 ...</span><br></pre></td></tr></table></figure>
+<p>在路由表里发现<strong>10.42.1.0&#x2F;24</strong>网段的数据下一跳是<strong>192.168.205.3</strong>，也就是目标pod <strong>10.42.1.9</strong>的宿主机器。所以进行arp目标mac地址封包，将数据发往<strong>192.168.205.3</strong>。注意目标pod的下一跳地址是目标pod所在的host，也就是说数据会从原始pod所在的host通过下一跳发往目标pod所在的host。即是原始pod的host必须和目标pod的host在同一个二层网络里，因为只有这样才可以下一跳路由可达。这个也是flannel的underlay网络host gw方式的限制，既要求所有的k8s worker node节点都在同一个二层网络里(可以认为是在同一个ip子网)。</p>
+<ul>
+<li>数据包在目标 pod 宿主机中的路由</li>
+</ul>
+<p>当数据包路由到目标pod <strong>10.42.1.9</strong>的host <strong>192.168.205.3</strong>的时候(通过二层交换)，目标pod宿主机上开启了转发功能(net.ipv4.ip_forward &#x3D; 1)，所以主机发现目标ip <strong>10.42.1.9 <strong>不是自己的ip时候，就对这个数据包做路由转发。查看宿主</strong>192.168.205.3</strong>的路由表</p>
+<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line"><span class="meta prompt_"># </span><span class="language-bash">ip addr |grep 192.168.205.3</span></span><br><span class="line">    inet 192.168.205.3/24 metric 100 brd 192.168.205.255 scope global dynamic enp0s1</span><br><span class="line"><span class="meta prompt_"></span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">ip route</span></span><br><span class="line">10.42.1.0/24 dev cni0 proto kernel scope link src 10.42.1.1</span><br></pre></td></tr></table></figure>
+<p>在路由表里发现<strong>10.42.1.0&#x2F;24</strong>网段的数据下一跳是直连路由，由设备cni0 网卡转发。cni 网卡 <strong>10.42.1.1</strong> 作为linux bridge，会把数据通过veth pair从host network namespace发送到目标pod的<strong>10.42.1.9</strong>的network namespace里。然后由内核交给应用程序处理，从而完成了pod到pod的通讯。可以使用 kubectl debug 查看路由经过节点</p>
+<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line"><span class="meta prompt_"># </span><span class="language-bash">kubectl debug -it nginx-test-7646687cc4-z8xnq --image=busybox -- /bin/sh</span></span><br><span class="line"><span class="meta prompt_"></span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">ip addr</span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">traceroute 10.42.1.9</span></span><br></pre></td></tr></table></figure>
+
+<p><strong>flannel underlay（host-gw 方式）总结</strong></p>
+<ul>
+<li>从源pod的network namespace到host network namespace的cni0 linux bridge上。</li>
+<li>在源pod所在的host里做三层路由选择，下一跳地址为目标pod所在的host。</li>
+<li>数据包从源pod所在的host发送到目标pod所在的host。（二层 mac 封装数据包）</li>
+<li>在目标pod所在的host里做三层路由选择，本地直连路由到目标pod里。</li>
+<li>要求所有的节点必须开启路由转发功能(net.ipv4.ip_forward &#x3D; 1)</li>
+<li>要求所有的节点都在同一个二层网络里，来完成目标pod所在host的下一跳路由</li>
+</ul>
+<h4 id="2）flannel-overlay-网络：vxlan-方式"><a href="#2）flannel-overlay-网络：vxlan-方式" class="headerlink" title="2）flannel overlay 网络：vxlan 方式"></a>2）flannel overlay 网络：vxlan 方式</h4><p><strong>overlay 网络概念与配置</strong></p>
+<ul>
+<li>概念</li>
+</ul>
+<p>vxlan 是一种overlay 网络技术，意在利用在三层网络之上构建二层网络。对于二层网络一般采用 vlan 技术来隔离，不过 vlan 在数据包里总共4个字节，有12bit用来标识不同的二层网络，这样总共可以有4000多个 vlan。而 vxlan header有8个字节，有24bit用来标识不同的二层网络，这样总共是1600多万个 vxlan。<a href="https://tools.ietf.org/html/rfc7348">vxlan详解</a></p>
+<ul>
+<li>配置方式：<a href="https://mp.weixin.qq.com/s?__biz=MzI0MDE3MjAzMg==&mid=2648393268&idx=1&sn=ea7df945f11a57619a81df8599bcbe99&chksm=f1310b5bc646824daaf9ac6cb2dec4b8c8f54fdf4753b5379db991c88e4e5951ec928b9da2d9&scene=178&cur_album_id=2123526506718003213#rd">参考</a></li>
+</ul>
+<p>1.使用 vxlan 配置集群时，因为 vxlan 利用 udp 包的 payload 封装二层 eth 包，mtu 值从1500变为1450。<br>2.vxlan 利用 udp 封包，etcd 配置 udp 使用8472端口接收数据，需要在所有节点放行8472 udp port 。</p>
+<p><strong>service 与 Pod 对应信息</strong></p>
+<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line"><span class="meta prompt_"># </span><span class="language-bash">kubectl describe service nginx-test</span></span><br><span class="line">Name:              nginx-test</span><br><span class="line">Namespace:         default</span><br><span class="line">Labels:            app=nginx-test</span><br><span class="line">Annotations:       &lt;none&gt;</span><br><span class="line">Selector:          app=nginx-test</span><br><span class="line">Type:              ClusterIP</span><br><span class="line">IP Family Policy:  SingleStack</span><br><span class="line">IP Families:       IPv4</span><br><span class="line">IP:                10.43.6.58</span><br><span class="line">IPs:               10.43.6.58</span><br><span class="line">Port:              80-80  80/TCP</span><br><span class="line">TargetPort:        80/TCP</span><br><span class="line">Endpoints:         10.42.0.65:80,10.42.1.9:80</span><br><span class="line">Session Affinity:  None</span><br><span class="line">Events:            &lt;none&gt;</span><br><span class="line"><span class="meta prompt_"></span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">kubectl get pod -owide</span></span><br><span class="line">NAME                          READY   STATUS    RESTARTS      AGE   IP           NODE     NOMINATED NODE   READINESS GATES</span><br><span class="line">nginx-test-7646687cc4-n8s9s   1/1     Running   6 (60m ago)   26d   10.42.0.65   master   &lt;none&gt;           &lt;none&gt;</span><br><span class="line">nginx-test-7646687cc4-z8xnq   1/1     Running   0             47s   10.42.1.9    node1    &lt;none&gt;           &lt;none&gt;</span><br></pre></td></tr></table></figure>
+
+<p><strong>kubectl debug 查看路由走向与网络，进入 pod 10.42.0.65</strong></p>
+<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line"><span class="meta prompt_">#</span><span class="language-bash">kubectl debug -it nginx-test-7646687cc4-n8s9s --image=busybox -- /bin/sh</span></span><br><span class="line">/ # ping -c 3 10.42.1.9</span><br><span class="line">PING 10.42.1.9 (10.42.1.9): 56 data bytes</span><br><span class="line">64 bytes from 10.42.1.9: seq=0 ttl=62 time=1.447 ms</span><br><span class="line">64 bytes from 10.42.1.9: seq=1 ttl=62 time=2.732 ms</span><br><span class="line">64 bytes from 10.42.1.9: seq=2 ttl=62 time=0.880 ms</span><br><span class="line">/ # traceroute -n 10.42.1.9</span><br><span class="line">traceroute to 10.42.1.9 (10.42.1.9), 30 hops max, 46 byte packets</span><br><span class="line"> 1  10.42.0.1  0.027 ms  0.012 ms  0.009 ms</span><br><span class="line"> 2  10.42.1.0  1.761 ms  1.440 ms  1.085 ms</span><br><span class="line"> 3  10.42.1.9  1.453 ms  0.979 ms  0.976 ms</span><br></pre></td></tr></table></figure>
+
+<p><strong>数据包走向分析，从10.42.0.65请求10.42.1.9</strong></p>
+<ul>
+<li>数据在 pod namespace network 中路由</li>
+</ul>
+<p>ip为<strong>10.42.0.65</strong>的pod从自己的network namespace访问pod <strong>10.42.1.9</strong>，根据<strong>10.42.0.65</strong> pod network namespace的路由表，数据进入了<strong>10.42.0.65</strong> pod的宿主<strong>192.168.205.4</strong>的network namespace中的linux bridge cni0。查看宿主机路由信息</p>
+<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line"><span class="meta prompt_"># </span><span class="language-bash">ip addr |grep 192.168.205.4</span></span><br><span class="line">    inet 192.168.205.4/24 metric 100 brd 192.168.205.255 scope global dynamic enp0s1</span><br><span class="line"><span class="meta prompt_"></span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">ip route</span></span><br><span class="line">10.42.1.0/24 via 10.42.1.0 dev flannel.1 onlink</span><br></pre></td></tr></table></figure>
+<p><strong>10.42.1.0&#x2F;24</strong>网段的访问下一跳ip地址是<strong>10.42.1.0</strong>，用flannel.1设备发送。flannel.1设备就是 flannel 启动的时候根据vxlan类型网络在宿主上创建的，它属于vxlan设备，会完成对二层eth以太数据包到udp数据包的封装与拆封。其中的”.1”代表vxlan这个二层网络id号为1，也对应了vxlan网络在etcd里的配置。这个时候数据包源ip为<strong>10.42.0.65</strong>，目标ip为<strong>10.42.1.9</strong>，源mac为pod <strong>10.42.0.65</strong> network namespace中veth设备mac，目标mac为下一跳ip **10.42.1.0&#x2F;32 **的mac。</p>
+<ul>
+<li>查看 vtep 端点 mac 地址以及转发接口信息</li>
+</ul>
+<p>查看 mac 地址信息：在pod <strong>10.42.0.65</strong>的宿主<strong>192.168.205.4</strong>上通过arp表查询<strong>10.42.1.0&#x2F;32</strong>的mac地址为 62:c8:a9:ce:ca:4e</p>
+<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line"><span class="meta prompt_"># </span><span class="language-bash">ip addr |grep 192.168.205.4</span></span><br><span class="line">    inet 192.168.205.4/24 metric 100 brd 192.168.205.255 scope global dynamic enp0s1</span><br><span class="line"><span class="meta prompt_"></span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">ip neighbo |grep 10.42.1.0</span></span><br><span class="line">10.42.1.0 dev flannel.1 lladdr 62:c8:a9:ce:ca:4e PERMANENT</span><br><span class="line"><span class="meta prompt_"></span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">ip neighbo show dev flannel.1</span></span><br><span class="line">10.42.1.0 lladdr 62:c8:a9:ce:ca:4e PERMANENT</span><br><span class="line">10.42.2.0 lladdr ca:cb:1f:99:10:97 PERMANENT</span><br></pre></td></tr></table></figure>
+<p>查看 mac 地址转发信息：由于flannel.1设备是vxlan设备，会有转发接口与它的mac对应，继续在pod <strong>10.42.0.65</strong>的宿主<strong>192.168.205.4</strong>上查询flannel.1设备的mac转发接口。</p>
+<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line"><span class="meta prompt_"># </span><span class="language-bash">ip addr |grep 192.168.205.4</span></span><br><span class="line">    inet 192.168.205.4/24 metric 100 brd 192.168.205.255 scope global dynamic enp0s1</span><br><span class="line"><span class="meta prompt_"></span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">bridge fdb show |grep 62:c8:a9:ce:ca:4e</span></span><br><span class="line">62:c8:a9:ce:ca:4e dev flannel.1 dst 192.168.205.3 self permanent</span><br><span class="line"><span class="meta prompt_"></span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">bridge fdb show dev flannel.1</span></span><br><span class="line">62:c8:a9:ce:ca:4e dst 192.168.205.3 self permanent</span><br><span class="line">ee:87:b2:4a:fd:62 dst 192.168.205.5 self permanent</span><br></pre></td></tr></table></figure>
+<p>可以看到 flannel.1设备mac地址 <strong>62:c8:a9:ce:ca:4e</strong> 对应的转发接口为 <strong>192.168.205.3</strong>，代表flannel.1设备将会把原始二层数据包(源ip为<strong>10.42.0.65</strong>，目标ip为<strong>10.42.1.9</strong>，源mac为 pod <strong>10.42.0.65</strong> network namespace中veth设备mac，目标mac为<strong>10.42.1.0&#x2F;32</strong> mac)做为 upd 的 payload 发给 **192.168.205.3 **的 **8472 **端口。目标pod **10.42.1.9 **的宿主机确实是 <strong>192.168.205.3</strong>，而且其上的flannel.1设备同样会对8472端口的数据进行upd解包。</p>
+<ul>
+<li><p>flannel.1 设备处理 udp 封包与解包</p>
+<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line"><span class="meta prompt_"># </span><span class="language-bash">ip addr |grep 192.168.205.4</span></span><br><span class="line">    inet 192.168.205.4/24 metric 100 brd 192.168.205.255 scope global dynamic enp0s1</span><br><span class="line"><span class="meta prompt_"></span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">route -n</span></span><br><span class="line">Kernel IP routing table</span><br><span class="line">Destination     Gateway         Genmask         Flags Metric Ref    Use Iface</span><br><span class="line">0.0.0.0         192.168.205.1   0.0.0.0         UG    100    0        0 enp0s1</span><br><span class="line">192.168.205.0   0.0.0.0         255.255.255.0   U     100    0        0 enp0s1</span><br><span class="line">192.168.205.1   0.0.0.0         255.255.255.255 UH    100    0        0 enp0s1</span><br></pre></td></tr></table></figure>
+<p>flannel.1 设备 udp 封包：从pod **10.42.0.65 **的宿主 <strong>192.168.205.4</strong> 的路由表得知发往 <strong>192.168.205.0&#x2F;24</strong> 网段为直连路由，使用宿主网络设备 enp0s1 发送。所以对于：</p>
+<ul>
+<li>外层udp包：源ip为<strong>192.168.205.4</strong>，目标ip为<strong>192.168.205.3</strong>，源mac为<strong>192.168.205.4</strong> mac，目标mac为<strong>192.168.205.3</strong> mac。目标端口为8472，vxlan id为1.</li>
+<li>内层二层以太包：源ip为<strong>10.42.0.65</strong>，目标ip为<strong>10.42.1.9</strong>，源mac为pod <strong>10.42.0.65</strong> network namespace中veth设备mac，目标mac为<strong>10.42.1.0&#x2F;32</strong> mac</li>
+<li>完成封包以后根据宿主路由表发向目标节点 <strong>192.168.205.3</strong></li>
+</ul>
+</li>
+</ul>
+<p>flannel.1 设备 udp 解包：宿主机 **192.168.205.3 **接收到数据包后</p>
+<ul>
+<li><p>目标节点<strong>192.168.205.3</strong>的8472端口接收到udp包之后，发现数据包里有vxlan id标识为1。由于linux内核支持vxlan，所以协议栈可以通过vxlan id判断这是一个vxlan数据报文，并且vxlan为1。然后找到宿主机器上vxlan id为1的vxlan设备处理，就是<strong>192.168.205.3</strong>上的flannel.1设备。</p>
+</li>
+<li><p>flannel.1收到数据之后开始对vxlan udp报文拆包，去掉upd报文的ip，port，mac信息后得到内部的payload，发现是一个二层报文。</p>
+</li>
+<li><p>对于这个二层报文继续拆包，得到里面的源ip是<strong>10.42.0.65</strong>，目标ip是<strong>10.42.1.9</strong>。</p>
+</li>
+<li><p>根据<strong>192.168.205.3</strong>上路由表，将数据由linux bridge cni0做本地转发，cni0 作为 linux bridge 利用 veth pair 将数据转发到目标 pod <strong>10.42.1.9</strong></p>
+<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line"><span class="meta prompt_"># </span><span class="language-bash">ip addr |grep 192.168.205.3</span></span><br><span class="line">    inet 192.168.205.3/24 metric 100 brd 192.168.205.255 scope global dynamic enp0s1</span><br><span class="line"><span class="meta prompt_"></span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">route -n</span></span><br><span class="line">Destination     Gateway         Genmask         Flags Metric Ref    Use Iface</span><br><span class="line">10.42.1.0       0.0.0.0         255.255.255.0   U     0      0        0 cni0</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>宿主host的路由表的写入 与 flannel.1设备mac转发接口表的写入（fdb 转发）</p>
+</li>
+</ul>
+<p>因为所有的host都运行flannel服务，而flannel连接etcd存储中心，所以每个host就知道自己的子网地址cidr是什么，也知道在这个cidr中自己的flannel.1设备ip地址和mac地址，同时也知道了其它host的子网cidr以及flannel.1设备ip地址和mac地址。而知道了这些信息，就可以在flannel启动的时候写入到路由表和fdb中了，以 **192.168.205.4 **宿主为例：</p>
+<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line"><span class="meta prompt_">~# </span><span class="language-bash">ip addr |grep 192.168.205.4</span></span><br><span class="line">    inet 192.168.205.4/24 metric 100 brd 192.168.205.255 scope global dynamic enp0s1</span><br><span class="line"><span class="meta prompt_"></span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">bridge fdb show dev flannel.1</span></span><br><span class="line">62:c8:a9:ce:ca:4e dst 192.168.205.3 self permanent</span><br><span class="line">ee:87:b2:4a:fd:62 dst 192.168.205.5 self permanent</span><br><span class="line"><span class="meta prompt_"></span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">etcdctl ....</span></span><br></pre></td></tr></table></figure>
+
+<p><strong>flannel overlay（vxlan 方式）总结</strong></p>
+<ul>
+<li>每个宿主都有名字为flannel.x的vxlan网络设备来完成对于vxlan数据的udp封包与拆包，upd数据在宿主的8472端口上(端口值可配置)处理。</li>
+<li>数据从pod的network namespace进入到host的network namespace中。</li>
+<li>根据host network namespace中的路由表，下一跳ip为目标vxlan设备的ip，并且由当前host的flannel.x设备发送。</li>
+<li>根据host network namespace中的apr表找到下一跳ip的mac地址。</li>
+<li>根据host network namespace中fbd找到下一跳ip的mac地址对应的转发ip。</li>
+<li>当前host的flannel.x设备根据下一跳ip的mac地址对应的转发ip和本地路由表进行upd封包，这个时候：<ul>
+<li>外层udp包：源ip为当前host ip，目标ip为mac转发表中匹配的ip，源mac为前host ip的mac，目标mac为fdb中匹配ip的mac。目标端口为8472(可配置)，vxlan id为1(可配置).</li>
+<li>内层二层以太帧包：源ip为源pod ip，目标ip为目标pod ip，源mac为源pod mac，目标mac为host network namespace中路由表里下一跳ip的mac(一般为目标pod对应的host中flannel.x设备ip)。</li>
+</ul>
+</li>
+<li>数据包由当前host路由到目标节点host。</li>
+<li>目标节点host的8472端口接收到udp包之后，发现数据包里有vxlan id标识.。然后根据linux vxlan协议，在目标宿主机器上找到与数据报文中vxlan id对应的vxlan设备，将数据交由其处理。</li>
+<li>vxlan设备收到数据之后开始对vxlan udp报文拆包，去掉upd报文的ip，port，mac信息后得到内部的payload，发现是一个二层报文。然后继续对这个二层报文拆包，得到里面的源pod ip和目标pod ip。</li>
+<li>根据目标节点host上路由表，将数据由linux bridge cni0做本地转发。</li>
+<li>数据由linux bridge cni0利用veth pair转发到目标pod。</li>
+<li>每个宿主host的flannel服务启动的时候读取etcd中的vxlan配置信息，在宿主host的路由表和mac转发接口表fdb里写入相应数据。</li>
+</ul>
+<h4 id="3）flannel-underlay-与-overlay-网络对比"><a href="#3）flannel-underlay-与-overlay-网络对比" class="headerlink" title="3）flannel underlay 与 overlay 网络对比"></a>3）flannel underlay 与 overlay 网络对比</h4><ul>
+<li>都要求host宿主开启网络转发功能(net.ipv4.ip_forward &#x3D; 1)。</li>
+<li>flannel underlay网络没有数据包的额外封包与拆包，效率会更高一些。</li>
+<li>对于flannel underlay网络要求所有的worker node都在同一个二层网络里，从而完成目标pod的下一跳路由。即underlay网络worker node不能跨子网。</li>
+<li>flannel vxlan overlay 网络有封包与拆包，并且外层包都是 udp 包。因此 worker node只要三层路由可达就好，支持worker node能跨子网。</li>
+<li>flannel vxlan overlay网络内层包是二层以太包，基于linux vxlan设备</li>
+<li>flannel underlay网络和flannel vxlan overlay网络所有数据包都由操作系统内核空间处理，没有用户空间的应用程序参与。</li>
+</ul>
 <blockquote>
-<ul>
-<li>IP：10.16.1.41、10.16.3.227</li>
-<li>容器内部启动端口：8080</li>
-</ul>
+<h4 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h4><p>1、k8s 集群网络：<br><a href="https://mp.weixin.qq.com/mp/appmsgalbum?__biz=MzI0MDE3MjAzMg==&action=getalbum&album_id=2123526506718003213&scene=173&from_msgid=2648393229&from_itemidx=1&count=3&nolastread=1#wechat_redirect">https://mp.weixin.qq.com/mp/appmsgalbum?__biz&#x3D;MzI0MDE3MjAzMg&#x3D;&#x3D;&amp;action&#x3D;getalbum&amp;album_id&#x3D;2123526506718003213&amp;scene&#x3D;173&amp;from_msgid&#x3D;2648393229&amp;from_itemidx&#x3D;1&amp;count&#x3D;3&amp;nolastread&#x3D;1#wechat_redirect</a><br>2、iptables 详解：<br><a href="https://lixiangyun.gitbook.io/iptables_doc_zh_cn/">https://lixiangyun.gitbook.io/iptables_doc_zh_cn&#x2F;</a><br><a href="https://www.jianshu.com/p/ee4ee15d3658">https://www.jianshu.com/p/ee4ee15d3658</a><br>3、Docker 网络类型：<a href="https://developer.aliyun.com/article/974008#slide-4">https://developer.aliyun.com/article/974008#slide-4</a><br>4、ipvs 工作模式原理：<a href="https://icloudnative.io/posts/ipvs-how-kubernetes-services-direct-traffic-to-pods/">https://icloudnative.io/posts/ipvs-how-kubernetes-services-direct-traffic-to-pods/</a></p>
 </blockquote>
-<p><strong>NodePort信息（两个Node节点、使用ClusterIP模式时没有该信息）：</strong></p>
-<blockquote>
-<ul>
-<li>NodeIP：172.16.9.150、172.16.9.64</li>
-<li>公开的静态端口：30152、30144</li>
-</ul>
-</blockquote>
-<p><strong>LoadBanlancer 信息（公网或私网）：</strong></p>
-<blockquote>
-<ul>
-<li>暴露公网IP：112.124.13.114</li>
-<li>外部端点：112.124.13.114:80</li>
-</ul>
-<p><strong>此时，可通过四种方式进行应用的请求（最终流量到达一致，都会到容器内部）：</strong></p>
-<ol>
-<li>集群内部请求 ServiceIP：10.32.230.55:80 或 reos-app-file-base-svc:80（解析需Coredns组件）</li>
-<li>集群内部请求 PodIP（随时变化，一般不使用）：10.16.1.41:8080 或 10.16.3.227:8080</li>
-<li>集群内部或外部请求 NodeIP：172.16.9.150:30152 或 172.16.9.64:30144</li>
-<li>集群内部或外部请求 SLB IP：112.124.13.114:80 （注意集群内部访问时要修改外部策略 local –&gt; Cluster）</li>
-</ol>
-<p><strong>查看端点信息：kubectl get endpoints&#x2F;xxxxx -owide</strong></p>
-</blockquote>
-<img data-src="/posts/754e/k8s1.png" class>
-
-
-<h4 id="Ingress：将集群内的-Service-对外暴露7层的访问接入点"><a href="#Ingress：将集群内的-Service-对外暴露7层的访问接入点" class="headerlink" title="Ingress：将集群内的 Service 对外暴露7层的访问接入点"></a>Ingress：将集群内的 Service 对外暴露7层的访问接入点</h4><p>如：前后端使用 &#x2F;static&#x2F; 、 &#x2F;apis&#x2F; 的不同 URL ，使用 Ingress 匹配规则并进行对应后端的反向代理</p>
-<img data-src="/posts/754e/k8s2.png" class>
-
-<h4 id="Coredns：服务发现DNS，实现不同部署环境访问同样的访问入口"><a href="#Coredns：服务发现DNS，实现不同部署环境访问同样的访问入口" class="headerlink" title="Coredns：服务发现DNS，实现不同部署环境访问同样的访问入口"></a>Coredns：服务发现DNS，实现不同部署环境访问同样的访问入口</h4><ul>
-<li>通过 Service 的服务名解析出 ClusterIP</li>
-<li>通过 StatefulSet 的 Pod 名解析出 Pod 的 IP</li>
-</ul>
-<h4 id="其他"><a href="#其他" class="headerlink" title="其他"></a>其他</h4><ul>
-<li>相关阿里云资源：<a href="https://help.aliyun.com/product/27706.html">VPC</a>、<a href="https://help.aliyun.com/product/27537.html">SLB</a></li>
-<li><a href="https://help.aliyun.com/document_detail/97467.html">Terway 与 Flannel对比</a></li>
-</ul>
-<h3 id="四、存储"><a href="#四、存储" class="headerlink" title="四、存储"></a>四、存储</h3><img data-src="/posts/754e/k8s3.png" class>
-<h4 id="容器存储接口CSI-Plugin-组件"><a href="#容器存储接口CSI-Plugin-组件" class="headerlink" title="容器存储接口CSI-Plugin 组件"></a>容器存储接口CSI-Plugin 组件</h4><ul>
-<li>云盘存储卷</li>
-<li>容器网络文件系统</li>
-<li>NAS 存储卷</li>
-<li>OSS 存储卷</li>
-<li>CPFS 存储卷</li>
-<li>本地存储卷</li>
-<li>容器存储监控&amp;运维</li>
-</ul>
-<h4 id="存储FlexVolume-组件"><a href="#存储FlexVolume-组件" class="headerlink" title="存储FlexVolume 组件"></a>存储FlexVolume 组件</h4><ul>
-<li>云盘存储卷</li>
-<li>NAS 存储卷</li>
-<li>OSS 存储卷</li>
-<li>CPFS 存储卷</li>
-<li>持久化存储卷声明</li>
-</ul>
-<h3 id="五、应用"><a href="#五、应用" class="headerlink" title="五、应用"></a>五、应用</h3><h4 id="工作负载"><a href="#工作负载" class="headerlink" title="工作负载"></a>工作负载</h4><ul>
-<li>无状态工作 Deployment</li>
-<li>有状态工作 StatefulSet<ul>
-<li>特性：Pod 一致性、稳定的持久化存储、稳定的网络标志（hostname）、稳定的次序（副本的数字序号）</li>
-</ul>
-</li>
-<li>守护进程集 DaemenSet<ul>
-<li>保证每个节点上都运行一个容器副本</li>
-<li>部署集群日志、监控或其他系统管理应用</li>
-</ul>
-</li>
-<li>任务 Job<ul>
-<li>仅执行一次性任务，保证批处理任务一个或多个 Pod 成功结束</li>
-<li>支持的Job类型：非并行、固定结束次数、工作队列并行Job、固定结束次数的并行Job</li>
-</ul>
-</li>
-<li>定时任务 CronJob<ul>
-<li>执行周期性和重复性任务（如备份操作或发送邮件），通过时间调度</li>
-</ul>
-</li>
-<li>容器组<ul>
-<li>Pod：最小部署单元，由单个容器（实际docker 容器）或几个紧耦合的容器组成</li>
-</ul>
-</li>
-<li>自定义资源<ul>
-<li>自定义资源定义拓展 K8S API</li>
-<li>查看集群中所有API 组和包含的资源类型</li>
-</ul>
-</li>
-</ul>
-<h4 id="镜像（ACR仓库）"><a href="#镜像（ACR仓库）" class="headerlink" title="镜像（ACR仓库）"></a>镜像（ACR仓库）</h4><ul>
-<li>镜像签名组件：kritis-validation-hook</li>
-<li>镜像免密拉取组件：aliyun-acr-credential-helper</li>
-</ul>
-<h4 id="配置项-Configmap-与保密字典-Secret"><a href="#配置项-Configmap-与保密字典-Secret" class="headerlink" title="配置项 Configmap 与保密字典 Secret"></a>配置项 Configmap 与保密字典 Secret</h4><ul>
-<li>配置项管理和使用<ul>
-<li>控制台&#x2F;YAML  创建管理Configmap 资源</li>
-<li>使用：设置Pod 环境变量、设置命令行参数、数据卷中使用</li>
-</ul>
-</li>
-<li>保密字典管理和使用<ul>
-<li>控制台&#x2F;YAML 创建管理Secret 资源</li>
-<li>使用：设置Pod 环境变量、数据卷中使用</li>
-</ul>
-</li>
-</ul>
-<h4 id="应用调度与部署"><a href="#应用调度与部署" class="headerlink" title="应用调度与部署"></a>应用调度与部署</h4><ul>
-<li>调度应用Pod 至指定节点：通过设置节点<strong>标签</strong>，配置nodeSelector 强制约束Pod 调度到指定节点（控制台给节点添加标签，然后Pod 启动的YAML 模板 spec –&gt; nodeSelector –&gt; gourp 配置为新增的标签名）</li>
-<li>Descheduler 组件对集群Pod 调度优化（通过策略设置）<ul>
-<li>删除重复Pod，确保只有一个Pod 与同一节点运行的ReplicaSet、Replication Controller、StatefulSet、Job 关联</li>
-<li>删除违反Pod 间反亲和性的Pod</li>
-<li>驱逐其他节点Pod 到未充分利用的节点</li>
-<li>删除重启次数过多的Pod</li>
-</ul>
-</li>
-<li>应用触发器重新部署应用：控制台生成触发器URL，通过请求URL 触发重新部署（可通过curl 或集成开发语言）</li>
-<li>Helm 应用部署<ul>
-<li>Chart：Helm包，包含运行应用所需的镜像、依赖和资源定义、集群中服务定义，类似APT 的dpkg 或YUM 的rpm 文件。</li>
-<li>Release：运行Chart 的实例。同一集群Chart 可以安装多次，每次安装都会创建一个release（如一个MySQL Chart 安装两次，就会在服务器上产生两个release 版本的数据库）。</li>
-<li>Repository： 用于发布和存储Chart 的存储库。</li>
-<li>Helm 组件：Helm CLI 客户端工具、Tiller 服务端组件、Repository 存储库（HTTP协议访问）。</li>
-</ul>
-</li>
-<li>控制台方式&#x2F;YAML方式 部署、发布和监控应用</li>
-</ul>
-<h4 id="使用AHAS对应用进行高可用防护"><a href="#使用AHAS对应用进行高可用防护" class="headerlink" title="使用AHAS对应用进行高可用防护"></a>使用AHAS对应用进行高可用防护</h4><p><a href="https://help.aliyun.com/document_detail/193575.html">https://help.aliyun.com/document_detail&#x2F;193575.html</a></p>
-<h3 id="六、组件"><a href="#六、组件" class="headerlink" title="六、组件"></a>六、组件</h3><h4 id="核心组件"><a href="#核心组件" class="headerlink" title="核心组件"></a>核心组件</h4><ul>
-<li><p>系统组件</p>
-<ul>
-<li>Kube API Server：集群总线和入口网关。</li>
-<li>Kube Controller Manager：集群内部资源管理器。</li>
-<li>Cloud Controller Manager：提供集群与阿里云基础产品对接能力，如 CLB、VPC等。<h4 id="应用管理"><a href="#应用管理" class="headerlink" title="应用管理"></a>应用管理</h4></li>
-</ul>
-</li>
-<li><p>可选组件</p>
-<ul>
-<li>appcenter：提供统一管理多集群应用部署和应用生命周期的应用中心组件。</li>
-<li>progressive-delivery-tool：提供应用渐进式灰度发布的组件。<h4 id="日志与监控"><a href="#日志与监控" class="headerlink" title="日志与监控"></a>日志与监控</h4></li>
-</ul>
-</li>
-<li><p>系统组件</p>
-<ul>
-<li>alicloud-monitor-controller：ACK提供对接云监控的系统组件。</li>
-<li>metrics-server：ACK基于社区开源监控组件进行改造和增强的监控采集和离线组件，并提供Metrics API进行数据消费，提供HPA的能力。</li>
-</ul>
-</li>
-<li><p>可选组件</p>
-<ul>
-<li>ack-node-problem-detector：ACK基于社区开源项目进行改造和增强的集群节点异常事件监控组件，以及对接第三方监控平台功能的组件。</li>
-<li>ags-metrics-collector：为基因计算客户使用的监控服务组件，可以通过该组件监控基因工作流中各个节点资源使用的详细信息。</li>
-<li>ack-arms-prometheus：使用ARMS Prometheus实现容器服务集群监控。</li>
-<li>logtail-ds：使用日志服务采集Kubernetes容器日志。</li>
-<li>logtail-windows：ACK集群上使用的容器日志收集插件，用于在阿里云上配合SLS服务对Windows容器进行日志收集。<h4 id="存储"><a href="#存储" class="headerlink" title="存储"></a>存储</h4></li>
-</ul>
-</li>
-<li><p>可选组件</p>
-<ul>
-<li>csi-plugin：支持数据卷的挂载、卸载功能。创建集群时，如果选择CSI插件实现阿里云存储的接入能力的话，默认安装该组件。</li>
-<li>csi-provisioner：支持数据卷的自动创建能力。创建集群时，如果选择CSI插件实现阿里云存储的接入能力的话，默认安装该组件。</li>
-<li>storage-operator：用于管理存储组件的生命周期。</li>
-<li>alicloud-disk-controller：支持自动创建云盘卷。</li>
-<li>Flexvolume：社区较早实现的存储卷扩展机制。Flexvolume支持数据卷的挂载、卸载功能。创建集群时，如果选择Flexvolume插件实现阿里云存储的接入能力的话，默认安装该组件。</li>
-</ul>
-</li>
-</ul>
-<h4 id="网络"><a href="#网络" class="headerlink" title="网络"></a>网络</h4><ul>
-<li>系统组件<ul>
-<li>CoreDNS：ACK集群中默认采用的DNS服务发现插件，其遵循Kubernetes DNS-Based Service Discovery规范。</li>
-<li>Nginx Ingress Controller：Nginx Ingress Controller解析Ingress的转发规则。Ingress Controller收到请求，匹配Ingress转发规则转发到后端Service。</li>
-<li>managed-kube-proxy-windows：ACK托管版集群上使用的容器化kube-proxy，用于管理Windows节点上Service的访问入口，包括集群内Pod到Service的访问和集群外访问Service。</li>
-</ul>
-</li>
-<li>可选组件<ul>
-<li>Terway :  阿里云开源的基于专有网络VPC的容器网络接口CNI插件，支持基于Kubernetes标准的网络策略（NetworkPolicy）来定义容器间的访问策略。创建集群时，如果选择Terway网络插件实现集群内部网络互通的话，默认安装该组件。</li>
-<li>Flannel：容器网络接口CNI插件，在阿里云上使用的Flannel网络模式采用阿里云VPC模式。创建集群时，如果选择Flannel网络插件实现集群内部网络互通的话，默认安装该组件。</li>
-<li>ACK NodeLocal DNSCache：基于社区开源项目NodeLocal DNSCache的一套DNS本地缓存解决方案。</li>
-<li>kube-flannel-ds-windows：ACK托管版集群上使用的容器网络插件，用于构建适合Windows容器通讯的L2Bridge集群网络。</li>
-</ul>
-</li>
-</ul>
-<img data-src="/posts/754e/k8s4.png" class>
-
-<h4 id="安全"><a href="#安全" class="headerlink" title="安全"></a><a href="https://help.aliyun.com/document_detail/277412.html#title-nq4-jps-k41">安全</a></h4><h4 id="其他-1"><a href="#其他-1" class="headerlink" title="其他"></a><a href="https://help.aliyun.com/document_detail/277412.html#title-iib-fx3-2hl">其他</a></h4><h3 id="七、其他"><a href="#七、其他" class="headerlink" title="七、其他"></a>七、其他</h3><h4 id="K8S-集群-NetworkPolicy-策略"><a href="#K8S-集群-NetworkPolicy-策略" class="headerlink" title="K8S 集群 NetworkPolicy 策略"></a><a href="https://yuque.antfin.com/kifo8h/nee5aa/bzg9vq">K8S 集群 NetworkPolicy 策略</a></h4><ul>
-<li>Pod 和 Pod 通信通过三个标识符组合来辨识：</li>
-</ul>
-<p>1、其他被允许的 Pods（Pod 无法阻塞自身的访问）<br>2、被允许的 namespace<br>3、IP 组块 （Pod 本身所在的 Node 和 Pod  IP通信默认允许通信）</p>
-<ul>
-<li>默认情况下，Pod 非隔离。 被 NetworkPolicy 选中进入隔离状态。</li>
-<li>NetworkPolicy 策略不会冲突，累积策略。多个策略作用于一个Pod时，Pod 的入站&#x2F;出站策略取所有策略的并集</li>
-<li>两个 Pod 之间通信时，需要源端Pod上的出站（Egress）规则和目标端 Pod 上的入站（Ingress）规则都要允许该流量。</li>
-<li>ACK只支持 Terway 网络模式，不支持 Flannel 网络模式</li>
-</ul>
 ]]></content>
       <categories>
         <category>CNCF</category>
       </categories>
       <tags>
-        <tag>阿里云</tag>
         <tag>K8S</tag>
       </tags>
   </entry>
@@ -1464,6 +1881,78 @@
       </tags>
   </entry>
   <entry>
+    <title>阿里云-Promotheus &amp; Grafana 监控大盘与告警通知</title>
+    <url>/posts/9a8h.html</url>
+    <content><![CDATA[<link rel="stylesheet" class="aplayer-secondary-style-marker" href="/assets/css/APlayer.min.css"><script src="/assets/js/APlayer.min.js" class="aplayer-secondary-script-marker"></script><script class="meting-secondary-script-marker" src="/assets/js/Meting.min.js"></script><h3 id="一、背景"><a href="#一、背景" class="headerlink" title="一、背景"></a>一、背景</h3><ul>
+<li>线上ACK 集群部署了StatefulSet 应用（rabbitMQ），由于rabbitMQ 本身自带的management 后台数据展示较为简陋且没有告警功能，因此考虑接入云上产品监控资源数据且对接告警通知功能，主要通过如下产品实现：<ul>
+<li>接入Prometheus 监控+grafana 进行数据图表展示。</li>
+<li>利用Arms 产品获取Prometheus 的监控指标，按照设定的阈值进行告警通知功能。</li>
+</ul>
+</li>
+</ul>
+<h3 id="二、操作过程"><a href="#二、操作过程" class="headerlink" title="二、操作过程"></a>二、操作过程</h3><h4 id="1）接入Prometheus-组件监控，获取数据指标"><a href="#1）接入Prometheus-组件监控，获取数据指标" class="headerlink" title="1）接入Prometheus 组件监控，获取数据指标"></a>1）接入Prometheus 组件监控，获取数据指标</h4><ul>
+<li>进入云产品 <strong>Prometheus监控服务</strong>，选择对应集群。（ACK集群需要先安装Prometheus 监控组件，安装参考：<a href="https://help.aliyun.com/document_detail/161304.html">ARMS Prometheus监控</a>）<img data-src="/posts/9a8h/1.png" class></li>
+</ul>
+<span id="more"></span>
+<ul>
+<li><p>选择 组件监控 ，点击添加组件监控，选择要添加的组件。（本次示例为RabbitMQ）</p>
+<img data-src="/posts/9a8h/2.png" class>
+<img data-src="/posts/9a8h/3.png" class>
+</li>
+<li><p>添加后即可进入grafana 大盘查看指标数据。验证数据方式可以通过 **curl  xxx:9419&#x2F;metrics ** 获取指标数据，如图:</p>
+<img data-src="/posts/9a8h/4.png" class></li>
+</ul>
+<h4 id="2）grafana-接入数据展示"><a href="#2）grafana-接入数据展示" class="headerlink" title="2）grafana 接入数据展示"></a>2）grafana 接入数据展示</h4><ul>
+<li><p>从Pometheus 控制台，点击对应生成的大盘，进入grafana 数据展示界面</p>
+<img data-src="/posts/9a8h/5.png" class>
+</li>
+<li><p>进入grafana Dashboard界面后，需要新增一个panel。操作如下：</p>
+<img data-src="/posts/9a8h/6.png" class>
+<img data-src="/posts/9a8h/7.png" class>
+<img data-src="/posts/9a8h/8.png" class>
+</li>
+<li><p>在ACK集群查看展示组件相关监控数据：在对应ACK 集群中，选择 <strong>运维管理 – Prometheus监控 –Cloud RABBITMQ</strong> ，即可查看大盘数据。</p>
+<img data-src="/posts/9a8h/9.png" class></li>
+</ul>
+<h4 id="3）创建告警阈值与通知"><a href="#3）创建告警阈值与通知" class="headerlink" title="3）创建告警阈值与通知"></a>3）创建告警阈值与通知</h4><ul>
+<li><p>创建钉钉群，并生成钉钉机器人webhook地址。参考：<a href="https://help.aliyun.com/document_detail/251838.html">https://help.aliyun.com/document_detail&#x2F;251838.html</a></p>
+</li>
+<li><p>在云产品 <strong>Prometheus监控服务</strong> 中，将钉钉机器人添加到告警联系人，使用IM机器人方式。</p>
+<img data-src="/posts/9a8h/10.png" class>
+</li>
+<li><p>在云产品 <strong>应用实时监控服务ARMS – Prometheus监控 – Prometheus告警规则</strong> 中，点击<strong>创建Prometheus告警规则</strong> ，创建告警规则。告警规则详细如图：</p>
+<img data-src="/posts/9a8h/11.png" class>
+<img data-src="/posts/9a8h/12.png" class>
+</li>
+<li><p>在云产品 <strong>应用实时监控服务ARMS – 告警管理 – 通知策略</strong> 中，点击<strong>创建通知策略</strong> ，创建告警通知策略。策略配置详细如图：</p>
+<img data-src="/posts/9a8h/13.png" class>
+<img data-src="/posts/9a8h/14.png" class></li>
+</ul>
+<h4 id="4）验证告警"><a href="#4）验证告警" class="headerlink" title="4）验证告警"></a>4）验证告警</h4><ul>
+<li>将告警规则中PromQL 语句暂时配置为：sum by (queue)(rabbitmq_queue_messages_unacknowledged{app&#x3D;”rabbi-exporter”}) &gt;&#x3D; 0</li>
+</ul>
+<p>来产生告警</p>
+<ul>
+<li><p>在云产品 <strong>应用实时监控服务ARMS – 告警管理 – 告警发送历史&#x2F;告警事件历史</strong> 中，搜索告警事件与发送结果：</p>
+<img data-src="/posts/9a8h/15.png" class>
+<img data-src="/posts/9a8h/16.png" class>
+</li>
+<li><p>可以看到钉钉群已正常接收告警通知（告警恢复自动发送恢复通知并停止发送告警消息）</p>
+<img data-src="/posts/9a8h/17.png" class></li>
+</ul>
+<h3 id="三、注意事项"><a href="#三、注意事项" class="headerlink" title="三、注意事项"></a>三、注意事项</h3><ul>
+<li>ACK 集群 RabbitMQ应用告警是创建的临时告警群。后续如需添加其他人或告警通知发布到正式群组按情况进行调整。</li>
+</ul>
+]]></content>
+      <categories>
+        <category>CNCF</category>
+      </categories>
+      <tags>
+        <tag>阿里云</tag>
+        <tag>K8S</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>可观测性-Fluentd 日志组件</title>
     <url>/posts/41fe.html</url>
     <content><![CDATA[<link rel="stylesheet" class="aplayer-secondary-style-marker" href="/assets/css/APlayer.min.css"><script src="/assets/js/APlayer.min.js" class="aplayer-secondary-script-marker"></script><script class="meting-secondary-script-marker" src="/assets/js/Meting.min.js"></script><h3 id="一、组件说明"><a href="#一、组件说明" class="headerlink" title="一、组件说明"></a>一、组件说明</h3><p><strong>Fluentd</strong><br>负责从 Kubernetes 搜集日志，每个 node 节点上面的 fluentd 监控并收集该节点上面的系统+容器日志，并将处理过后的日志信息发送给 Elasticsearch。</p>
@@ -1604,78 +2093,6 @@
       </categories>
       <tags>
         <tag>Observability</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>阿里云-Promotheus &amp; Grafana 监控大盘与告警通知</title>
-    <url>/posts/9a8h.html</url>
-    <content><![CDATA[<link rel="stylesheet" class="aplayer-secondary-style-marker" href="/assets/css/APlayer.min.css"><script src="/assets/js/APlayer.min.js" class="aplayer-secondary-script-marker"></script><script class="meting-secondary-script-marker" src="/assets/js/Meting.min.js"></script><h3 id="一、背景"><a href="#一、背景" class="headerlink" title="一、背景"></a>一、背景</h3><ul>
-<li>线上ACK 集群部署了StatefulSet 应用（rabbitMQ），由于rabbitMQ 本身自带的management 后台数据展示较为简陋且没有告警功能，因此考虑接入云上产品监控资源数据且对接告警通知功能，主要通过如下产品实现：<ul>
-<li>接入Prometheus 监控+grafana 进行数据图表展示。</li>
-<li>利用Arms 产品获取Prometheus 的监控指标，按照设定的阈值进行告警通知功能。</li>
-</ul>
-</li>
-</ul>
-<h3 id="二、操作过程"><a href="#二、操作过程" class="headerlink" title="二、操作过程"></a>二、操作过程</h3><h4 id="1）接入Prometheus-组件监控，获取数据指标"><a href="#1）接入Prometheus-组件监控，获取数据指标" class="headerlink" title="1）接入Prometheus 组件监控，获取数据指标"></a>1）接入Prometheus 组件监控，获取数据指标</h4><ul>
-<li>进入云产品 <strong>Prometheus监控服务</strong>，选择对应集群。（ACK集群需要先安装Prometheus 监控组件，安装参考：<a href="https://help.aliyun.com/document_detail/161304.html">ARMS Prometheus监控</a>）<img data-src="/posts/9a8h/1.png" class></li>
-</ul>
-<span id="more"></span>
-<ul>
-<li><p>选择 组件监控 ，点击添加组件监控，选择要添加的组件。（本次示例为RabbitMQ）</p>
-<img data-src="/posts/9a8h/2.png" class>
-<img data-src="/posts/9a8h/3.png" class>
-</li>
-<li><p>添加后即可进入grafana 大盘查看指标数据。验证数据方式可以通过 **curl  xxx:9419&#x2F;metrics ** 获取指标数据，如图:</p>
-<img data-src="/posts/9a8h/4.png" class></li>
-</ul>
-<h4 id="2）grafana-接入数据展示"><a href="#2）grafana-接入数据展示" class="headerlink" title="2）grafana 接入数据展示"></a>2）grafana 接入数据展示</h4><ul>
-<li><p>从Pometheus 控制台，点击对应生成的大盘，进入grafana 数据展示界面</p>
-<img data-src="/posts/9a8h/5.png" class>
-</li>
-<li><p>进入grafana Dashboard界面后，需要新增一个panel。操作如下：</p>
-<img data-src="/posts/9a8h/6.png" class>
-<img data-src="/posts/9a8h/7.png" class>
-<img data-src="/posts/9a8h/8.png" class>
-</li>
-<li><p>在ACK集群查看展示组件相关监控数据：在对应ACK 集群中，选择 <strong>运维管理 – Prometheus监控 –Cloud RABBITMQ</strong> ，即可查看大盘数据。</p>
-<img data-src="/posts/9a8h/9.png" class></li>
-</ul>
-<h4 id="3）创建告警阈值与通知"><a href="#3）创建告警阈值与通知" class="headerlink" title="3）创建告警阈值与通知"></a>3）创建告警阈值与通知</h4><ul>
-<li><p>创建钉钉群，并生成钉钉机器人webhook地址。参考：<a href="https://help.aliyun.com/document_detail/251838.html">https://help.aliyun.com/document_detail&#x2F;251838.html</a></p>
-</li>
-<li><p>在云产品 <strong>Prometheus监控服务</strong> 中，将钉钉机器人添加到告警联系人，使用IM机器人方式。</p>
-<img data-src="/posts/9a8h/10.png" class>
-</li>
-<li><p>在云产品 <strong>应用实时监控服务ARMS – Prometheus监控 – Prometheus告警规则</strong> 中，点击<strong>创建Prometheus告警规则</strong> ，创建告警规则。告警规则详细如图：</p>
-<img data-src="/posts/9a8h/11.png" class>
-<img data-src="/posts/9a8h/12.png" class>
-</li>
-<li><p>在云产品 <strong>应用实时监控服务ARMS – 告警管理 – 通知策略</strong> 中，点击<strong>创建通知策略</strong> ，创建告警通知策略。策略配置详细如图：</p>
-<img data-src="/posts/9a8h/13.png" class>
-<img data-src="/posts/9a8h/14.png" class></li>
-</ul>
-<h4 id="4）验证告警"><a href="#4）验证告警" class="headerlink" title="4）验证告警"></a>4）验证告警</h4><ul>
-<li>将告警规则中PromQL 语句暂时配置为：sum by (queue)(rabbitmq_queue_messages_unacknowledged{app&#x3D;”rabbi-exporter”}) &gt;&#x3D; 0</li>
-</ul>
-<p>来产生告警</p>
-<ul>
-<li><p>在云产品 <strong>应用实时监控服务ARMS – 告警管理 – 告警发送历史&#x2F;告警事件历史</strong> 中，搜索告警事件与发送结果：</p>
-<img data-src="/posts/9a8h/15.png" class>
-<img data-src="/posts/9a8h/16.png" class>
-</li>
-<li><p>可以看到钉钉群已正常接收告警通知（告警恢复自动发送恢复通知并停止发送告警消息）</p>
-<img data-src="/posts/9a8h/17.png" class></li>
-</ul>
-<h3 id="三、注意事项"><a href="#三、注意事项" class="headerlink" title="三、注意事项"></a>三、注意事项</h3><ul>
-<li>ACK 集群 RabbitMQ应用告警是创建的临时告警群。后续如需添加其他人或告警通知发布到正式群组按情况进行调整。</li>
-</ul>
-]]></content>
-      <categories>
-        <category>CNCF</category>
-      </categories>
-      <tags>
-        <tag>阿里云</tag>
-        <tag>K8S</tag>
       </tags>
   </entry>
   <entry>
