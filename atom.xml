@@ -6,7 +6,7 @@
   <link href="https://359sun.top/atom.xml" rel="self"/>
   
   <link href="https://359sun.top/"/>
-  <updated>2024-01-21T15:28:43.151Z</updated>
+  <updated>2024-01-21T15:33:40.702Z</updated>
   <id>https://359sun.top/</id>
   
   <author>
@@ -17,11 +17,11 @@
   <generator uri="https://hexo.io/">Hexo</generator>
   
   <entry>
-    <title>docker</title>
+    <title>Docker</title>
     <link href="https://359sun.top/posts/c018.html"/>
     <id>https://359sun.top/posts/c018.html</id>
     <published>2024-01-21T14:49:15.000Z</published>
-    <updated>2024-01-21T15:28:43.151Z</updated>
+    <updated>2024-01-21T15:33:40.702Z</updated>
     
     
     <summary type="html">&lt;h3 id=&quot;Docker-Engine&quot;&gt;&lt;a href=&quot;#Docker-Engine&quot; class=&quot;headerlink&quot; title=&quot;Docker Engine&quot;&gt;&lt;/a&gt;Docker Engine&lt;/h3&gt;&lt;h4 id=&quot;Install&quot;&gt;&lt;a href=&quot;#Install&quot; class=&quot;headerlink&quot; title=&quot;Install&quot;&gt;&lt;/a&gt;Install&lt;/h4&gt;&lt;figure class=&quot;highlight shell&quot;&gt;&lt;table&gt;&lt;tr&gt;&lt;td class=&quot;gutter&quot;&gt;&lt;pre&gt;&lt;span class=&quot;line&quot;&gt;1&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;2&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;3&lt;/span&gt;&lt;br&gt;&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;code&quot;&gt;&lt;pre&gt;&lt;span class=&quot;line&quot;&gt;&lt;span class=&quot;meta prompt_&quot;&gt;# &lt;/span&gt;&lt;span class=&quot;language-bash&quot;&gt;install docker engine&lt;/span&gt;&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;https://docs.docker.com/engine/install/debian/&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;&lt;/span&gt;&lt;br&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/figure&gt;
