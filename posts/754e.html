@@ -25,7 +25,7 @@
 
   <meta name="description" content="一、ACK集群网络规划https:&#x2F;&#x2F;help.aliyun.com&#x2F;document_detail&#x2F;86500.html 二、RBAC授权https:&#x2F;&#x2F;yuque.antfin.com&#x2F;kifo8h&#x2F;nee5aa&#x2F;mvx5t5 三、网络容器网络CNIhttps:&#x2F;&#x2F;help.aliyun.com&#x2F;document_detail&#x2F;195424.html">
 <meta property="og:type" content="article">
-<meta property="og:title" content="K8S &amp; ACK 学习记录">
+<meta property="og:title" content="Kubernetes &amp; ACK 学习记录">
 <meta property="og:url" content="https://359sun.top/posts/754e.html">
 <meta property="og:site_name" content="Yakir Blog">
 <meta property="og:description" content="一、ACK集群网络规划https:&#x2F;&#x2F;help.aliyun.com&#x2F;document_detail&#x2F;86500.html 二、RBAC授权https:&#x2F;&#x2F;yuque.antfin.com&#x2F;kifo8h&#x2F;nee5aa&#x2F;mvx5t5 三、网络容器网络CNIhttps:&#x2F;&#x2F;help.aliyun.com&#x2F;document_detail&#x2F;195424.html">
@@ -35,10 +35,10 @@
 <meta property="og:image" content="https://359sun.top/posts/754e/k8s3.png">
 <meta property="og:image" content="https://359sun.top/posts/754e/k8s4.png">
 <meta property="article:published_time" content="2022-05-31T15:04:28.000Z">
-<meta property="article:modified_time" content="2022-06-28T14:13:56.218Z">
+<meta property="article:modified_time" content="2024-01-21T15:28:43.153Z">
 <meta property="article:author" content="Yakir">
-<meta property="article:tag" content="阿里云">
-<meta property="article:tag" content="K8S">
+<meta property="article:tag" content="Alicloud">
+<meta property="article:tag" content="Kubernetes">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:image" content="https://359sun.top/posts/754e/k8s1.png">
 
@@ -55,7 +55,7 @@
   };
 </script>
 
-  <title>K8S & ACK 学习记录 | Yakir Blog</title>
+  <title>Kubernetes & ACK 学习记录 | Yakir Blog</title>
   
 
 
@@ -221,7 +221,7 @@
     </span>
       <header class="post-header">
         <h1 class="post-title" itemprop="name headline">
-          K8S & ACK 学习记录
+          Kubernetes & ACK 学习记录
         </h1>
 
         <div class="post-meta">
@@ -238,7 +238,7 @@
                   <i class="far fa-calendar-check"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2022-06-28 22:13:56" itemprop="dateModified" datetime="2022-06-28T22:13:56+08:00">2022-06-28</time>
+                <time title="修改时间：2024-01-21 23:28:43" itemprop="dateModified" datetime="2024-01-21T23:28:43+08:00">2024-01-21</time>
               </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -263,7 +263,7 @@
                 <i class="far fa-file-word"></i>
               </span>
                 <span class="post-meta-item-text">本文字数：</span>
-              <span>4.8k</span>
+              <span>4.9k</span>
             </span>
             <span class="post-meta-item" title="阅读时长">
               <span class="post-meta-item-icon">
@@ -352,7 +352,7 @@
 <li>通过 StatefulSet 的 Pod 名解析出 Pod 的 IP</li>
 </ul>
 <h4 id="其他"><a href="#其他" class="headerlink" title="其他"></a>其他</h4><ul>
-<li>相关阿里云资源：<a target="_blank" rel="noopener" href="https://help.aliyun.com/product/27706.html">VPC</a>、<a target="_blank" rel="noopener" href="https://help.aliyun.com/product/27537.html">SLB</a></li>
+<li>相关Alicloud资源：<a target="_blank" rel="noopener" href="https://help.aliyun.com/product/27706.html">VPC</a>、<a target="_blank" rel="noopener" href="https://help.aliyun.com/product/27537.html">SLB</a></li>
 <li><a target="_blank" rel="noopener" href="https://help.aliyun.com/document_detail/97467.html">Terway 与 Flannel对比</a></li>
 </ul>
 <h3 id="四、存储"><a href="#四、存储" class="headerlink" title="四、存储"></a>四、存储</h3><img data-src="/posts/754e/k8s3.png" class>
@@ -397,7 +397,7 @@
 </ul>
 </li>
 <li>自定义资源<ul>
-<li>自定义资源定义拓展 K8S API</li>
+<li>自定义资源定义拓展 Kubernetes API</li>
 <li>查看集群中所有API 组和包含的资源类型</li>
 </ul>
 </li>
@@ -443,7 +443,7 @@
 <ul>
 <li>Kube API Server：集群总线和入口网关。</li>
 <li>Kube Controller Manager：集群内部资源管理器。</li>
-<li>Cloud Controller Manager：提供集群与阿里云基础产品对接能力，如 CLB、VPC等。<h4 id="应用管理"><a href="#应用管理" class="headerlink" title="应用管理"></a>应用管理</h4></li>
+<li>Cloud Controller Manager：提供集群与Alicloud基础产品对接能力，如 CLB、VPC等。<h4 id="应用管理"><a href="#应用管理" class="headerlink" title="应用管理"></a>应用管理</h4></li>
 </ul>
 </li>
 <li><p>可选组件</p>
@@ -464,16 +464,16 @@
 <li>ags-metrics-collector：为基因计算客户使用的监控服务组件，可以通过该组件监控基因工作流中各个节点资源使用的详细信息。</li>
 <li>ack-arms-prometheus：使用ARMS Prometheus实现容器服务集群监控。</li>
 <li>logtail-ds：使用日志服务采集Kubernetes容器日志。</li>
-<li>logtail-windows：ACK集群上使用的容器日志收集插件，用于在阿里云上配合SLS服务对Windows容器进行日志收集。<h4 id="存储"><a href="#存储" class="headerlink" title="存储"></a>存储</h4></li>
+<li>logtail-windows：ACK集群上使用的容器日志收集插件，用于在Alicloud上配合SLS服务对Windows容器进行日志收集。<h4 id="存储"><a href="#存储" class="headerlink" title="存储"></a>存储</h4></li>
 </ul>
 </li>
 <li><p>可选组件</p>
 <ul>
-<li>csi-plugin：支持数据卷的挂载、卸载功能。创建集群时，如果选择CSI插件实现阿里云存储的接入能力的话，默认安装该组件。</li>
-<li>csi-provisioner：支持数据卷的自动创建能力。创建集群时，如果选择CSI插件实现阿里云存储的接入能力的话，默认安装该组件。</li>
+<li>csi-plugin：支持数据卷的挂载、卸载功能。创建集群时，如果选择CSI插件实现Alicloud存储的接入能力的话，默认安装该组件。</li>
+<li>csi-provisioner：支持数据卷的自动创建能力。创建集群时，如果选择CSI插件实现Alicloud存储的接入能力的话，默认安装该组件。</li>
 <li>storage-operator：用于管理存储组件的生命周期。</li>
 <li>alicloud-disk-controller：支持自动创建云盘卷。</li>
-<li>Flexvolume：社区较早实现的存储卷扩展机制。Flexvolume支持数据卷的挂载、卸载功能。创建集群时，如果选择Flexvolume插件实现阿里云存储的接入能力的话，默认安装该组件。</li>
+<li>Flexvolume：社区较早实现的存储卷扩展机制。Flexvolume支持数据卷的挂载、卸载功能。创建集群时，如果选择Flexvolume插件实现Alicloud存储的接入能力的话，默认安装该组件。</li>
 </ul>
 </li>
 </ul>
@@ -485,8 +485,8 @@
 </ul>
 </li>
 <li>可选组件<ul>
-<li>Terway :  阿里云开源的基于专有网络VPC的容器网络接口CNI插件，支持基于Kubernetes标准的网络策略（NetworkPolicy）来定义容器间的访问策略。创建集群时，如果选择Terway网络插件实现集群内部网络互通的话，默认安装该组件。</li>
-<li>Flannel：容器网络接口CNI插件，在阿里云上使用的Flannel网络模式采用阿里云VPC模式。创建集群时，如果选择Flannel网络插件实现集群内部网络互通的话，默认安装该组件。</li>
+<li>Terway :  Alicloud开源的基于专有网络VPC的容器网络接口CNI插件，支持基于Kubernetes标准的网络策略（NetworkPolicy）来定义容器间的访问策略。创建集群时，如果选择Terway网络插件实现集群内部网络互通的话，默认安装该组件。</li>
+<li>Flannel：容器网络接口CNI插件，在Alicloud上使用的Flannel网络模式采用AlicloudVPC模式。创建集群时，如果选择Flannel网络插件实现集群内部网络互通的话，默认安装该组件。</li>
 <li>ACK NodeLocal DNSCache：基于社区开源项目NodeLocal DNSCache的一套DNS本地缓存解决方案。</li>
 <li>kube-flannel-ds-windows：ACK托管版集群上使用的容器网络插件，用于构建适合Windows容器通讯的L2Bridge集群网络。</li>
 </ul>
@@ -494,7 +494,7 @@
 </ul>
 <img data-src="/posts/754e/k8s4.png" class>
 
-<h4 id="安全"><a href="#安全" class="headerlink" title="安全"></a><a target="_blank" rel="noopener" href="https://help.aliyun.com/document_detail/277412.html#title-nq4-jps-k41">安全</a></h4><h4 id="其他-1"><a href="#其他-1" class="headerlink" title="其他"></a><a target="_blank" rel="noopener" href="https://help.aliyun.com/document_detail/277412.html#title-iib-fx3-2hl">其他</a></h4><h3 id="七、其他"><a href="#七、其他" class="headerlink" title="七、其他"></a>七、其他</h3><h4 id="K8S-集群-NetworkPolicy-策略"><a href="#K8S-集群-NetworkPolicy-策略" class="headerlink" title="K8S 集群 NetworkPolicy 策略"></a><a target="_blank" rel="noopener" href="https://yuque.antfin.com/kifo8h/nee5aa/bzg9vq">K8S 集群 NetworkPolicy 策略</a></h4><ul>
+<h4 id="安全"><a href="#安全" class="headerlink" title="安全"></a><a target="_blank" rel="noopener" href="https://help.aliyun.com/document_detail/277412.html#title-nq4-jps-k41">安全</a></h4><h4 id="其他-1"><a href="#其他-1" class="headerlink" title="其他"></a><a target="_blank" rel="noopener" href="https://help.aliyun.com/document_detail/277412.html#title-iib-fx3-2hl">其他</a></h4><h3 id="七、其他"><a href="#七、其他" class="headerlink" title="七、其他"></a>七、其他</h3><h4 id="Kubernetes-集群-NetworkPolicy-策略"><a href="#Kubernetes-集群-NetworkPolicy-策略" class="headerlink" title="Kubernetes 集群 NetworkPolicy 策略"></a><a target="_blank" rel="noopener" href="https://yuque.antfin.com/kifo8h/nee5aa/bzg9vq">Kubernetes 集群 NetworkPolicy 策略</a></h4><ul>
 <li>Pod 和 Pod 通信通过三个标识符组合来辨识：</li>
 </ul>
 <p>1、其他被允许的 Pods（Pod 无法阻塞自身的访问）<br>2、被允许的 namespace<br>3、IP 组块 （Pod 本身所在的 Node 和 Pod  IP通信默认允许通信）</p>
@@ -519,7 +519,7 @@
   </li>
   <li class="post-copyright-link">
     <strong>本文链接：</strong>
-    <a href="https://359sun.top/posts/754e.html" title="K8S &amp; ACK 学习记录">https://359sun.top/posts/754e.html</a>
+    <a href="https://359sun.top/posts/754e.html" title="Kubernetes &amp; ACK 学习记录">https://359sun.top/posts/754e.html</a>
   </li>
   <li class="post-copyright-license">
     <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" rel="noopener" target="_blank"><i class="fab fa-fw fa-creative-commons"></i>BY-NC-SA</a> 许可协议。转载请注明出处！
@@ -550,10 +550,10 @@
       <footer class="post-footer">
           
           <div class="post-tags">
-              <!-- <a href="/tags/%E9%98%BF%E9%87%8C%E4%BA%91/" rel="tag"><i class="fa fa-tag"></i> 阿里云</a> -->
-              <a href="/tags/%E9%98%BF%E9%87%8C%E4%BA%91/" rel="tag"><i class="fa fa-tag"></i> 阿里云</a>
-              <!-- <a href="/tags/k8s/" rel="tag"><i class="fa fa-tag"></i> K8S</a> -->
-              <a href="/tags/k8s/" rel="tag"><i class="fa fa-tag"></i> K8S</a>
+              <!-- <a href="/tags/alicloud/" rel="tag"><i class="fa fa-tag"></i> Alicloud</a> -->
+              <a href="/tags/alicloud/" rel="tag"><i class="fa fa-tag"></i> Alicloud</a>
+              <!-- <a href="/tags/kubernetes/" rel="tag"><i class="fa fa-tag"></i> Kubernetes</a> -->
+              <a href="/tags/kubernetes/" rel="tag"><i class="fa fa-tag"></i> Kubernetes</a>
           </div>
 
         
@@ -562,8 +562,8 @@
         
     <div class="post-nav">
       <div class="post-nav-item">
-    <a href="/posts/c06e.html" rel="prev" title="Docker 学习记录">
-      <i class="fa fa-chevron-left"></i> Docker 学习记录
+    <a href="/posts/4a2a.html" rel="prev" title="ACK 集群日志接入 SLS">
+      <i class="fa fa-chevron-left"></i> ACK 集群日志接入 SLS
     </a></div>
       <div class="post-nav-item">
     <a href="/posts/dc02.html" rel="next" title="流量网关方案与灰度发布">
@@ -628,7 +628,7 @@
 
       <!--noindex-->
       <div class="post-toc-wrap sidebar-panel">
-          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%B8%80%E3%80%81ACK%E9%9B%86%E7%BE%A4%E7%BD%91%E7%BB%9C%E8%A7%84%E5%88%92"><span class="nav-text">一、ACK集群网络规划</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BA%8C%E3%80%81RBAC%E6%8E%88%E6%9D%83"><span class="nav-text">二、RBAC授权</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%B8%89%E3%80%81%E7%BD%91%E7%BB%9C"><span class="nav-text">三、网络</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%AE%B9%E5%99%A8%E7%BD%91%E7%BB%9CCNI"><span class="nav-text">容器网络CNI</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Service%EF%BC%9A%E5%B0%86%E4%B8%80%E7%BB%84%E5%AE%B9%E5%99%A8%E6%9A%B4%E9%9C%B2%E8%AE%BF%E9%97%AE%E6%8E%A5%E5%85%A5%E7%82%B9%EF%BC%8C%E5%8F%AF%E8%B4%9F%E8%BD%BD%E5%9D%87%E8%A1%A1"><span class="nav-text">Service：将一组容器暴露访问接入点，可负载均衡</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Ingress%EF%BC%9A%E5%B0%86%E9%9B%86%E7%BE%A4%E5%86%85%E7%9A%84-Service-%E5%AF%B9%E5%A4%96%E6%9A%B4%E9%9C%B27%E5%B1%82%E7%9A%84%E8%AE%BF%E9%97%AE%E6%8E%A5%E5%85%A5%E7%82%B9"><span class="nav-text">Ingress：将集群内的 Service 对外暴露7层的访问接入点</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Coredns%EF%BC%9A%E6%9C%8D%E5%8A%A1%E5%8F%91%E7%8E%B0DNS%EF%BC%8C%E5%AE%9E%E7%8E%B0%E4%B8%8D%E5%90%8C%E9%83%A8%E7%BD%B2%E7%8E%AF%E5%A2%83%E8%AE%BF%E9%97%AE%E5%90%8C%E6%A0%B7%E7%9A%84%E8%AE%BF%E9%97%AE%E5%85%A5%E5%8F%A3"><span class="nav-text">Coredns：服务发现DNS，实现不同部署环境访问同样的访问入口</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%85%B6%E4%BB%96"><span class="nav-text">其他</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%9B%9B%E3%80%81%E5%AD%98%E5%82%A8"><span class="nav-text">四、存储</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%AE%B9%E5%99%A8%E5%AD%98%E5%82%A8%E6%8E%A5%E5%8F%A3CSI-Plugin-%E7%BB%84%E4%BB%B6"><span class="nav-text">容器存储接口CSI-Plugin 组件</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%AD%98%E5%82%A8FlexVolume-%E7%BB%84%E4%BB%B6"><span class="nav-text">存储FlexVolume 组件</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BA%94%E3%80%81%E5%BA%94%E7%94%A8"><span class="nav-text">五、应用</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%B7%A5%E4%BD%9C%E8%B4%9F%E8%BD%BD"><span class="nav-text">工作负载</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E9%95%9C%E5%83%8F%EF%BC%88ACR%E4%BB%93%E5%BA%93%EF%BC%89"><span class="nav-text">镜像（ACR仓库）</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E9%85%8D%E7%BD%AE%E9%A1%B9-Configmap-%E4%B8%8E%E4%BF%9D%E5%AF%86%E5%AD%97%E5%85%B8-Secret"><span class="nav-text">配置项 Configmap 与保密字典 Secret</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%BA%94%E7%94%A8%E8%B0%83%E5%BA%A6%E4%B8%8E%E9%83%A8%E7%BD%B2"><span class="nav-text">应用调度与部署</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E4%BD%BF%E7%94%A8AHAS%E5%AF%B9%E5%BA%94%E7%94%A8%E8%BF%9B%E8%A1%8C%E9%AB%98%E5%8F%AF%E7%94%A8%E9%98%B2%E6%8A%A4"><span class="nav-text">使用AHAS对应用进行高可用防护</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%85%AD%E3%80%81%E7%BB%84%E4%BB%B6"><span class="nav-text">六、组件</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%A0%B8%E5%BF%83%E7%BB%84%E4%BB%B6"><span class="nav-text">核心组件</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%BA%94%E7%94%A8%E7%AE%A1%E7%90%86"><span class="nav-text">应用管理</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%97%A5%E5%BF%97%E4%B8%8E%E7%9B%91%E6%8E%A7"><span class="nav-text">日志与监控</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%AD%98%E5%82%A8"><span class="nav-text">存储</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E7%BD%91%E7%BB%9C"><span class="nav-text">网络</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%AE%89%E5%85%A8"><span class="nav-text">安全</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%85%B6%E4%BB%96-1"><span class="nav-text">其他</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%B8%83%E3%80%81%E5%85%B6%E4%BB%96"><span class="nav-text">七、其他</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#K8S-%E9%9B%86%E7%BE%A4-NetworkPolicy-%E7%AD%96%E7%95%A5"><span class="nav-text">K8S 集群 NetworkPolicy 策略</span></a></li></ol></li></ol></div>
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%B8%80%E3%80%81ACK%E9%9B%86%E7%BE%A4%E7%BD%91%E7%BB%9C%E8%A7%84%E5%88%92"><span class="nav-text">一、ACK集群网络规划</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BA%8C%E3%80%81RBAC%E6%8E%88%E6%9D%83"><span class="nav-text">二、RBAC授权</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%B8%89%E3%80%81%E7%BD%91%E7%BB%9C"><span class="nav-text">三、网络</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%AE%B9%E5%99%A8%E7%BD%91%E7%BB%9CCNI"><span class="nav-text">容器网络CNI</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Service%EF%BC%9A%E5%B0%86%E4%B8%80%E7%BB%84%E5%AE%B9%E5%99%A8%E6%9A%B4%E9%9C%B2%E8%AE%BF%E9%97%AE%E6%8E%A5%E5%85%A5%E7%82%B9%EF%BC%8C%E5%8F%AF%E8%B4%9F%E8%BD%BD%E5%9D%87%E8%A1%A1"><span class="nav-text">Service：将一组容器暴露访问接入点，可负载均衡</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Ingress%EF%BC%9A%E5%B0%86%E9%9B%86%E7%BE%A4%E5%86%85%E7%9A%84-Service-%E5%AF%B9%E5%A4%96%E6%9A%B4%E9%9C%B27%E5%B1%82%E7%9A%84%E8%AE%BF%E9%97%AE%E6%8E%A5%E5%85%A5%E7%82%B9"><span class="nav-text">Ingress：将集群内的 Service 对外暴露7层的访问接入点</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Coredns%EF%BC%9A%E6%9C%8D%E5%8A%A1%E5%8F%91%E7%8E%B0DNS%EF%BC%8C%E5%AE%9E%E7%8E%B0%E4%B8%8D%E5%90%8C%E9%83%A8%E7%BD%B2%E7%8E%AF%E5%A2%83%E8%AE%BF%E9%97%AE%E5%90%8C%E6%A0%B7%E7%9A%84%E8%AE%BF%E9%97%AE%E5%85%A5%E5%8F%A3"><span class="nav-text">Coredns：服务发现DNS，实现不同部署环境访问同样的访问入口</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%85%B6%E4%BB%96"><span class="nav-text">其他</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%9B%9B%E3%80%81%E5%AD%98%E5%82%A8"><span class="nav-text">四、存储</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%AE%B9%E5%99%A8%E5%AD%98%E5%82%A8%E6%8E%A5%E5%8F%A3CSI-Plugin-%E7%BB%84%E4%BB%B6"><span class="nav-text">容器存储接口CSI-Plugin 组件</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%AD%98%E5%82%A8FlexVolume-%E7%BB%84%E4%BB%B6"><span class="nav-text">存储FlexVolume 组件</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BA%94%E3%80%81%E5%BA%94%E7%94%A8"><span class="nav-text">五、应用</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%B7%A5%E4%BD%9C%E8%B4%9F%E8%BD%BD"><span class="nav-text">工作负载</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E9%95%9C%E5%83%8F%EF%BC%88ACR%E4%BB%93%E5%BA%93%EF%BC%89"><span class="nav-text">镜像（ACR仓库）</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E9%85%8D%E7%BD%AE%E9%A1%B9-Configmap-%E4%B8%8E%E4%BF%9D%E5%AF%86%E5%AD%97%E5%85%B8-Secret"><span class="nav-text">配置项 Configmap 与保密字典 Secret</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%BA%94%E7%94%A8%E8%B0%83%E5%BA%A6%E4%B8%8E%E9%83%A8%E7%BD%B2"><span class="nav-text">应用调度与部署</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E4%BD%BF%E7%94%A8AHAS%E5%AF%B9%E5%BA%94%E7%94%A8%E8%BF%9B%E8%A1%8C%E9%AB%98%E5%8F%AF%E7%94%A8%E9%98%B2%E6%8A%A4"><span class="nav-text">使用AHAS对应用进行高可用防护</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%85%AD%E3%80%81%E7%BB%84%E4%BB%B6"><span class="nav-text">六、组件</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%A0%B8%E5%BF%83%E7%BB%84%E4%BB%B6"><span class="nav-text">核心组件</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%BA%94%E7%94%A8%E7%AE%A1%E7%90%86"><span class="nav-text">应用管理</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%97%A5%E5%BF%97%E4%B8%8E%E7%9B%91%E6%8E%A7"><span class="nav-text">日志与监控</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%AD%98%E5%82%A8"><span class="nav-text">存储</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E7%BD%91%E7%BB%9C"><span class="nav-text">网络</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%AE%89%E5%85%A8"><span class="nav-text">安全</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%85%B6%E4%BB%96-1"><span class="nav-text">其他</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%B8%83%E3%80%81%E5%85%B6%E4%BB%96"><span class="nav-text">七、其他</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#Kubernetes-%E9%9B%86%E7%BE%A4-NetworkPolicy-%E7%AD%96%E7%95%A5"><span class="nav-text">Kubernetes 集群 NetworkPolicy 策略</span></a></li></ol></li></ol></div>
       </div>
       <!--/noindex-->
 
@@ -651,13 +651,13 @@
       <div class="site-state-item site-state-categories">
             <a href="/categories/">
           
-        <span class="site-state-item-count">4</span>
+        <span class="site-state-item-count">8</span>
         <span class="site-state-item-name">分类</span></a>
       </div>
       <div class="site-state-item site-state-tags">
             <a href="/tags/">
           
-        <span class="site-state-item-count">8</span>
+        <span class="site-state-item-count">12</span>
         <span class="site-state-item-name">标签</span></a>
       </div>
   </nav>
@@ -723,7 +723,7 @@
 <div class="copyright">
   
   &copy; 
-  <span itemprop="copyrightYear">2023</span>
+  <span itemprop="copyrightYear">2024</span>
   <span class="with-love">
     <i class="fa fa-heart"></i>
   </span>

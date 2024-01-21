@@ -25,7 +25,7 @@
 
   <meta name="description" content="一、RBAC简易概述 1) RBAC 四种 API 对象 Role：一组权限的集合，在一个命名空间中，可以用其来定义一个角色，只能对命名空间内的资源进行授权。如果是集群级别的资源，则需要使用ClusterRole。例如：定义一个角色用来读取Pod的权限 ClusterRole：具有和角色一致的命名空间资源的管理能力，还可用于以下特殊元素的授权 集群范围的资源，例如Node 非资源型的路径，例如：&amp;">
 <meta property="og:type" content="article">
-<meta property="og:title" content="K8S-RBAC 权限控制">
+<meta property="og:title" content="Kubernetes-RBAC 权限控制">
 <meta property="og:url" content="https://359sun.top/posts/fa45.html">
 <meta property="og:site_name" content="Yakir Blog">
 <meta property="og:description" content="一、RBAC简易概述 1) RBAC 四种 API 对象 Role：一组权限的集合，在一个命名空间中，可以用其来定义一个角色，只能对命名空间内的资源进行授权。如果是集群级别的资源，则需要使用ClusterRole。例如：定义一个角色用来读取Pod的权限 ClusterRole：具有和角色一致的命名空间资源的管理能力，还可用于以下特殊元素的授权 集群范围的资源，例如Node 非资源型的路径，例如：&amp;">
@@ -41,10 +41,10 @@
 <meta property="og:image" content="https://359sun.top/posts/fa45/de4222775e67.png">
 <meta property="og:image" content="https://359sun.top/posts/fa45/ab8f20ce2acc.png">
 <meta property="article:published_time" content="2022-03-01T15:55:02.000Z">
-<meta property="article:modified_time" content="2023-02-08T15:32:33.103Z">
+<meta property="article:modified_time" content="2024-01-21T15:28:43.155Z">
 <meta property="article:author" content="Yakir">
-<meta property="article:tag" content="阿里云">
-<meta property="article:tag" content="K8S">
+<meta property="article:tag" content="Alicloud">
+<meta property="article:tag" content="Kubernetes">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:image" content="https://359sun.top/posts/fa45/gaisu.png">
 
@@ -61,7 +61,7 @@
   };
 </script>
 
-  <title>K8S-RBAC 权限控制 | Yakir Blog</title>
+  <title>Kubernetes-RBAC 权限控制 | Yakir Blog</title>
   
 
 
@@ -227,7 +227,7 @@
     </span>
       <header class="post-header">
         <h1 class="post-title" itemprop="name headline">
-          K8S-RBAC 权限控制
+          Kubernetes-RBAC 权限控制
         </h1>
 
         <div class="post-meta">
@@ -244,7 +244,7 @@
                   <i class="far fa-calendar-check"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2023-02-08 23:32:33" itemprop="dateModified" datetime="2023-02-08T23:32:33+08:00">2023-02-08</time>
+                <time title="修改时间：2024-01-21 23:28:43" itemprop="dateModified" datetime="2024-01-21T23:28:43+08:00">2024-01-21</time>
               </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -308,14 +308,14 @@
 </ul>
 <p><strong>Role和ClusterRole是权限规则的定义</strong></p>
 <ul>
-<li>rules代表具体的授权规则，类似于阿里云RAM中的权限策略Policy</li>
+<li>rules代表具体的授权规则，类似于AlicloudRAM中的权限策略Policy</li>
 <li>Role和ClusterRole区别只在于一个是集群级别的资源控制</li>
 </ul>
 <span id="more"></span>
 
-<p><strong>RoleBinding和ClusterRoleBinding是将User、Group、ServiceAccount绑定到Role或ClusterRole中（类似阿里云RAM中将Policy赋权给RAM角色或RAM账号）</strong></p>
+<p><strong>RoleBinding和ClusterRoleBinding是将User、Group、ServiceAccount绑定到Role或ClusterRole中（类似AlicloudRAM中将Policy赋权给RAM角色或RAM账号）</strong></p>
 <ul>
-<li>User、Group、ServiceAccount 是 K8S 集群中单独的概念，与系统级别不同。参考：<a target="_blank" rel="noopener" href="https://www.qikqiak.com/k8strain2/security/rbac/#%E5%88%9B%E5%BB%BA%E8%A7%92%E8%89%B2">https://www.qikqiak.com/k8strain2/security/rbac/#%E5%88%9B%E5%BB%BA%E8%A7%92%E8%89%B2</a></li>
+<li>User、Group、ServiceAccount 是 Kubernetes 集群中单独的概念，与系统级别不同。参考：<a target="_blank" rel="noopener" href="https://www.qikqiak.com/k8strain2/security/rbac/#%E5%88%9B%E5%BB%BA%E8%A7%92%E8%89%B2">https://www.qikqiak.com/k8strain2/security/rbac/#%E5%88%9B%E5%BB%BA%E8%A7%92%E8%89%B2</a></li>
 <li>RoleBinding 可以引用同一个 namespace 中的任何 Role ；或者一个 RoleBinding 可以引用某 ClusterRole 并将该 ClusterRole 绑定到 RoleBinding 所在的 namespace。</li>
 <li>如需 ClusterRole 绑定到集群中所有 namespace，必须要使用 ClusterRoleBinding</li>
 <li>RoleBinding 对应可引用一个 ClusterRole 对象用于在 RoleBinding 所在的 namespace 内授予用户对所引用的 ClusterRole 中定义的 namespace 资源的访问权限。（在整个集群内定义一组通用角色，然后在不同 namespace 中复用这些角色）</li>
@@ -413,7 +413,7 @@
   </li>
   <li class="post-copyright-link">
     <strong>本文链接：</strong>
-    <a href="https://359sun.top/posts/fa45.html" title="K8S-RBAC 权限控制">https://359sun.top/posts/fa45.html</a>
+    <a href="https://359sun.top/posts/fa45.html" title="Kubernetes-RBAC 权限控制">https://359sun.top/posts/fa45.html</a>
   </li>
   <li class="post-copyright-license">
     <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" rel="noopener" target="_blank"><i class="fab fa-fw fa-creative-commons"></i>BY-NC-SA</a> 许可协议。转载请注明出处！
@@ -444,10 +444,10 @@
       <footer class="post-footer">
           
           <div class="post-tags">
-              <!-- <a href="/tags/%E9%98%BF%E9%87%8C%E4%BA%91/" rel="tag"><i class="fa fa-tag"></i> 阿里云</a> -->
-              <a href="/tags/%E9%98%BF%E9%87%8C%E4%BA%91/" rel="tag"><i class="fa fa-tag"></i> 阿里云</a>
-              <!-- <a href="/tags/k8s/" rel="tag"><i class="fa fa-tag"></i> K8S</a> -->
-              <a href="/tags/k8s/" rel="tag"><i class="fa fa-tag"></i> K8S</a>
+              <!-- <a href="/tags/alicloud/" rel="tag"><i class="fa fa-tag"></i> Alicloud</a> -->
+              <a href="/tags/alicloud/" rel="tag"><i class="fa fa-tag"></i> Alicloud</a>
+              <!-- <a href="/tags/kubernetes/" rel="tag"><i class="fa fa-tag"></i> Kubernetes</a> -->
+              <a href="/tags/kubernetes/" rel="tag"><i class="fa fa-tag"></i> Kubernetes</a>
           </div>
 
         
@@ -545,13 +545,13 @@
       <div class="site-state-item site-state-categories">
             <a href="/categories/">
           
-        <span class="site-state-item-count">4</span>
+        <span class="site-state-item-count">8</span>
         <span class="site-state-item-name">分类</span></a>
       </div>
       <div class="site-state-item site-state-tags">
             <a href="/tags/">
           
-        <span class="site-state-item-count">8</span>
+        <span class="site-state-item-count">12</span>
         <span class="site-state-item-name">标签</span></a>
       </div>
   </nav>
@@ -617,7 +617,7 @@
 <div class="copyright">
   
   &copy; 
-  <span itemprop="copyrightYear">2023</span>
+  <span itemprop="copyrightYear">2024</span>
   <span class="with-love">
     <i class="fa fa-heart"></i>
   </span>

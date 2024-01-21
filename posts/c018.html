@@ -1,0 +1,646 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 6.2.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+<link rel="stylesheet" href="https://fonts.loli.net/css?family=Noto Serif SC:300,300italic,400,400italic,700,700italic&display=swap&subset=latin,latin-ext">
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.css">
+  <link rel="stylesheet" href="/lib/pace/pace-theme-minimal.min.css">
+  <script src="/lib/pace/pace.min.js"></script>
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"359sun.top","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"left","always":true,"display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":true,"show_result":true,"style":"mac"},"back2top":{"enable":true,"sidebar":true,"scrollpercent":true},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":true,"mediumzoom":false,"lazyload":true,"pangu":false,"comments":{"style":"tabs","active":"gitalk","storage":true,"lazyload":false,"nav":{"gitalk":{"order":-2}},"activeClass":"gitalk"},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+  <meta name="description" content="Docker EngineInstall123# install docker enginehttps:&#x2F;&#x2F;docs.docker.com&#x2F;engine&#x2F;install&#x2F;debian&#x2F;  StorageOverview12345678910111213141516171819# show docker volume infodocker volume lsDRIVER    VOLUME NAME">
+<meta property="og:type" content="article">
+<meta property="og:title" content="docker">
+<meta property="og:url" content="https://359sun.top/posts/c018.html">
+<meta property="og:site_name" content="Yakir Blog">
+<meta property="og:description" content="Docker EngineInstall123# install docker enginehttps:&#x2F;&#x2F;docs.docker.com&#x2F;engine&#x2F;install&#x2F;debian&#x2F;  StorageOverview12345678910111213141516171819# show docker volume infodocker volume lsDRIVER    VOLUME NAME">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2024-01-21T14:49:15.000Z">
+<meta property="article:modified_time" content="2024-01-21T15:28:43.151Z">
+<meta property="article:author" content="Yakir">
+<meta property="article:tag" content="Docker">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="https://359sun.top/posts/c018.html">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>docker | Yakir Blog</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+<link rel="alternate" href="/atom.xml" title="Yakir Blog" type="application/atom+xml">
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">Yakir Blog</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+        <li class="menu-item menu-item-musiclist">
+
+    <a href="/musiclist/" rel="section"><i class="fa fa-music fa-fw"></i>歌单</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="reading-progress-bar"></div>
+
+  <a href="https://github.com/yakir3" class="github-corner" title="Follow me on GitHub" aria-label="Follow me on GitHub" rel="noopener" target="_blank"><svg width="80" height="80" viewBox="0 0 250 250" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path></svg></a>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://359sun.top/posts/c018.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.jpg">
+      <meta itemprop="name" content="Yakir">
+      <meta itemprop="description" content="Yakir Blog">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Yakir Blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          docker
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+              
+
+              <time title="创建时间：2024-01-21 22:49:15 / 修改时间：23:28:43" itemprop="dateCreated datePublished" datetime="2024-01-21T22:49:15+08:00">2024-01-21</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/container/" itemprop="url" rel="index"><span itemprop="name">Container</span></a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span><br>
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+                <span class="post-meta-item-text">本文字数：</span>
+              <span>8.7k</span>
+            </span>
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+                <span class="post-meta-item-text">阅读时长 &asymp;</span>
+              <span>8 分钟</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h3 id="Docker-Engine"><a href="#Docker-Engine" class="headerlink" title="Docker Engine"></a>Docker Engine</h3><h4 id="Install"><a href="#Install" class="headerlink" title="Install"></a>Install</h4><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta prompt_"># </span><span class="language-bash">install docker engine</span></span><br><span class="line">https://docs.docker.com/engine/install/debian/</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<h4 id="Storage"><a href="#Storage" class="headerlink" title="Storage"></a>Storage</h4><h5 id="Overview"><a href="#Overview" class="headerlink" title="Overview"></a>Overview</h5><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta prompt_"># </span><span class="language-bash">show docker volume info</span></span><br><span class="line">docker volume ls</span><br><span class="line">DRIVER    VOLUME NAME</span><br><span class="line">local     jenkins_home</span><br><span class="line">local     yakir-test</span><br><span class="line"><span class="meta prompt_"></span></span><br><span class="line"><span class="meta prompt_"></span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">how to use</span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">default volume, directory = /var/lib/docker/volumes/</span></span><br><span class="line">-v yakir-test:/container-app/my-app</span><br><span class="line">--volume yakir-test:/container-app/my-app</span><br><span class="line">--mount</span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash"><span class="built_in">bind</span> mounts</span></span><br><span class="line">-v /local_path/app.conf:/container-app/app.conf</span><br><span class="line">--volume /local_path/app.conf:/container-app/app.conf</span><br><span class="line">--mount</span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">memory volume</span></span><br><span class="line">--tmpfs</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+<span id="more"></span>
+<h5 id="Volumes"><a href="#Volumes" class="headerlink" title="Volumes"></a>Volumes</h5><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta prompt_"># </span><span class="language-bash">create volume</span></span><br><span class="line">docker volume create yakir-test</span><br><span class="line"><span class="meta prompt_"></span></span><br><span class="line"><span class="meta prompt_"></span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">start container with volume</span></span><br><span class="line">docker run -d --name test \</span><br><span class="line"><span class="meta prompt_">#</span><span class="language-bash"><span class="comment">##</span></span> </span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">option1</span></span><br><span class="line">-v yakir-test:/app \</span><br><span class="line">--volume yakir-test:/app \</span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">anonymous mode</span></span><br><span class="line">--volume /app</span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">option2</span></span><br><span class="line">--mount source=yakir-test,target=/app \</span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash"><span class="built_in">readonly</span> mode</span></span><br><span class="line">--mount source=yakir-test,destination=/usr/share/nginx/html,readonly \</span><br><span class="line">--mount &#x27;type=volume,source=nfsvolume,target=/app,volume-driver=local,volume-opt=type=nfs,volume-opt=device=:/var/docker-nfs,volume-opt=o=addr=10.0.0.10&#x27; \</span><br><span class="line"><span class="meta prompt_">#</span><span class="language-bash"><span class="comment">##</span></span></span><br><span class="line">nginx:latest</span><br><span class="line"><span class="meta prompt_"></span></span><br><span class="line"><span class="meta prompt_"></span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">use a volume with docker-ompose</span></span><br><span class="line">services:</span><br><span class="line">  frontend:</span><br><span class="line">    image: node:lts</span><br><span class="line">    volumes:</span><br><span class="line">      - yakir-test:/home/node/app</span><br><span class="line">volumes:</span><br><span class="line">  yakir-test:</span><br><span class="line">     # external: true</span><br><span class="line"><span class="meta prompt_"></span></span><br><span class="line"><span class="meta prompt_"></span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">show and remove volume</span></span><br><span class="line">docker inspect volume yakir-test</span><br><span class="line">docker stop test</span><br><span class="line">docker volume rm yakir-test</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<h5 id="Bind-mounts"><a href="#Bind-mounts" class="headerlink" title="Bind mounts"></a>Bind mounts</h5><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta prompt_"># </span><span class="language-bash">start container with <span class="built_in">bind</span> mounts</span></span><br><span class="line">docker run -d --name test \</span><br><span class="line"><span class="meta prompt_">#</span><span class="language-bash"><span class="comment">##</span></span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">option1</span></span><br><span class="line">-v /opt/app.conf:/app/app.conf \</span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">option2</span></span><br><span class="line">--mount type=bind,source=&quot;$(pwd)&quot;/target,target=/app/ \</span><br><span class="line">--mount type=bind,source=&quot;$(pwd)&quot;/target,target=/app/,readonly \</span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash"><span class="built_in">bind</span> propagation</span></span><br><span class="line">--mount type=bind,source=&quot;$(pwd)&quot;/target,target=/app2,readonly,bind-propagation=rslave \</span><br><span class="line"><span class="meta prompt_">#</span><span class="language-bash"><span class="comment">##</span></span></span><br><span class="line">nginx:latest</span><br><span class="line"><span class="meta prompt_"></span></span><br><span class="line"><span class="meta prompt_"></span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">use <span class="built_in">bind</span> mounts with docker-compose</span></span><br><span class="line">services:</span><br><span class="line">  frontend:</span><br><span class="line">    image: node:lts</span><br><span class="line">    volumes:</span><br><span class="line">      - type: bind</span><br><span class="line">        source: ./static</span><br><span class="line">        target: /opt/app/static</span><br><span class="line">volumes:</span><br><span class="line">  myapp:</span><br><span class="line"><span class="meta prompt_"></span></span><br><span class="line"><span class="meta prompt_"></span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">show and remove container</span></span><br><span class="line">docker inspect test --format &#x27;&#123;&#123; json .Mounts &#125;&#125;&#x27;</span><br><span class="line">docker stop test</span><br><span class="line">docker rm test</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<h5 id="tmpfs-mounts"><a href="#tmpfs-mounts" class="headerlink" title="tmpfs mounts"></a>tmpfs mounts</h5><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta prompt_"># </span><span class="language-bash">start container with tmpfs</span></span><br><span class="line">docker run -it --name tmptest \</span><br><span class="line"><span class="meta prompt_">#</span><span class="language-bash"><span class="comment">##</span></span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">option1</span></span><br><span class="line">--tmpfs /app</span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">option2</span></span><br><span class="line">--mount type=tmpfs,target=/app \</span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">specify tmpfs options</span></span><br><span class="line">--mount type=tmpfs,destination=/app,tmpfs-mode=1770,tmpfs-size=104857600 \</span><br><span class="line"><span class="meta prompt_">#</span><span class="language-bash"><span class="comment">##</span></span></span><br><span class="line">nginx:latest</span><br><span class="line"><span class="meta prompt_"></span></span><br><span class="line"><span class="meta prompt_"></span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">show and remove container</span></span><br><span class="line">docker inspect tmptest --format &#x27;&#123;&#123; json .Mounts &#125;&#125;&#x27;</span><br><span class="line">docker stop tmptest</span><br><span class="line">docker rm tmptest</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<h5 id="Storage-drivers"><a href="#Storage-drivers" class="headerlink" title="Storage drivers"></a>Storage drivers</h5><h6 id="Btrfs"><a href="#Btrfs" class="headerlink" title="Btrfs"></a>Btrfs</h6><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta prompt_"># </span><span class="language-bash">stop docker</span></span><br><span class="line">systemctl stop docker.service</span><br><span class="line"><span class="meta prompt_"></span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">backup and empty contents</span></span><br><span class="line">cp -au /var/lib/docker/ /var/lib/docker.bk</span><br><span class="line">rm -rf /var/lib/docker/*</span><br><span class="line"><span class="meta prompt_"></span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">format block device as a btrfs filesystem</span></span><br><span class="line">mkfs.btrfs -f /dev/xvdf</span><br><span class="line"><span class="meta prompt_"></span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">mount the btrfs filesystem on /var/lib/docker mount point</span></span><br><span class="line">mount -t btrfs /dev/xvdf /var/lib/docker</span><br><span class="line">cp -au /var/lib/docker.bk/* /var/lib/docker/</span><br><span class="line"><span class="meta prompt_"></span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">configure Docker to use the btrfs storage driver</span></span><br><span class="line">vim /etc/docker/daemon.json</span><br><span class="line">&#123;</span><br><span class="line">  &quot;storage-driver&quot;: &quot;btrfs&quot;</span><br><span class="line">&#125;</span><br><span class="line">systemctl start docker.service</span><br><span class="line"><span class="meta prompt_"></span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">verify</span></span><br><span class="line">docker info --format &#x27;&#123;&#123; json .Driver &#125;&#125;&#x27;</span><br><span class="line">&quot;btrfs&quot;</span><br></pre></td></tr></table></figure>
+
+<h6 id="OverlayFS"><a href="#OverlayFS" class="headerlink" title="OverlayFS"></a>OverlayFS</h6><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta prompt_"># </span><span class="language-bash">stop docker</span></span><br><span class="line">systemctl stop docker.service</span><br><span class="line"><span class="meta prompt_"></span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">backup and empty contents</span></span><br><span class="line">cp -au /var/lib/docker/ /var/lib/docker.bk</span><br><span class="line">rm -rf /var/lib/docker/*</span><br><span class="line"><span class="meta prompt_"></span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">options: separate backing filesystem, mount into /var/lib/docker and make sure to add mount to /etc/fstab to make it.</span>  </span><br><span class="line"><span class="meta prompt_"></span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">configure Docker to use the btrfs storage driver</span></span><br><span class="line">vim /etc/docker/daemon.json</span><br><span class="line">&#123;</span><br><span class="line">  &quot;storage-driver&quot;: &quot;overlay2&quot;</span><br><span class="line">&#125;</span><br><span class="line">systemctl start docker.service</span><br><span class="line"><span class="meta prompt_"></span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">verify</span></span><br><span class="line">docker info --format &#x27;&#123;&#123; json .Driver &#125;&#125;&#x27;    </span><br><span class="line">&quot;overlay2&quot;</span><br><span class="line">mount |grep overlay |grep docker</span><br></pre></td></tr></table></figure>
+
+<h6 id="ZFS"><a href="#ZFS" class="headerlink" title="ZFS"></a>ZFS</h6><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta prompt_"># </span><span class="language-bash">stop docker</span></span><br><span class="line">systemctl stop docker.service</span><br><span class="line"><span class="meta prompt_"></span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">backup and empty contents</span></span><br><span class="line">cp -auR /var/lib/docker/ /var/lib/docker.bk</span><br><span class="line">rm -rf /var/lib/docker/*</span><br><span class="line"><span class="meta prompt_"></span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">create a new zpool on block device and mount into /var/lib/docker</span></span><br><span class="line">zpool create -f zpool-docker -m /var/lib/docker /dev/xvdf</span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">add zpoll</span></span><br><span class="line">zpool add zpool-docker /dev/xvdh</span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">verify zpool</span></span><br><span class="line">zfs list</span><br><span class="line">NAME           USED  AVAIL  REFER  MOUNTPOINT</span><br><span class="line">zpool-docker    55K  96.4G    19K  /var/lib/docker</span><br><span class="line"><span class="meta prompt_"></span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">configure Docker to use the btrfs storage driver</span></span><br><span class="line">vim /etc/docker/daemon.json</span><br><span class="line">&#123;</span><br><span class="line">  &quot;storage-driver&quot;: &quot;zfs&quot;</span><br><span class="line">&#125;</span><br><span class="line">systemctl start docker.service</span><br><span class="line"><span class="meta prompt_"></span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">verify</span></span><br><span class="line">docker info --format &#x27;&#123;&#123; json .Driver &#125;&#125;&#x27;    </span><br><span class="line">&quot;zfs&quot;</span><br></pre></td></tr></table></figure>
+
+<h6 id="containerd-snapshotters"><a href="#containerd-snapshotters" class="headerlink" title="containerd snapshotters"></a>containerd snapshotters</h6><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta prompt_"># </span><span class="language-bash">configure Docker to use the btrfs storage driver</span></span><br><span class="line">vim /etc/docker/daemon.json</span><br><span class="line">&#123;</span><br><span class="line">  &quot;features&quot;: &#123;</span><br><span class="line">    &quot;containerd-snapshotter&quot;: true</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line">systemctl restart docker.service</span><br><span class="line"><span class="meta prompt_"></span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">verify</span></span><br><span class="line">docker info -f &#x27;&#123;&#123; .DriverStatus &#125;&#125;&#x27;</span><br><span class="line">[[driver-type io.containerd.snapshotter.v1]]</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<h4 id="Networking"><a href="#Networking" class="headerlink" title="Networking"></a>Networking</h4><h5 id="Overview-1"><a href="#Overview-1" class="headerlink" title="Overview"></a>Overview</h5><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta prompt_"># </span><span class="language-bash">show docker network info</span></span><br><span class="line">docker network ls</span><br><span class="line">NETWORK ID     NAME      DRIVER    SCOPE</span><br><span class="line">b2adc1fcf214   bridge    bridge    local</span><br><span class="line">2ed9fbc8db3e   host      host      local</span><br><span class="line">f1b2d749ed2c   none      null      local</span><br><span class="line"><span class="meta prompt_"></span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">how to use</span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">bridge</span></span><br><span class="line">--net bridge</span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">host</span></span><br><span class="line">--net host</span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">none</span></span><br><span class="line">--net none</span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">container</span></span><br><span class="line">--net container:container_name|container_id</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<h5 id="Networking-drivers"><a href="#Networking-drivers" class="headerlink" title="Networking drivers"></a>Networking drivers</h5><h6 id="Bridge"><a href="#Bridge" class="headerlink" title="Bridge"></a>Bridge</h6><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta prompt_"># </span><span class="language-bash">bridge</span></span><br><span class="line">每个容器拥有独立网络协议栈，为每一个容器分配、设置 IP 等。将容器连接到虚拟网桥（默认为 docker0 网桥）。</span><br><span class="line"><span class="meta prompt_"></span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">1.在宿主机上创建 container namespace</span></span><br><span class="line">xxx</span><br><span class="line"><span class="meta prompt_"></span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">2.daemon 进程利用 veth pair 技术，在宿主机上创建一对对等虚拟网络接口设备。veth pair 特性是一端流量会流向另一端。</span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">一个接口放在宿主机的 docker0 虚拟网桥上并命名为 vethxxx</span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">查看网桥信息</span></span><br><span class="line">brctl show</span><br><span class="line">bridge name     bridge id               STP enabled     interfaces</span><br><span class="line">docker0         8000.0242db01d347       no              vethccab668</span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">查看宿主机 vethxxx 接口</span></span><br><span class="line">ip addr |grep vethccab668</span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">另外一个接口放进 container 所属的 namespace 下并命名为 eth0 接口</span></span><br><span class="line">docker run --rm -dit busybox sh ip addr</span><br><span class="line"><span class="meta prompt_"></span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">3.daemon 进程还会从网桥 docker0 的私有地址空间中分配一个 IP 地址和子网给该容器，并设置 docker0 的 IP 地址为容器的默认网关</span></span><br><span class="line">docker inspect test |grep Gateway</span><br><span class="line">            &quot;Gateway&quot;: &quot;172.17.0.1&quot;,</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<h6 id="Overlay"><a href="#Overlay" class="headerlink" title="Overlay"></a>Overlay</h6><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta prompt_"># </span><span class="language-bash">多 docker 主机组建网络，配合 docker swarm 使用</span></span><br></pre></td></tr></table></figure>
+
+<h6 id="Host"><a href="#Host" class="headerlink" title="Host"></a>Host</h6><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta prompt_"># </span><span class="language-bash">host</span></span><br><span class="line">使用宿主机的 IP 和端口，共享宿主机网络协议栈。</span><br><span class="line"><span class="meta prompt_"></span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash"><span class="built_in">test</span></span></span><br><span class="line">docker run --rm -dit --net host busybox ip addr</span><br></pre></td></tr></table></figure>
+
+<h6 id="IPvlan"><a href="#IPvlan" class="headerlink" title="IPvlan"></a>IPvlan</h6><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta prompt_"># </span><span class="language-bash">ipvlan</span></span><br><span class="line">ipvlan_mode: l2, l3(default), l3s</span><br><span class="line">ipvlan_flag: bridge(default), private, vepa</span><br><span class="line">parent: eth0</span><br><span class="line"><span class="meta prompt_"></span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">l2 mode: 使用宿主机的望断</span></span><br><span class="line">docker network create -d ipvlan \</span><br><span class="line">     --subnet=192.168.1.0/24 \</span><br><span class="line">     --gateway=192.168.1.1 \</span><br><span class="line">     -o ipvlan_mode=l2 \</span><br><span class="line">     -o parent=eth0 test_l2_net</span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash"><span class="built_in">test</span></span></span><br><span class="line">docker run --net=test_l2_net --name=ipv1 -dit alpine /bin/sh</span><br><span class="line">docker run --net=test_l2_net --name=ipv2 -it --rm alpine /bin/sh</span><br><span class="line">ping -c 4 ipv1</span><br><span class="line"><span class="meta prompt_"></span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">l3 mode</span></span><br><span class="line">docker network create -d ipvlan \</span><br><span class="line">     --subnet=192.168.1.0/24 \</span><br><span class="line">     --subnet=10.10.1.0/24 \</span><br><span class="line">     -o ipvlan_mode=l3 test_l3_net</span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash"><span class="built_in">test</span></span></span><br><span class="line">docker run --net=test_l3_net --ip=192.168.1.10 -dit busybox /bin/sh</span><br><span class="line">docker run --net=test_l3_net --ip=10.10.1.10 -dit busybox /bin/sh</span><br><span class="line"></span><br><span class="line">docker run --net=test_l3_net --ip=192.168.1.9 -it --rm busybox ping -c 2 10.10.1.10</span><br><span class="line">docker run --net=test_l3_net --ip=10.10.1.9 -it --rm busybox ping -c 2 192.168.1.10</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<h6 id="Macvlan"><a href="#Macvlan" class="headerlink" title="Macvlan"></a>Macvlan</h6><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta prompt_"># </span><span class="language-bash">macvlan</span></span><br><span class="line"><span class="meta prompt_"></span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">bridge mode</span></span><br><span class="line">docker network create -d macvlan \</span><br><span class="line">  --subnet=172.16.86.0/24 \</span><br><span class="line">  --gateway=172.16.86.1 \</span><br><span class="line">  -o parent=eth0 pub_net</span><br><span class="line"><span class="meta prompt_"></span></span><br><span class="line"><span class="meta prompt_"></span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">802.1Q trunk bridge mode</span></span><br><span class="line">docker network create -d macvlan \</span><br><span class="line">    --subnet=192.168.50.0/24 \</span><br><span class="line">    --gateway=192.168.50.1 \</span><br><span class="line">    -o parent=eth0.50 macvlan50</span><br><span class="line"></span><br><span class="line">docker network create -d macvlan \</span><br><span class="line">    --subnet=192.168.60.0/24 \</span><br><span class="line">    --gateway=192.168.60.1 \</span><br><span class="line">    -o parent=eth0.60 macvlan60</span><br><span class="line"><span class="meta prompt_"></span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">https://zhuanlan.zhihu.com/p/616504632</span></span><br></pre></td></tr></table></figure>
+
+<h6 id="None"><a href="#None" class="headerlink" title="None"></a>None</h6><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta prompt_"># </span><span class="language-bash">none</span></span><br><span class="line">每个容器拥有独立网络协议栈，但没有网络设置，如分配 veth pair 和网桥连接等。</span><br><span class="line"><span class="meta prompt_"></span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">verify</span></span><br><span class="line">docker run --rm -dit --net none busybox ip addr</span><br></pre></td></tr></table></figure>
+
+<h6 id="Container"><a href="#Container" class="headerlink" title="Container"></a>Container</h6><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta prompt_"># </span><span class="language-bash">container</span></span><br><span class="line">和一个指定已有的容器共享网络协议栈，使用共有的 IP、端口等。</span><br><span class="line"><span class="meta prompt_"></span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">verify</span></span><br><span class="line">docker run -dit --name test --rm busybox sh</span><br><span class="line">docker run -it --name c1 --net container:test --rm busybox ip addr</span><br><span class="line">docker run -it --name c2 --net container:test --rm busybox ip addr</span><br></pre></td></tr></table></figure>
+
+<h6 id="自定义网络模式"><a href="#自定义网络模式" class="headerlink" title="自定义网络模式"></a>自定义网络模式</h6><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta prompt_"># </span><span class="language-bash">user-defined</span> </span><br><span class="line">默认 docker0 网桥无法通过 container name host 通信，自定义网络默认使用 daemon 进程内嵌的 DNS server，可以直接通过 --name 指定的 container name 进行通信</span><br><span class="line"><span class="meta prompt_"></span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">创建自定义网络</span></span><br><span class="line">docker network create yakir-test</span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">宿主机查看新增虚拟网卡</span></span><br><span class="line">ip addr</span><br><span class="line">    inet 172.19.0.1/16 brd 172.19.255.255 scope global br-8cb8260a95cf</span><br><span class="line">brctl show</span><br><span class="line">br-8cb8260a95cf         8000.024272aa9d38       no              veth556b81b</span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">verify</span></span><br><span class="line">docker run -dit --name test1 --net yakir-test --rm busybox sh</span><br><span class="line">docker run -it --name test2 --net yakir-test --rm busybox ping -c 4 test1</span><br><span class="line"><span class="meta prompt_"></span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">连接已有的网络</span></span><br><span class="line">docker run -dit --name test3 --net yakir-test --rm busybox sh</span><br><span class="line">docker network connect yakir-test test3 </span><br><span class="line">docker exec -it test3 ip addr</span><br><span class="line">531: eth0@if532: &lt;BROADCAST,MULTICAST,UP,LOWER_UP,M-DOWN&gt; mtu 1500 qdisc noqueue </span><br><span class="line">    link/ether 02:42:ac:11:00:02 brd ff:ff:ff:ff:ff:ff</span><br><span class="line">    inet 172.17.0.2/16 brd 172.17.255.255 scope global eth0</span><br><span class="line">       valid_lft forever preferred_lft forever</span><br><span class="line">533: eth1@if534: &lt;BROADCAST,MULTICAST,UP,LOWER_UP,M-DOWN&gt; mtu 1500 qdisc noqueue </span><br><span class="line">    link/ether 02:42:ac:13:00:02 brd ff:ff:ff:ff:ff:ff</span><br><span class="line">    inet 172.19.0.2/16 brd 172.19.255.255 scope global eth1</span><br><span class="line">       valid_lft forever preferred_lft forever</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<h5 id="Daemon"><a href="#Daemon" class="headerlink" title="Daemon"></a>Daemon</h5><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta prompt_"># </span><span class="language-bash">configuration file</span></span><br><span class="line">/etc/docker/daemon.json</span><br><span class="line">~/.config/docker/daemon.json</span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">configuration using flags</span></span><br><span class="line">dockerd --debug \</span><br><span class="line">  --tls=true \</span><br><span class="line">  --tlscert=/var/docker/server.pem \</span><br><span class="line">  --tlskey=/var/docker/serverkey.pem \</span><br><span class="line">  --host tcp://192.168.10.1:2376</span><br><span class="line"><span class="meta prompt_"></span></span><br><span class="line"><span class="meta prompt_"></span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">default data directory</span></span><br><span class="line">/var/lib/docker</span><br><span class="line"><span class="meta prompt_"></span></span><br><span class="line"><span class="meta prompt_"></span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">systemd</span></span><br><span class="line">cat /lib/systemd/system/docker.service</span><br><span class="line"></span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<h4 id="Docker-Build-amp-amp-Compose"><a href="#Docker-Build-amp-amp-Compose" class="headerlink" title="Docker Build &amp;&amp; Compose"></a>Docker Build &amp;&amp; Compose</h4><h5 id="Dockerfile"><a href="#Dockerfile" class="headerlink" title="Dockerfile"></a>Dockerfile</h5><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta prompt_"></span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">编写规范</span></span><br><span class="line">1. 使用统一的 base 镜像。</span><br><span class="line">2. 动静分离（基础稳定内容放在底层）。</span><br><span class="line">3. 最小原则（镜像只打包必需的东西）。</span><br><span class="line">4. 一个原则（每个镜像只有一个功能，交互通过网络，模块化管理）。</span><br><span class="line">5. 使用更少的层，减少每层的内容。</span><br><span class="line">6. 不要在 Dockerfile 单独修改文件权限（entrypoint / 拷贝+修改权限同时操作）。</span><br><span class="line">7. 利用 cache 加快构建速度。</span><br><span class="line">8. 版本控制和自动构建（放入 git 版本控制中，自动构建镜像，构建参数/变量给予文档说明）。</span><br><span class="line">9. 使用 .dockerignore 文件（排除文件和目录）</span><br></pre></td></tr></table></figure>
+
+<h5 id="docker-compose"><a href="#docker-compose" class="headerlink" title="docker-compose"></a>docker-compose</h5><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"></span><br></pre></td></tr></table></figure>
+
+<h4 id="Command"><a href="#Command" class="headerlink" title="Command"></a>Command</h4><p>[[containerRuntime#docker &amp; podman|Docker Command]]</p>
+<blockquote>
+<p>Reference:</p>
+<ol>
+<li><a target="_blank" rel="noopener" href="https://docs.docker.com/">Docker Official Documentation</a></li>
+<li><a target="_blank" rel="noopener" href="https://docs.docker.com/network/drivers/">Docker network-drivers</a></li>
+<li><a target="_blank" rel="noopener" href="https://docs.docker.com/engine/reference/builder/">Dockerfile reference</a></li>
+</ol>
+</blockquote>
+
+    </div>
+
+    
+    
+    
+        
+
+<div>
+<ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>本文作者： </strong>Yakir
+  </li>
+  <li class="post-copyright-link">
+    <strong>本文链接：</strong>
+    <a href="https://359sun.top/posts/c018.html" title="docker">https://359sun.top/posts/c018.html</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" rel="noopener" target="_blank"><i class="fab fa-fw fa-creative-commons"></i>BY-NC-SA</a> 许可协议。转载请注明出处！
+  </li>
+</ul>
+</div>
+
+        
+
+  <div class="followme">
+    <p>欢迎关注我的其它发布渠道</p>
+
+    <div class="social-list">
+
+        <div class="social-item">
+          <a target="_blank" class="social-link" href="/atom.xml">
+            <span class="icon">
+              <i class="fa fa-rss"></i>
+            </span>
+
+            <span class="label">RSS</span>
+          </a>
+        </div>
+    </div>
+  </div>
+
+
+      <footer class="post-footer">
+          
+          <div class="post-tags">
+              <!-- <a href="/tags/docker/" rel="tag"><i class="fa fa-tag"></i> Docker</a> -->
+              <a href="/tags/docker/" rel="tag"><i class="fa fa-tag"></i> Docker</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/posts/5d90.html" rel="prev" title="Kubernetes-网络">
+      <i class="fa fa-chevron-left"></i> Kubernetes-网络
+    </a></div>
+      <div class="post-nav-item"></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+    <div class="comments" id="gitalk-container"></div>
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#Docker-Engine"><span class="nav-text">Docker Engine</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#Install"><span class="nav-text">Install</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Storage"><span class="nav-text">Storage</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#Overview"><span class="nav-text">Overview</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#Volumes"><span class="nav-text">Volumes</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#Bind-mounts"><span class="nav-text">Bind mounts</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#tmpfs-mounts"><span class="nav-text">tmpfs mounts</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#Storage-drivers"><span class="nav-text">Storage drivers</span></a><ol class="nav-child"><li class="nav-item nav-level-6"><a class="nav-link" href="#Btrfs"><span class="nav-text">Btrfs</span></a></li><li class="nav-item nav-level-6"><a class="nav-link" href="#OverlayFS"><span class="nav-text">OverlayFS</span></a></li><li class="nav-item nav-level-6"><a class="nav-link" href="#ZFS"><span class="nav-text">ZFS</span></a></li><li class="nav-item nav-level-6"><a class="nav-link" href="#containerd-snapshotters"><span class="nav-text">containerd snapshotters</span></a></li></ol></li></ol></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Networking"><span class="nav-text">Networking</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#Overview-1"><span class="nav-text">Overview</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#Networking-drivers"><span class="nav-text">Networking drivers</span></a><ol class="nav-child"><li class="nav-item nav-level-6"><a class="nav-link" href="#Bridge"><span class="nav-text">Bridge</span></a></li><li class="nav-item nav-level-6"><a class="nav-link" href="#Overlay"><span class="nav-text">Overlay</span></a></li><li class="nav-item nav-level-6"><a class="nav-link" href="#Host"><span class="nav-text">Host</span></a></li><li class="nav-item nav-level-6"><a class="nav-link" href="#IPvlan"><span class="nav-text">IPvlan</span></a></li><li class="nav-item nav-level-6"><a class="nav-link" href="#Macvlan"><span class="nav-text">Macvlan</span></a></li><li class="nav-item nav-level-6"><a class="nav-link" href="#None"><span class="nav-text">None</span></a></li><li class="nav-item nav-level-6"><a class="nav-link" href="#Container"><span class="nav-text">Container</span></a></li><li class="nav-item nav-level-6"><a class="nav-link" href="#%E8%87%AA%E5%AE%9A%E4%B9%89%E7%BD%91%E7%BB%9C%E6%A8%A1%E5%BC%8F"><span class="nav-text">自定义网络模式</span></a></li></ol></li><li class="nav-item nav-level-5"><a class="nav-link" href="#Daemon"><span class="nav-text">Daemon</span></a></li></ol></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Docker-Build-amp-amp-Compose"><span class="nav-text">Docker Build &amp;&amp; Compose</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#Dockerfile"><span class="nav-text">Dockerfile</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#docker-compose"><span class="nav-text">docker-compose</span></a></li></ol></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Command"><span class="nav-text">Command</span></a></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Yakir"
+      src="/images/avatar.jpg">
+  <p class="site-author-name" itemprop="name">Yakir</p>
+  <div class="site-description" itemprop="description">Yakir Blog</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">19</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">8</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">12</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/yakir3" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;yakir3" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="/atom.xml" title="RSS → &#x2F;atom.xml"><i class="fa fa-rss fa-fw"></i>RSS</a>
+      </span>
+  </div>
+
+
+
+  <div class="links-of-blogroll motion-element links-of-blogroll-block">
+    <div class="links-of-blogroll-title">
+      <!-- modify icon to fire by szw -->
+      <i class="fa fa-history fa-" aria-hidden="true"></i>
+      近期文章
+    </div>
+    <ul class="links-of-blogroll-list">
+      
+      
+        <li class="recent_posts_li">
+          <!--<a href="/" title="" target="_blank"></a>-->
+        </li>
+      
+        <li class="recent_posts_li">
+          <!--<a href="/" title="" target="_blank"></a>-->
+        </li>
+      
+        <li class="recent_posts_li">
+          <!--<a href="/" title="" target="_blank"></a>-->
+        </li>
+      
+    </ul>
+  </div>
+
+
+
+
+      </div>
+        <div class="back-to-top motion-element">
+          <i class="fa fa-arrow-up"></i>
+          <span>0%</span>
+        </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2024</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Yakir</span>
+</div>
+  <div class="powered-by">Powered by Hexo Next
+  </div>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/jquery@3/dist/jquery.min.js"></script>
+  <script src="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/lozad@1/dist/lozad.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+<link rel="stylesheet" href="//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.css">
+
+<script>
+NexT.utils.loadComments(document.querySelector('#gitalk-container'), () => {
+  NexT.utils.getScript('//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.js', () => {
+    var gitalk = new Gitalk({
+      clientID    : 'dc69ab400b19bd3a1bab',
+      clientSecret: '5a20b4b4faa303672257572d4df0be83b97061cb',
+      repo        : 'yakir3.github.io',
+      owner       : 'yakir3',
+      admin       : ['yakir3'],
+      id          : '615ca8afa168bf8f0adfde210ed5e220',
+        language: 'zh-CN',
+      distractionFreeMode: true
+    });
+    gitalk.render('gitalk-container');
+  }, window.Gitalk);
+});
+</script>
+
+</body>
+</html>

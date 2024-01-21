@@ -34,10 +34,9 @@
 <meta property="og:image" content="https://359sun.top/posts/8aa0/2afdc3d69fa9.png">
 <meta property="og:image" content="https://359sun.top/posts/8aa0/6bbe6aab7201.png">
 <meta property="article:published_time" content="2022-03-07T14:01:06.000Z">
-<meta property="article:modified_time" content="2022-06-28T14:11:35.389Z">
+<meta property="article:modified_time" content="2024-01-21T15:30:00.082Z">
 <meta property="article:author" content="Yakir">
-<meta property="article:tag" content="阿里云">
-<meta property="article:tag" content="K8S">
+<meta property="article:tag" content="Kubernetes">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:image" content="https://359sun.top/posts/8aa0/7b70de99e5f7.png">
 
@@ -237,7 +236,7 @@
                   <i class="far fa-calendar-check"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2022-06-28 22:11:35" itemprop="dateModified" datetime="2022-06-28T22:11:35+08:00">2022-06-28</time>
+                <time title="修改时间：2024-01-21 23:30:00" itemprop="dateModified" datetime="2024-01-21T23:30:00+08:00">2024-01-21</time>
               </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -245,7 +244,11 @@
               </span>
               <span class="post-meta-item-text">分类于</span>
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/cncf/" itemprop="url" rel="index"><span itemprop="name">CNCF</span></a>
+                  <a href="/categories/alicloud/" itemprop="url" rel="index"><span itemprop="name">Alicloud</span></a>
+                </span>
+                  ，
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/alicloud/cncf/" itemprop="url" rel="index"><span itemprop="name">CNCF</span></a>
                 </span>
             </span>
 
@@ -314,15 +317,15 @@
 <p>常见的CNI 插件：Calico、Flannel、Terway、Weave Net、 以及 Contiv</p>
 <h4 id="2）Terway与Flannel对比"><a href="#2）Terway与Flannel对比" class="headerlink" title="2）Terway与Flannel对比"></a>2）Terway与Flannel对比</h4><p>在创建集群时，ACK提供Terway和Flannel两种网络插件：</p>
 <ul>
-<li>Terway：是阿里云容器服务ACK自研的网络插件。Terway将阿里云的弹性网卡分配给容器，支持基于Kubernetes标准的网络策略来定义容器间的访问策略，支持对单个容器做带宽的限流。Terway拥有更为灵活的IPAM（容器地址分配）策略，避免地址浪费。如果您不需要使用网络策略（Network Policy），可以选择Flannel，其他情况建议选择Terway。</li>
-<li>Flannel：使用的是简单稳定的社区Flannel CNI插件。配合阿里云的VPC的高速网络，能给集群高性能和稳定的容器网络体验。Flannel功能偏简单，支持的特性少。例如，不支持基于Kubernetes标准的网络策略（Network Policy）。更多信息，请参见<a target="_blank" rel="noopener" href="https://github.com/coreos/flannel">Flannel</a>。</li>
+<li>Terway：是Alicloud容器服务ACK自研的网络插件。Terway将Alicloud的弹性网卡分配给容器，支持基于Kubernetes标准的网络策略来定义容器间的访问策略，支持对单个容器做带宽的限流。Terway拥有更为灵活的IPAM（容器地址分配）策略，避免地址浪费。如果您不需要使用网络策略（Network Policy），可以选择Flannel，其他情况建议选择Terway。</li>
+<li>Flannel：使用的是简单稳定的社区Flannel CNI插件。配合Alicloud的VPC的高速网络，能给集群高性能和稳定的容器网络体验。Flannel功能偏简单，支持的特性少。例如，不支持基于Kubernetes标准的网络策略（Network Policy）。更多信息，请参见<a target="_blank" rel="noopener" href="https://github.com/coreos/flannel">Flannel</a>。</li>
 </ul>
 <h4 id="3）NetworkPolicy-实现方式"><a href="#3）NetworkPolicy-实现方式" class="headerlink" title="3）NetworkPolicy 实现方式"></a>3）NetworkPolicy 实现方式</h4><ol>
-<li>前置条件：集群安装 CNI（container network interface）插件，阿里云支持两种插件：Flannel（不支持NetworkPolicy）、Terway</li>
+<li>前置条件：集群安装 CNI（container network interface）插件，Alicloud支持两种插件：Flannel（不支持NetworkPolicy）、Terway</li>
 <li>ACK 集群开启NetworkPolicy 方式：</li>
 </ol>
 <ul>
-<li>控制台方式操作（简易操作）：需通过阿里云提工单申请</li>
+<li>控制台方式操作（简易操作）：需通过Alicloud提工单申请</li>
 <li>命令行方式操作（kubectl 方式）：无需申请可直接操作。开启方式：<ul>
 <li><p>创建Terway集群时可选中** NetworkPolicy支持** 直接开启</p>
 <img data-src="/posts/8aa0/2afdc3d69fa9.png" class>
@@ -348,7 +351,7 @@
 </ul>
 <h3 id="三、实现方案与难点"><a href="#三、实现方案与难点" class="headerlink" title="三、实现方案与难点"></a>三、实现方案与难点</h3><h4 id="实现难点"><a href="#实现难点" class="headerlink" title="实现难点"></a>实现难点</h4><ul>
 <li>ACK 集群都为托管版，无法通过自行修改配置更改CNI 插件。且更改CNI 插件可能会导致当前网络模型变动造成未知异常</li>
-<li>阿里云ACK 集群有两种CNI 网络插件：Flannel、Terway。阿里云的ACK 集群上面只有Terway 集群支持NetworkPolicy。</li>
+<li>AlicloudACK 集群有两种CNI 网络插件：Flannel、Terway。Alicloud的ACK 集群上面只有Terway 集群支持NetworkPolicy。</li>
 <li>已有网络插件无法平滑进行切换，只能通过删除集群重建物理层的方式重新改为 Terway 集群。</li>
 </ul>
 <h4 id="迁移可行性方案思考"><a href="#迁移可行性方案思考" class="headerlink" title="迁移可行性方案思考"></a>迁移可行性方案思考</h4><ul>
@@ -360,9 +363,9 @@
 </ul>
 <h4 id="参考："><a href="#参考：" class="headerlink" title="参考："></a>参考：</h4><ol>
 <li>Kubernetes 官网：<a target="_blank" rel="noopener" href="https://kubernetes.io/zh/docs/concepts/services-networking/network-policies/">https://kubernetes.io/zh/docs/concepts/services-networking/network-policies/</a></li>
-<li>阿里云官网：<a target="_blank" rel="noopener" href="https://help.aliyun.com/document_detail/97621.html">https://help.aliyun.com/document_detail&#x2F;97621.html</a></li>
+<li>Alicloud官网：<a target="_blank" rel="noopener" href="https://help.aliyun.com/document_detail/97621.html">https://help.aliyun.com/document_detail&#x2F;97621.html</a></li>
 <li>NetworkPolicy 支持的CNI 插件：<a target="_blank" rel="noopener" href="https://www.qikqiak.com/k8strain/network/networkpolicy/">https://www.qikqiak.com/k8strain/network/networkpolicy/</a></li>
-<li>阿里云官网（Terway 集群网络规划策略）：<a target="_blank" rel="noopener" href="https://help.aliyun.com/document_detail/86500.html">https://help.aliyun.com/document_detail&#x2F;86500.html</a></li>
+<li>Alicloud官网（Terway 集群网络规划策略）：<a target="_blank" rel="noopener" href="https://help.aliyun.com/document_detail/86500.html">https://help.aliyun.com/document_detail&#x2F;86500.html</a></li>
 </ol>
 
     </div>
@@ -410,10 +413,8 @@
       <footer class="post-footer">
           
           <div class="post-tags">
-              <!-- <a href="/tags/%E9%98%BF%E9%87%8C%E4%BA%91/" rel="tag"><i class="fa fa-tag"></i> 阿里云</a> -->
-              <a href="/tags/%E9%98%BF%E9%87%8C%E4%BA%91/" rel="tag"><i class="fa fa-tag"></i> 阿里云</a>
-              <!-- <a href="/tags/k8s/" rel="tag"><i class="fa fa-tag"></i> K8S</a> -->
-              <a href="/tags/k8s/" rel="tag"><i class="fa fa-tag"></i> K8S</a>
+              <!-- <a href="/tags/kubernetes/" rel="tag"><i class="fa fa-tag"></i> Kubernetes</a> -->
+              <a href="/tags/kubernetes/" rel="tag"><i class="fa fa-tag"></i> Kubernetes</a>
           </div>
 
         
@@ -422,12 +423,12 @@
         
     <div class="post-nav">
       <div class="post-nav-item">
-    <a href="/posts/fa45.html" rel="prev" title="K8S-RBAC 权限控制">
-      <i class="fa fa-chevron-left"></i> K8S-RBAC 权限控制
+    <a href="/posts/fa45.html" rel="prev" title="Kubernetes-RBAC 权限控制">
+      <i class="fa fa-chevron-left"></i> Kubernetes-RBAC 权限控制
     </a></div>
       <div class="post-nav-item">
-    <a href="/posts/9a8h.html" rel="next" title="阿里云-Promotheus & Grafana 监控大盘与告警通知">
-      阿里云-Promotheus & Grafana 监控大盘与告警通知 <i class="fa fa-chevron-right"></i>
+    <a href="/posts/9a8h.html" rel="next" title="Alicloud-Promotheus & Grafana 监控大盘与告警通知">
+      Alicloud-Promotheus & Grafana 监控大盘与告警通知 <i class="fa fa-chevron-right"></i>
     </a></div>
     </div>
       </footer>
@@ -511,13 +512,13 @@
       <div class="site-state-item site-state-categories">
             <a href="/categories/">
           
-        <span class="site-state-item-count">4</span>
+        <span class="site-state-item-count">8</span>
         <span class="site-state-item-name">分类</span></a>
       </div>
       <div class="site-state-item site-state-tags">
             <a href="/tags/">
           
-        <span class="site-state-item-count">8</span>
+        <span class="site-state-item-count">12</span>
         <span class="site-state-item-name">标签</span></a>
       </div>
   </nav>
@@ -583,7 +584,7 @@
 <div class="copyright">
   
   &copy; 
-  <span itemprop="copyrightYear">2023</span>
+  <span itemprop="copyrightYear">2024</span>
   <span class="with-love">
     <i class="fa fa-heart"></i>
   </span>

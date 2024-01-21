@@ -36,9 +36,9 @@
 <meta property="og:image" content="https://359sun.top/posts/ce0f/helm4.png">
 <meta property="og:image" content="https://359sun.top/posts/ce0f/helm5.png">
 <meta property="article:published_time" content="2022-05-04T13:46:04.000Z">
-<meta property="article:modified_time" content="2022-06-28T14:12:49.637Z">
+<meta property="article:modified_time" content="2024-01-21T15:28:43.152Z">
 <meta property="article:author" content="Yakir">
-<meta property="article:tag" content="阿里云">
+<meta property="article:tag" content="Alicloud">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:image" content="https://359sun.top/posts/ce0f/helm1.png">
 
@@ -238,7 +238,7 @@
                   <i class="far fa-calendar-check"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2022-06-28 22:12:49" itemprop="dateModified" datetime="2022-06-28T22:12:49+08:00">2022-06-28</time>
+                <time title="修改时间：2024-01-21 23:28:43" itemprop="dateModified" datetime="2024-01-21T23:28:43+08:00">2024-01-21</time>
               </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -263,7 +263,7 @@
                 <i class="far fa-file-word"></i>
               </span>
                 <span class="post-meta-item-text">本文字数：</span>
-              <span>4.1k</span>
+              <span>4.2k</span>
             </span>
             <span class="post-meta-item" title="阅读时长">
               <span class="post-meta-item-icon">
@@ -287,7 +287,7 @@
 </ul>
 <span id="more"></span>
 <ul>
-<li>安装阿里云helm 插件与操作<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 安装 Helm 插件</span></span><br><span class="line">helm plugin install https://github.com/AliyunContainerService/helm-acr</span><br><span class="line"></span><br><span class="line">&lt;!--more--&gt;</span><br><span class="line"><span class="comment"># 配置本地仓库映射</span></span><br><span class="line"><span class="built_in">export</span> HELM_REPO_USERNAME=<span class="string">&#x27;&lt;企业版实例访问凭证中账号&gt;&#x27;</span></span><br><span class="line"><span class="built_in">export</span> HELM_REPO_PASSWORD=<span class="string">&#x27;&lt;企业版实例访问凭证中密码&gt;&#x27;</span></span><br><span class="line">helm repo add &lt;本地仓库名称&gt; acr://registry-chart-test.cn-hangzhou.cr.aliyuncs.com/&lt;命名空间&gt;/&lt;Chart仓库名称&gt; --username <span class="variable">$&#123;HELM_REPO_USERNAME&#125;</span> --password <span class="variable">$&#123;HELM_REPO_PASSWORD&#125;</span></span><br><span class="line"><span class="comment">#export HELM_REPO_USERNAME=devops@ib_daily</span></span><br><span class="line"><span class="comment">#export HELM_REPO_PASSWORD=2RJPfCgHXroSYQga</span></span><br><span class="line"><span class="comment">#helm repo add aliyun-acr-repo acr://registry-chart-test.cn-hangzhou.cr.aliyuncs.com/chart-test/app-test --username $&#123;HELM_REPO_USERNAME&#125; --password $&#123;HELM_REPO_PASSWORD&#125;</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 推送Chart</span></span><br><span class="line"><span class="comment">#本地创建一个 Chart</span></span><br><span class="line">helm create &lt;Chart 名称&gt;</span><br><span class="line"><span class="comment">#helm create app-test</span></span><br><span class="line"><span class="comment">#推送 Chart 目录</span></span><br><span class="line">helm cm-push &lt;Chart 名称&gt; &lt;本地仓库名称&gt;</span><br><span class="line"><span class="comment">#helm cm-push app-test aliyun-acr-repo</span></span><br><span class="line"><span class="comment">#或者推送 Chart 压缩包</span></span><br><span class="line">helm cm-push &lt;Chart 名称&gt;-&lt;Chart 版本&gt;.tgz &lt;本地仓库名称&gt;</span><br><span class="line"></span><br><span class="line"><span class="comment"># 拉取Chart</span></span><br><span class="line"><span class="comment">#从线上Chart 仓库更新本地Chart 索引</span></span><br><span class="line">helm repo update</span><br><span class="line"><span class="comment">#helm repo update aliyun-acr-repo</span></span><br><span class="line"><span class="comment">#拉取Chart</span></span><br><span class="line">helm fetch &lt;本地仓库名称&gt;/&lt;Chart 名称&gt; --version &lt;Chart 版本&gt;</span><br><span class="line"><span class="comment">#helm fetch aliyun-acr-repo/app-test --version=20211228100329-daily</span></span><br><span class="line"><span class="comment">#或者直接安装Chart</span></span><br><span class="line">helm install -f values.yaml &lt;本地仓库名称&gt;/&lt;Chart 名称&gt; --version &lt;Chart 版本&gt;</span><br><span class="line"><span class="comment">#helm install app-test aliyun-acr-repo/app-test --version 20211228100329-daily --namespace daily-apps</span></span><br></pre></td></tr></table></figure>
+<li>安装Alicloudhelm 插件与操作<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 安装 Helm 插件</span></span><br><span class="line">helm plugin install https://github.com/AliyunContainerService/helm-acr</span><br><span class="line"></span><br><span class="line">&lt;!--more--&gt;</span><br><span class="line"><span class="comment"># 配置本地仓库映射</span></span><br><span class="line"><span class="built_in">export</span> HELM_REPO_USERNAME=<span class="string">&#x27;&lt;企业版实例访问凭证中账号&gt;&#x27;</span></span><br><span class="line"><span class="built_in">export</span> HELM_REPO_PASSWORD=<span class="string">&#x27;&lt;企业版实例访问凭证中密码&gt;&#x27;</span></span><br><span class="line">helm repo add &lt;本地仓库名称&gt; acr://registry-chart-test.cn-hangzhou.cr.aliyuncs.com/&lt;命名空间&gt;/&lt;Chart仓库名称&gt; --username <span class="variable">$&#123;HELM_REPO_USERNAME&#125;</span> --password <span class="variable">$&#123;HELM_REPO_PASSWORD&#125;</span></span><br><span class="line"><span class="comment">#export HELM_REPO_USERNAME=devops@ib_daily</span></span><br><span class="line"><span class="comment">#export HELM_REPO_PASSWORD=2RJPfCgHXroSYQga</span></span><br><span class="line"><span class="comment">#helm repo add aliyun-acr-repo acr://registry-chart-test.cn-hangzhou.cr.aliyuncs.com/chart-test/app-test --username $&#123;HELM_REPO_USERNAME&#125; --password $&#123;HELM_REPO_PASSWORD&#125;</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 推送Chart</span></span><br><span class="line"><span class="comment">#本地创建一个 Chart</span></span><br><span class="line">helm create &lt;Chart 名称&gt;</span><br><span class="line"><span class="comment">#helm create app-test</span></span><br><span class="line"><span class="comment">#推送 Chart 目录</span></span><br><span class="line">helm cm-push &lt;Chart 名称&gt; &lt;本地仓库名称&gt;</span><br><span class="line"><span class="comment">#helm cm-push app-test aliyun-acr-repo</span></span><br><span class="line"><span class="comment">#或者推送 Chart 压缩包</span></span><br><span class="line">helm cm-push &lt;Chart 名称&gt;-&lt;Chart 版本&gt;.tgz &lt;本地仓库名称&gt;</span><br><span class="line"></span><br><span class="line"><span class="comment"># 拉取Chart</span></span><br><span class="line"><span class="comment">#从线上Chart 仓库更新本地Chart 索引</span></span><br><span class="line">helm repo update</span><br><span class="line"><span class="comment">#helm repo update aliyun-acr-repo</span></span><br><span class="line"><span class="comment">#拉取Chart</span></span><br><span class="line">helm fetch &lt;本地仓库名称&gt;/&lt;Chart 名称&gt; --version &lt;Chart 版本&gt;</span><br><span class="line"><span class="comment">#helm fetch aliyun-acr-repo/app-test --version=20211228100329-daily</span></span><br><span class="line"><span class="comment">#或者直接安装Chart</span></span><br><span class="line">helm install -f values.yaml &lt;本地仓库名称&gt;/&lt;Chart 名称&gt; --version &lt;Chart 版本&gt;</span><br><span class="line"><span class="comment">#helm install app-test aliyun-acr-repo/app-test --version 20211228100329-daily --namespace daily-apps</span></span><br></pre></td></tr></table></figure>
 <blockquote>
 <p>helm install 操作实际执行按顺序安装资源：</p>
 <ul>
@@ -355,7 +355,7 @@
 </li>
 <li><p>基本目录结构内容：Chart.yaml（chart 信息说明） 、Values.yaml（自定义变量） 、charts（子chart目录，依赖）</p>
 </li>
-<li><p>templates 模板（实际安装到K8S 集群中的资源定义Yaml 模板文件，如deployment、pod 等）</p>
+<li><p>templates 模板（实际安装到Kubernetes 集群中的资源定义Yaml 模板文件，如deployment、pod 等）</p>
 <ul>
 <li>资源模板：confimap.yaml、deployment.yaml 等</li>
 <li>命名模板：_helpers.tpl</li>
@@ -366,7 +366,7 @@
 <li><p>访问文件</p>
 </li>
 </ul>
-<h3 id="二、测试验证部署app-test"><a href="#二、测试验证部署app-test" class="headerlink" title="二、测试验证部署app-test"></a>二、测试验证部署app-test</h3><h4 id="1）本地安装helm、kubectl（连接K8S-集群）二进制命令"><a href="#1）本地安装helm、kubectl（连接K8S-集群）二进制命令" class="headerlink" title="1）本地安装helm、kubectl（连接K8S 集群）二进制命令"></a>1）本地安装helm、kubectl（连接K8S 集群）二进制命令</h4><h4 id="2）初始化配置app-test"><a href="#2）初始化配置app-test" class="headerlink" title="2）初始化配置app-test"></a>2）初始化配置app-test</h4><ul>
+<h3 id="二、测试验证部署app-test"><a href="#二、测试验证部署app-test" class="headerlink" title="二、测试验证部署app-test"></a>二、测试验证部署app-test</h3><h4 id="1）本地安装helm、kubectl（连接Kubernetes-集群）二进制命令"><a href="#1）本地安装helm、kubectl（连接Kubernetes-集群）二进制命令" class="headerlink" title="1）本地安装helm、kubectl（连接Kubernetes 集群）二进制命令"></a>1）本地安装helm、kubectl（连接Kubernetes 集群）二进制命令</h4><h4 id="2）初始化配置app-test"><a href="#2）初始化配置app-test" class="headerlink" title="2）初始化配置app-test"></a>2）初始化配置app-test</h4><ul>
 <li><p>初始化应用目录：helm create app-test</p>
 </li>
 <li><p>应用app-test 目录结构</p>
@@ -400,9 +400,9 @@
 <li>更新版本<img data-src="/posts/ce0f/helm5.png" class></li>
 </ul>
 <h3 id="三、问题点"><a href="#三、问题点" class="headerlink" title="三、问题点"></a>三、问题点</h3><ul>
-<li><p>使用helm 命令安装需本地连接K8S 集群（需提供API Server 公网EIP）</p>
+<li><p>使用helm 命令安装需本地连接Kubernetes 集群（需提供API Server 公网EIP）</p>
 </li>
-<li><p>与阿里云Edas 产品兼容问题</p>
+<li><p>与AlicloudEdas 产品兼容问题</p>
 <ul>
 <li>使用helm 部署的应用与Edas 不共通，因此使用helm 部署的无法从Edas 上查看应用的相关信息</li>
 <li>Edas 支持将手动部署的Deployment 手动导入，参考：<a target="_blank" rel="noopener" href="https://help.aliyun.com/document_detail/202036.html">https://help.aliyun.com/document_detail&#x2F;202036.html</a>（自行部署导入Edas 的应用暂未确定是否能完整导入Edas 组件注入的变量）</li>
@@ -466,8 +466,8 @@
       <footer class="post-footer">
           
           <div class="post-tags">
-              <!-- <a href="/tags/%E9%98%BF%E9%87%8C%E4%BA%91/" rel="tag"><i class="fa fa-tag"></i> 阿里云</a> -->
-              <a href="/tags/%E9%98%BF%E9%87%8C%E4%BA%91/" rel="tag"><i class="fa fa-tag"></i> 阿里云</a>
+              <!-- <a href="/tags/alicloud/" rel="tag"><i class="fa fa-tag"></i> Alicloud</a> -->
+              <a href="/tags/alicloud/" rel="tag"><i class="fa fa-tag"></i> Alicloud</a>
           </div>
 
         
@@ -542,7 +542,7 @@
 
       <!--noindex-->
       <div class="post-toc-wrap sidebar-panel">
-          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%B8%80%E3%80%81Helm-%E5%AE%89%E8%A3%85%E4%B8%8E%E6%A8%A1%E6%9D%BF"><span class="nav-text">一、Helm 安装与模板</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#1%EF%BC%89Helm-%E5%AE%89%E8%A3%85%E9%83%A8%E7%BD%B2"><span class="nav-text">1）Helm 安装部署</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2%EF%BC%89Helm-%E6%A8%A1%E6%9D%BF%E4%B8%8E%E8%AF%AD%E6%B3%95%E7%BC%96%E5%86%99"><span class="nav-text">2）Helm 模板与语法编写</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BA%8C%E3%80%81%E6%B5%8B%E8%AF%95%E9%AA%8C%E8%AF%81%E9%83%A8%E7%BD%B2app-test"><span class="nav-text">二、测试验证部署app-test</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#1%EF%BC%89%E6%9C%AC%E5%9C%B0%E5%AE%89%E8%A3%85helm%E3%80%81kubectl%EF%BC%88%E8%BF%9E%E6%8E%A5K8S-%E9%9B%86%E7%BE%A4%EF%BC%89%E4%BA%8C%E8%BF%9B%E5%88%B6%E5%91%BD%E4%BB%A4"><span class="nav-text">1）本地安装helm、kubectl（连接K8S 集群）二进制命令</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2%EF%BC%89%E5%88%9D%E5%A7%8B%E5%8C%96%E9%85%8D%E7%BD%AEapp-test"><span class="nav-text">2）初始化配置app-test</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#3%EF%BC%89%E9%85%8D%E7%BD%AE%E9%95%9C%E5%83%8F%E4%BB%93%E5%BA%93%EF%BC%8C%E9%83%A8%E7%BD%B2%E5%BA%94%E7%94%A8"><span class="nav-text">3）配置镜像仓库，部署应用</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%B8%89%E3%80%81%E9%97%AE%E9%A2%98%E7%82%B9"><span class="nav-text">三、问题点</span></a></li></ol></div>
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%B8%80%E3%80%81Helm-%E5%AE%89%E8%A3%85%E4%B8%8E%E6%A8%A1%E6%9D%BF"><span class="nav-text">一、Helm 安装与模板</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#1%EF%BC%89Helm-%E5%AE%89%E8%A3%85%E9%83%A8%E7%BD%B2"><span class="nav-text">1）Helm 安装部署</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2%EF%BC%89Helm-%E6%A8%A1%E6%9D%BF%E4%B8%8E%E8%AF%AD%E6%B3%95%E7%BC%96%E5%86%99"><span class="nav-text">2）Helm 模板与语法编写</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BA%8C%E3%80%81%E6%B5%8B%E8%AF%95%E9%AA%8C%E8%AF%81%E9%83%A8%E7%BD%B2app-test"><span class="nav-text">二、测试验证部署app-test</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#1%EF%BC%89%E6%9C%AC%E5%9C%B0%E5%AE%89%E8%A3%85helm%E3%80%81kubectl%EF%BC%88%E8%BF%9E%E6%8E%A5Kubernetes-%E9%9B%86%E7%BE%A4%EF%BC%89%E4%BA%8C%E8%BF%9B%E5%88%B6%E5%91%BD%E4%BB%A4"><span class="nav-text">1）本地安装helm、kubectl（连接Kubernetes 集群）二进制命令</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2%EF%BC%89%E5%88%9D%E5%A7%8B%E5%8C%96%E9%85%8D%E7%BD%AEapp-test"><span class="nav-text">2）初始化配置app-test</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#3%EF%BC%89%E9%85%8D%E7%BD%AE%E9%95%9C%E5%83%8F%E4%BB%93%E5%BA%93%EF%BC%8C%E9%83%A8%E7%BD%B2%E5%BA%94%E7%94%A8"><span class="nav-text">3）配置镜像仓库，部署应用</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%B8%89%E3%80%81%E9%97%AE%E9%A2%98%E7%82%B9"><span class="nav-text">三、问题点</span></a></li></ol></div>
       </div>
       <!--/noindex-->
 
@@ -565,13 +565,13 @@
       <div class="site-state-item site-state-categories">
             <a href="/categories/">
           
-        <span class="site-state-item-count">4</span>
+        <span class="site-state-item-count">8</span>
         <span class="site-state-item-name">分类</span></a>
       </div>
       <div class="site-state-item site-state-tags">
             <a href="/tags/">
           
-        <span class="site-state-item-count">8</span>
+        <span class="site-state-item-count">12</span>
         <span class="site-state-item-name">标签</span></a>
       </div>
   </nav>
@@ -637,7 +637,7 @@
 <div class="copyright">
   
   &copy; 
-  <span itemprop="copyrightYear">2023</span>
+  <span itemprop="copyrightYear">2024</span>
   <span class="with-love">
     <i class="fa fa-heart"></i>
   </span>
