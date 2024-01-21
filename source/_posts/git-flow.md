@@ -1,7 +1,7 @@
 ---
 title: Git Flow 工作流
 categories:
-  - Linux
+  - Operations
 tags:
   - git
 abbrlink: '539'

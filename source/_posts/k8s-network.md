@@ -1,9 +1,9 @@
 ---
-title: K8S-网络
+title: Kubernetes-网络
 categories:
   - CNCF
 tags:
-  - K8S
+  - Kubernetes
 abbrlink: 5d90
 date: 2023-02-08 23:20:49
 ---

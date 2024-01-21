@@ -560,7 +560,7 @@ kubectl get pod,svc -n monitor
 
 # 配置 Grafana
 #登录，导入 Prometheus 数据源
-#导入监控 K8S 集群模板，官方模板 https://grafana.com/grafana/dashboards/162/revisions
+#导入监控 Kubernetes 集群模板，官方模板 https://grafana.com/grafana/dashboards/162/revisions
 #监控 node，导入 node_exporter.json
 
 

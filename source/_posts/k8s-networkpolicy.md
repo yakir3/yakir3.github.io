@@ -3,10 +3,10 @@ title: NetworkPolicy 隔离策略
 abbrlink: 8aa0
 date: 2022-03-07 22:01:06
 categories:
+  - Alicloud
   - CNCF
 tags:
-  - 阿里云
-  - K8S
+  - Kubernetes
 ---
 ### 一、背景
 > 一次对当前业务使用ACK 集群的业务调研与改造：针对NetworkPolicy 策略的调研，主要用于新建ACK 集群的网络规划与网络隔离
@@ -42,16 +42,16 @@ k8s 本身没有对容器之间的通信网络进行实现，而是通过 CNI �
 #### 2）Terway与Flannel对比
 在创建集群时，ACK提供Terway和Flannel两种网络插件：
 
-- Terway：是阿里云容器服务ACK自研的网络插件。Terway将阿里云的弹性网卡分配给容器，支持基于Kubernetes标准的网络策略来定义容器间的访问策略，支持对单个容器做带宽的限流。Terway拥有更为灵活的IPAM（容器地址分配）策略，避免地址浪费。如果您不需要使用网络策略（Network Policy），可以选择Flannel，其他情况建议选择Terway。
-- Flannel：使用的是简单稳定的社区Flannel CNI插件。配合阿里云的VPC的高速网络，能给集群高性能和稳定的容器网络体验。Flannel功能偏简单，支持的特性少。例如，不支持基于Kubernetes标准的网络策略（Network Policy）。更多信息，请参见[Flannel](https://github.com/coreos/flannel)。
+- Terway：是Alicloud容器服务ACK自研的网络插件。Terway将Alicloud的弹性网卡分配给容器，支持基于Kubernetes标准的网络策略来定义容器间的访问策略，支持对单个容器做带宽的限流。Terway拥有更为灵活的IPAM（容器地址分配）策略，避免地址浪费。如果您不需要使用网络策略（Network Policy），可以选择Flannel，其他情况建议选择Terway。
+- Flannel：使用的是简单稳定的社区Flannel CNI插件。配合Alicloud的VPC的高速网络，能给集群高性能和稳定的容器网络体验。Flannel功能偏简单，支持的特性少。例如，不支持基于Kubernetes标准的网络策略（Network Policy）。更多信息，请参见[Flannel](https://github.com/coreos/flannel)。
 
 
 
 #### 3）NetworkPolicy 实现方式
 
-1. 前置条件：集群安装 CNI（container network interface）插件，阿里云支持两种插件：Flannel（不支持NetworkPolicy）、Terway
+1. 前置条件：集群安装 CNI（container network interface）插件，Alicloud支持两种插件：Flannel（不支持NetworkPolicy）、Terway
 2. ACK 集群开启NetworkPolicy 方式：
-- 控制台方式操作（简易操作）：需通过阿里云提工单申请
+- 控制台方式操作（简易操作）：需通过Alicloud提工单申请
 - 命令行方式操作（kubectl 方式）：无需申请可直接操作。开启方式：
    - 创建Terway集群时可选中** NetworkPolicy支持** 直接开启
 {% asset_img 2afdc3d69fa9.png %}
@@ -114,7 +114,7 @@ spec:
 #### 实现难点
 
 - ACK 集群都为托管版，无法通过自行修改配置更改CNI 插件。且更改CNI 插件可能会导致当前网络模型变动造成未知异常
-- 阿里云ACK 集群有两种CNI 网络插件：Flannel、Terway。阿里云的ACK 集群上面只有Terway 集群支持NetworkPolicy。
+- AlicloudACK 集群有两种CNI 网络插件：Flannel、Terway。Alicloud的ACK 集群上面只有Terway 集群支持NetworkPolicy。
 - 已有网络插件无法平滑进行切换，只能通过删除集群重建物理层的方式重新改为 Terway 集群。
 
 
@@ -127,6 +127,6 @@ spec:
 
 #### 参考：
 1. Kubernetes 官网：[https://kubernetes.io/zh/docs/concepts/services-networking/network-policies/](https://kubernetes.io/zh/docs/concepts/services-networking/network-policies/)
-2. 阿里云官网：[https://help.aliyun.com/document_detail/97621.html](https://help.aliyun.com/document_detail/97621.html)
+2. Alicloud官网：[https://help.aliyun.com/document_detail/97621.html](https://help.aliyun.com/document_detail/97621.html)
 3. NetworkPolicy 支持的CNI 插件：[https://www.qikqiak.com/k8strain/network/networkpolicy/](https://www.qikqiak.com/k8strain/network/networkpolicy/)
-4. 阿里云官网（Terway 集群网络规划策略）：[https://help.aliyun.com/document_detail/86500.html](https://help.aliyun.com/document_detail/86500.html)
+4. Alicloud官网（Terway 集群网络规划策略）：[https://help.aliyun.com/document_detail/86500.html](https://help.aliyun.com/document_detail/86500.html)

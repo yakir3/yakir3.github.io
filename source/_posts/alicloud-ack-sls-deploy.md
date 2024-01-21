@@ -1,10 +1,9 @@
 ---
 title: ACK 集群日志接入 SLS
 categories:
-  - CNCF
+  - Alicloud
 tags:
-  - 阿里云
-  - K8S
+  - ACK
 abbrlink: 4a2a
 date: 2022-05-31 22:38:39
 ---
@@ -122,7 +121,7 @@ spec:
 > **    如需自定义tag 区分不同日志时，可通过自定义tag 区分。**
 > {% asset_img acksls9.png %}
 
-> 参考阿里云官方文档：[https://help.aliyun.com/document_detail/87540.html](https://help.aliyun.com/document_detail/87540.html)
+> 参考Alicloud官方文档：[https://help.aliyun.com/document_detail/87540.html](https://help.aliyun.com/document_detail/87540.html)
 
 
 
@@ -181,5 +180,5 @@ spec:
 #### 2）通过Sidecar CRD 方式采集
 [https://help.aliyun.com/document_detail/100575.htm](https://help.aliyun.com/document_detail/100575.htm)
 
-> 参考阿里云官方文档：[https://help.aliyun.com/document_detail/66654.html](https://help.aliyun.com/document_detail/66654.html)
+> 参考Alicloud官方文档：[https://help.aliyun.com/document_detail/66654.html](https://help.aliyun.com/document_detail/66654.html)
 

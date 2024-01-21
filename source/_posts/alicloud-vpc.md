@@ -1,9 +1,10 @@
 ---
 title: VPC 网络规划案例
 categories:
-  - 网络
+  - Alicloud
+  - Network
 tags:
-  - 阿里云
+  - VPC
 abbrlink: 64a8
 date: 2022-05-04 22:17:00
 ---
@@ -81,7 +82,7 @@ date: 2022-05-04 22:17:00
 
 - VPN网关原理与操作：
    - [IPSec VPN 技术原理](https://cloud.tencent.com/developer/article/1824924)
-   - [阿里云官方操作文档](https://help.aliyun.com/document_detail/65072.html)
+   - [Alicloud官方操作文档](https://help.aliyun.com/document_detail/65072.html)
 
 - [子网计算在线工具](https://www.bejson.com/convert/subnetmask/)
 

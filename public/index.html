@@ -198,6 +198,97 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://359sun.top/posts/c018.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.jpg">
+      <meta itemprop="name" content="Yakir">
+      <meta itemprop="description" content="Yakir Blog">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Yakir Blog">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/posts/c018.html" class="post-title-link" itemprop="url">Docker</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+              
+
+              <time title="创建时间：2024-01-21 22:49:15 / 修改时间：23:33:40" itemprop="dateCreated datePublished" datetime="2024-01-21T22:49:15+08:00">2024-01-21</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/container/" itemprop="url" rel="index"><span itemprop="name">Container</span></a>
+                </span>
+            </span>
+
+          <br>
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+                <span class="post-meta-item-text">本文字数：</span>
+              <span>8.7k</span>
+            </span>
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+                <span class="post-meta-item-text">阅读时长 &asymp;</span>
+              <span>8 分钟</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h3 id="Docker-Engine"><a href="#Docker-Engine" class="headerlink" title="Docker Engine"></a>Docker Engine</h3><h4 id="Install"><a href="#Install" class="headerlink" title="Install"></a>Install</h4><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta prompt_"># </span><span class="language-bash">install docker engine</span></span><br><span class="line">https://docs.docker.com/engine/install/debian/</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<h4 id="Storage"><a href="#Storage" class="headerlink" title="Storage"></a>Storage</h4><h5 id="Overview"><a href="#Overview" class="headerlink" title="Overview"></a>Overview</h5><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta prompt_"># </span><span class="language-bash">show docker volume info</span></span><br><span class="line">docker volume ls</span><br><span class="line">DRIVER    VOLUME NAME</span><br><span class="line">local     jenkins_home</span><br><span class="line">local     yakir-test</span><br><span class="line"><span class="meta prompt_"></span></span><br><span class="line"><span class="meta prompt_"></span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">how to use</span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">default volume, directory = /var/lib/docker/volumes/</span></span><br><span class="line">-v yakir-test:/container-app/my-app</span><br><span class="line">--volume yakir-test:/container-app/my-app</span><br><span class="line">--mount</span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash"><span class="built_in">bind</span> mounts</span></span><br><span class="line">-v /local_path/app.conf:/container-app/app.conf</span><br><span class="line">--volume /local_path/app.conf:/container-app/app.conf</span><br><span class="line">--mount</span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">memory volume</span></span><br><span class="line">--tmpfs</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+          <!--noindex-->
+            <div class="post-button">
+              <a class="btn" href="/posts/c018.html#more" rel="contents">
+                阅读全文 &raquo;
+              </a>
+            </div>
+          <!--/noindex-->
+        
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
     <link itemprop="mainEntityOfPage" href="https://359sun.top/posts/5d90.html">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -212,7 +303,7 @@
       <header class="post-header">
         <h2 class="post-title" itemprop="name headline">
           
-            <a href="/posts/5d90.html" class="post-title-link" itemprop="url">K8S-网络</a>
+            <a href="/posts/5d90.html" class="post-title-link" itemprop="url">Kubernetes-网络</a>
         </h2>
 
         <div class="post-meta">
@@ -229,7 +320,7 @@
                   <i class="far fa-calendar-check"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2023-06-05 18:52:38" itemprop="dateModified" datetime="2023-06-05T18:52:38+08:00">2023-06-05</time>
+                <time title="修改时间：2024-01-21 23:28:43" itemprop="dateModified" datetime="2024-01-21T23:28:43+08:00">2024-01-21</time>
               </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -321,17 +412,23 @@
                 <i class="far fa-calendar"></i>
               </span>
               <span class="post-meta-item-text">发表于</span>
-              
 
-              <time title="创建时间：2022-12-08 22:52:20 / 修改时间：23:00:24" itemprop="dateCreated datePublished" datetime="2022-12-08T22:52:20+08:00">2022-12-08</time>
+              <time title="创建时间：2022-12-08 22:52:20" itemprop="dateCreated datePublished" datetime="2022-12-08T22:52:20+08:00">2022-12-08</time>
             </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2024-01-21 23:28:43" itemprop="dateModified" datetime="2024-01-21T23:28:43+08:00">2024-01-21</time>
+              </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
                 <i class="far fa-folder"></i>
               </span>
               <span class="post-meta-item-text">分类于</span>
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/linux/" itemprop="url" rel="index"><span itemprop="name">Linux</span></a>
+                  <a href="/categories/operations/" itemprop="url" rel="index"><span itemprop="name">Operations</span></a>
                 </span>
             </span>
 
@@ -406,7 +503,7 @@
       <header class="post-header">
         <h2 class="post-title" itemprop="name headline">
           
-            <a href="/posts/2ead.html" class="post-title-link" itemprop="url">K8S - kube-eventer 事件中心组件</a>
+            <a href="/posts/2ead.html" class="post-title-link" itemprop="url">Kubernetes - kube-eventer 事件中心组件</a>
         </h2>
 
         <div class="post-meta">
@@ -415,10 +512,16 @@
                 <i class="far fa-calendar"></i>
               </span>
               <span class="post-meta-item-text">发表于</span>
-              
 
-              <time title="创建时间：2022-09-30 21:42:20 / 修改时间：21:54:26" itemprop="dateCreated datePublished" datetime="2022-09-30T21:42:20+08:00">2022-09-30</time>
+              <time title="创建时间：2022-09-30 21:42:20" itemprop="dateCreated datePublished" datetime="2022-09-30T21:42:20+08:00">2022-09-30</time>
             </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2024-01-21 23:28:43" itemprop="dateModified" datetime="2024-01-21T23:28:43+08:00">2024-01-21</time>
+              </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
                 <i class="far fa-folder"></i>
@@ -457,7 +560,7 @@
           <h3 id="一、背景"><a href="#一、背景" class="headerlink" title="一、背景"></a>一、背景</h3><h4 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h4><ul>
 <li><p>什么是事件：Kubernetes 的架构设计基于状态机，不同的状态之间进行转换则会生成相应的事件，正常的状态之间转换会生成 Normal 等级的事件，正常状态与异常状态之间的转换会生成Warning等级的事件。</p>
 </li>
-<li><p>kube-eventer 组件：阿里云开源组件，用于获取 K8S 集群中事件消息，并转存至自定义中间件或存储中。（K8S 集群默认只保存1小时内事件）</p>
+<li><p>kube-eventer 组件：Alicloud开源组件，用于获取 Kubernetes 集群中事件消息，并转存至自定义中间件或存储中。（Kubernetes 集群默认只保存1小时内事件）</p>
 </li>
 <li><p>组件官方地址：<a target="_blank" rel="noopener" href="https://github.com/AliyunContainerService/kube-eventer">https://github.com/AliyunContainerService/kube-eventer</a></p>
 </li>
@@ -471,13 +574,13 @@
 </tr>
 </thead>
 <tbody><tr>
-<td>K8S 集群</td>
+<td>Kubernetes 集群</td>
 <td>应用集群</td>
 <td>使用 minikube 测试集群</td>
 </tr>
 <tr>
 <td>kube-eventer</td>
-<td>收集 K8S 集群事件</td>
+<td>收集 Kubernetes 集群事件</td>
 <td>集群第三方组件</td>
 </tr>
 <tr>
@@ -540,10 +643,16 @@
                 <i class="far fa-calendar"></i>
               </span>
               <span class="post-meta-item-text">发表于</span>
-              
 
-              <time title="创建时间：2022-07-11 21:56:17 / 修改时间：22:04:01" itemprop="dateCreated datePublished" datetime="2022-07-11T21:56:17+08:00">2022-07-11</time>
+              <time title="创建时间：2022-07-11 21:56:17" itemprop="dateCreated datePublished" datetime="2022-07-11T21:56:17+08:00">2022-07-11</time>
             </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2024-01-21 23:28:43" itemprop="dateModified" datetime="2024-01-21T23:28:43+08:00">2024-01-21</time>
+              </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
                 <i class="far fa-folder"></i>
@@ -651,7 +760,7 @@
                   <i class="far fa-calendar-check"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2022-11-03 22:39:15" itemprop="dateModified" datetime="2022-11-03T22:39:15+08:00">2022-11-03</time>
+                <time title="修改时间：2024-01-21 23:28:43" itemprop="dateModified" datetime="2024-01-21T23:28:43+08:00">2024-01-21</time>
               </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -745,7 +854,7 @@
       <header class="post-header">
         <h2 class="post-title" itemprop="name headline">
           
-            <a href="/posts/28d6.html" class="post-title-link" itemprop="url">基于 Ubuntu + Containerd 部署 K8S 集群</a>
+            <a href="/posts/28d6.html" class="post-title-link" itemprop="url">基于 Ubuntu + Containerd 部署 Kubernetes 集群</a>
         </h2>
 
         <div class="post-meta">
@@ -762,7 +871,7 @@
                   <i class="far fa-calendar-check"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2022-06-21 22:57:16" itemprop="dateModified" datetime="2022-06-21T22:57:16+08:00">2022-06-21</time>
+                <time title="修改时间：2024-01-21 23:28:43" itemprop="dateModified" datetime="2024-01-21T23:28:43+08:00">2024-01-21</time>
               </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -860,7 +969,7 @@
                   <i class="far fa-calendar-check"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2022-06-20 23:35:12" itemprop="dateModified" datetime="2022-06-20T23:35:12+08:00">2022-06-20</time>
+                <time title="修改时间：2024-01-21 23:28:43" itemprop="dateModified" datetime="2024-01-21T23:28:43+08:00">2024-01-21</time>
               </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -868,7 +977,7 @@
               </span>
               <span class="post-meta-item-text">分类于</span>
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/middleware/" itemprop="url" rel="index"><span itemprop="name">MiddleWare</span></a>
+                  <a href="/categories/middleware/" itemprop="url" rel="index"><span itemprop="name">Middleware</span></a>
                 </span>
             </span>
 
@@ -950,10 +1059,16 @@
                 <i class="far fa-calendar"></i>
               </span>
               <span class="post-meta-item-text">发表于</span>
-              
 
-              <time title="创建时间：2022-06-06 20:28:44 / 修改时间：20:36:14" itemprop="dateCreated datePublished" datetime="2022-06-06T20:28:44+08:00">2022-06-06</time>
+              <time title="创建时间：2022-06-06 20:28:44" itemprop="dateCreated datePublished" datetime="2022-06-06T20:28:44+08:00">2022-06-06</time>
             </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2024-01-21 23:29:17" itemprop="dateModified" datetime="2024-01-21T23:29:17+08:00">2024-01-21</time>
+              </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
                 <i class="far fa-folder"></i>
@@ -961,6 +1076,10 @@
               <span class="post-meta-item-text">分类于</span>
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
                   <a href="/categories/cncf/" itemprop="url" rel="index"><span itemprop="name">CNCF</span></a>
+                </span>
+                  ，
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/cncf/alicloud/" itemprop="url" rel="index"><span itemprop="name">Alicloud</span></a>
                 </span>
             </span>
 
@@ -970,7 +1089,7 @@
                 <i class="far fa-file-word"></i>
               </span>
                 <span class="post-meta-item-text">本文字数：</span>
-              <span>3.4k</span>
+              <span>3.5k</span>
             </span>
             <span class="post-meta-item" title="阅读时长">
               <span class="post-meta-item-icon">
@@ -989,7 +1108,7 @@
     <div class="post-body" itemprop="articleBody">
 
       
-          <h3 id="流量网关方案与灰度发布方式"><a href="#流量网关方案与灰度发布方式" class="headerlink" title="流量网关方案与灰度发布方式"></a>流量网关方案与灰度发布方式</h3><h4 id="一、阿里云原生-Ingress-方式"><a href="#一、阿里云原生-Ingress-方式" class="headerlink" title="一、阿里云原生 Ingress 方式"></a>一、阿里云原生 Ingress 方式</h4><p><strong>前置要求</strong></p>
+          <h3 id="流量网关方案与灰度发布方式"><a href="#流量网关方案与灰度发布方式" class="headerlink" title="流量网关方案与灰度发布方式"></a>流量网关方案与灰度发布方式</h3><h4 id="一、Alicloud原生-Ingress-方式"><a href="#一、Alicloud原生-Ingress-方式" class="headerlink" title="一、Alicloud原生 Ingress 方式"></a>一、Alicloud原生 Ingress 方式</h4><p><strong>前置要求</strong></p>
 <ol>
 <li>集群已安装 Ingress 组件</li>
 <li>明确灰度发布规则（使用 cookie 值匹配 A&#x2F;B 测试规则）</li>
@@ -1063,7 +1182,7 @@
       <header class="post-header">
         <h2 class="post-title" itemprop="name headline">
           
-            <a href="/posts/754e.html" class="post-title-link" itemprop="url">K8S & ACK 学习记录</a>
+            <a href="/posts/754e.html" class="post-title-link" itemprop="url">Kubernetes & ACK 学习记录</a>
         </h2>
 
         <div class="post-meta">
@@ -1080,7 +1199,7 @@
                   <i class="far fa-calendar-check"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2022-06-28 22:13:56" itemprop="dateModified" datetime="2022-06-28T22:13:56+08:00">2022-06-28</time>
+                <time title="修改时间：2024-01-21 23:28:43" itemprop="dateModified" datetime="2024-01-21T23:28:43+08:00">2024-01-21</time>
               </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -1098,7 +1217,7 @@
                 <i class="far fa-file-word"></i>
               </span>
                 <span class="post-meta-item-text">本文字数：</span>
-              <span>4.8k</span>
+              <span>4.9k</span>
             </span>
             <span class="post-meta-item" title="阅读时长">
               <span class="post-meta-item-icon">
@@ -1123,101 +1242,6 @@
           <!--noindex-->
             <div class="post-button">
               <a class="btn" href="/posts/754e.html#more" rel="contents">
-                阅读全文 &raquo;
-              </a>
-            </div>
-          <!--/noindex-->
-        
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://359sun.top/posts/c06e.html">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.jpg">
-      <meta itemprop="name" content="Yakir">
-      <meta itemprop="description" content="Yakir Blog">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Yakir Blog">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/posts/c06e.html" class="post-title-link" itemprop="url">Docker 学习记录</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2022-05-31 23:00:45" itemprop="dateCreated datePublished" datetime="2022-05-31T23:00:45+08:00">2022-05-31</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="far fa-calendar-check"></i>
-                </span>
-                <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2022-06-28 22:13:24" itemprop="dateModified" datetime="2022-06-28T22:13:24+08:00">2022-06-28</time>
-              </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-folder"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/cncf/" itemprop="url" rel="index"><span itemprop="name">CNCF</span></a>
-                </span>
-            </span>
-
-          <br>
-            <span class="post-meta-item" title="本文字数">
-              <span class="post-meta-item-icon">
-                <i class="far fa-file-word"></i>
-              </span>
-                <span class="post-meta-item-text">本文字数：</span>
-              <span>496</span>
-            </span>
-            <span class="post-meta-item" title="阅读时长">
-              <span class="post-meta-item-icon">
-                <i class="far fa-clock"></i>
-              </span>
-                <span class="post-meta-item-text">阅读时长 &asymp;</span>
-              <span>1 分钟</span>
-            </span>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h3 id="一、Docker-基本原理"><a href="#一、Docker-基本原理" class="headerlink" title="一、Docker 基本原理"></a>一、Docker 基本原理</h3><h4 id="1-docker-基本概念"><a href="#1-docker-基本概念" class="headerlink" title="1.docker 基本概念"></a>1.docker 基本概念</h4><p>Docker Client： 客户端<br>Docker Daemon：服务端<br>Docker Images：镜像（只读 CD）<br>Docker Registry： 镜像仓库<br>Docker Container：实际运行服务的容器，通过 Images 启动（可以认为 Container 提供硬件环境，使用 Images 提供好的系统盘，加上项目代码，即可运行服务）</p>
-          <!--noindex-->
-            <div class="post-button">
-              <a class="btn" href="/posts/c06e.html#more" rel="contents">
                 阅读全文 &raquo;
               </a>
             </div>
@@ -1315,13 +1339,13 @@
       <div class="site-state-item site-state-categories">
             <a href="/categories/">
           
-        <span class="site-state-item-count">4</span>
+        <span class="site-state-item-count">8</span>
         <span class="site-state-item-name">分类</span></a>
       </div>
       <div class="site-state-item site-state-tags">
             <a href="/tags/">
           
-        <span class="site-state-item-count">8</span>
+        <span class="site-state-item-count">12</span>
         <span class="site-state-item-name">标签</span></a>
       </div>
   </nav>
@@ -1387,7 +1411,7 @@
 <div class="copyright">
   
   &copy; 
-  <span itemprop="copyrightYear">2023</span>
+  <span itemprop="copyrightYear">2024</span>
   <span class="with-love">
     <i class="fa fa-heart"></i>
   </span>

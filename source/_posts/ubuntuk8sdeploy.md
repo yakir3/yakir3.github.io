@@ -1,9 +1,9 @@
 ---
-title: 基于 Ubuntu + Containerd 部署 K8S 集群
+title: 基于 Ubuntu + Containerd 部署 Kubernetes 集群
 categories:
   - CNCF
 tags:
-  - K8S
+  - Kubernetes
 abbrlink: 28d6
 date: 2022-06-07 22:17:15
 ---
@@ -219,7 +219,7 @@ sudo ctr version
 ### 三、构建集群
 #### 1.组件安装（所有节点执行）
 ```shell
-# 使用阿里云加速镜像
+# 使用Alicloud加速镜像
 curl https://mirrors.aliyun.com/kubernetes/apt/doc/apt-key.gpg | sudo apt-key add -
 sudo tee /etc/apt/sources.list.d/kubernetes.list << EOF
 deb https://mirrors.aliyun.com/kubernetes/apt/ kubernetes-xenial main
@@ -414,7 +414,7 @@ curl 172.16.166.132:80 -I     # 请求 Pod 应用内部端口（targetPort，容
 
 - kubelet
 - kubeproxy
-- 容器运行时（CR）：containerd（K8S 后续版本不使用 docker）
+- 容器运行时（CR）：containerd（Kubernetes 后续版本不使用 docker）
 
 **插件 Addons**
 
@@ -426,7 +426,7 @@ curl 172.16.166.132:80 -I     # 请求 Pod 应用内部端口（targetPort，容
 - 监控：Prometheus
 
 ### 四、Kubernetes 仪表板（Dashboard）
-#### 1.K8S 原生仪表板
+#### 1.Kubernetes 原生仪表板
 > 官方文档：[https://kubernetes.io/zh/docs/tasks/access-application-cluster/web-ui-dashboard/](https://kubernetes.io/zh/docs/tasks/access-application-cluster/web-ui-dashboard/)
 
 ```shell
@@ -466,5 +466,5 @@ kubectl describe secret -n kubernetes-dashboard $(kubectl get secret -n kubernet
 ### 五、参考文档
 1、[multipass 官网](https://multipass.run/)
 2、[Kubernetes 官方文档](https://kubernetes.io/zh/docs/concepts/overview/components/#container-runtime)
-3、[二进制方式安装 K8S 集群](https://blog.weiyigeek.top/2022/5-7-654.html)
+3、[二进制方式安装 Kubernetes 集群](https://blog.weiyigeek.top/2022/5-7-654.html)
 

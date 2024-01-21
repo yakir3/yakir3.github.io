@@ -1,10 +1,10 @@
 ---
-title: K8S & ACK 学习记录
+title: Kubernetes & ACK 学习记录
 categories:
   - CNCF
 tags:
-  - K8S
-  - 阿里云
+  - Kubernetes
+  - Alicloud
 abbrlink: 754e
 date: 2022-05-31 23:04:28
 ---
@@ -74,7 +74,7 @@ date: 2022-05-31 23:04:28
 
 #### 其他
 
-- 相关阿里云资源：[VPC](https://help.aliyun.com/product/27706.html)、[SLB](https://help.aliyun.com/product/27537.html)
+- 相关Alicloud资源：[VPC](https://help.aliyun.com/product/27706.html)、[SLB](https://help.aliyun.com/product/27537.html)
 - [Terway 与 Flannel对比](https://help.aliyun.com/document_detail/97467.html)
 
 ### 四、存储
@@ -114,7 +114,7 @@ date: 2022-05-31 23:04:28
 - 容器组
    - Pod：最小部署单元，由单个容器（实际docker 容器）或几个紧耦合的容器组成
 - 自定义资源
-   - 自定义资源定义拓展 K8S API
+   - 自定义资源定义拓展 Kubernetes API
    - 查看集群中所有API 组和包含的资源类型
 
 #### 镜像（ACR仓库）
@@ -157,7 +157,7 @@ date: 2022-05-31 23:04:28
 - 系统组件
    - Kube API Server：集群总线和入口网关。
    - Kube Controller Manager：集群内部资源管理器。
-   - Cloud Controller Manager：提供集群与阿里云基础产品对接能力，如 CLB、VPC等。
+   - Cloud Controller Manager：提供集群与Alicloud基础产品对接能力，如 CLB、VPC等。
 #### 应用管理
 
 - 可选组件
@@ -173,15 +173,15 @@ date: 2022-05-31 23:04:28
    - ags-metrics-collector：为基因计算客户使用的监控服务组件，可以通过该组件监控基因工作流中各个节点资源使用的详细信息。
    - ack-arms-prometheus：使用ARMS Prometheus实现容器服务集群监控。
    - logtail-ds：使用日志服务采集Kubernetes容器日志。
-   - logtail-windows：ACK集群上使用的容器日志收集插件，用于在阿里云上配合SLS服务对Windows容器进行日志收集。
+   - logtail-windows：ACK集群上使用的容器日志收集插件，用于在Alicloud上配合SLS服务对Windows容器进行日志收集。
 #### 存储
 
 - 可选组件
-   - csi-plugin：支持数据卷的挂载、卸载功能。创建集群时，如果选择CSI插件实现阿里云存储的接入能力的话，默认安装该组件。
-   - csi-provisioner：支持数据卷的自动创建能力。创建集群时，如果选择CSI插件实现阿里云存储的接入能力的话，默认安装该组件。
+   - csi-plugin：支持数据卷的挂载、卸载功能。创建集群时，如果选择CSI插件实现Alicloud存储的接入能力的话，默认安装该组件。
+   - csi-provisioner：支持数据卷的自动创建能力。创建集群时，如果选择CSI插件实现Alicloud存储的接入能力的话，默认安装该组件。
    - storage-operator：用于管理存储组件的生命周期。
    - alicloud-disk-controller：支持自动创建云盘卷。
-   - Flexvolume：社区较早实现的存储卷扩展机制。Flexvolume支持数据卷的挂载、卸载功能。创建集群时，如果选择Flexvolume插件实现阿里云存储的接入能力的话，默认安装该组件。
+   - Flexvolume：社区较早实现的存储卷扩展机制。Flexvolume支持数据卷的挂载、卸载功能。创建集群时，如果选择Flexvolume插件实现Alicloud存储的接入能力的话，默认安装该组件。
 
 #### 网络
 
@@ -190,8 +190,8 @@ date: 2022-05-31 23:04:28
    - Nginx Ingress Controller：Nginx Ingress Controller解析Ingress的转发规则。Ingress Controller收到请求，匹配Ingress转发规则转发到后端Service。
    - managed-kube-proxy-windows：ACK托管版集群上使用的容器化kube-proxy，用于管理Windows节点上Service的访问入口，包括集群内Pod到Service的访问和集群外访问Service。
 - 可选组件
-   - Terway :  阿里云开源的基于专有网络VPC的容器网络接口CNI插件，支持基于Kubernetes标准的网络策略（NetworkPolicy）来定义容器间的访问策略。创建集群时，如果选择Terway网络插件实现集群内部网络互通的话，默认安装该组件。
-   - Flannel：容器网络接口CNI插件，在阿里云上使用的Flannel网络模式采用阿里云VPC模式。创建集群时，如果选择Flannel网络插件实现集群内部网络互通的话，默认安装该组件。
+   - Terway :  Alicloud开源的基于专有网络VPC的容器网络接口CNI插件，支持基于Kubernetes标准的网络策略（NetworkPolicy）来定义容器间的访问策略。创建集群时，如果选择Terway网络插件实现集群内部网络互通的话，默认安装该组件。
+   - Flannel：容器网络接口CNI插件，在Alicloud上使用的Flannel网络模式采用AlicloudVPC模式。创建集群时，如果选择Flannel网络插件实现集群内部网络互通的话，默认安装该组件。
    - ACK NodeLocal DNSCache：基于社区开源项目NodeLocal DNSCache的一套DNS本地缓存解决方案。
    - kube-flannel-ds-windows：ACK托管版集群上使用的容器网络插件，用于构建适合Windows容器通讯的L2Bridge集群网络。
 
@@ -201,7 +201,7 @@ date: 2022-05-31 23:04:28
 #### [其他](https://help.aliyun.com/document_detail/277412.html#title-iib-fx3-2hl)
 
 ### 七、其他
-#### [K8S 集群 NetworkPolicy 策略](https://yuque.antfin.com/kifo8h/nee5aa/bzg9vq)
+#### [Kubernetes 集群 NetworkPolicy 策略](https://yuque.antfin.com/kifo8h/nee5aa/bzg9vq)
 
 - Pod 和 Pod 通信通过三个标识符组合来辨识：
 

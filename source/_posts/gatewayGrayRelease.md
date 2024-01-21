@@ -2,15 +2,15 @@
 title: 流量网关方案与灰度发布
 categories:
   - CNCF
+  - Alicloud
 tags:
-  - 阿里云
   - Istio
 abbrlink: dc02
 date: 2022-06-06 20:28:44
 ---
 ### 流量网关方案与灰度发布方式
 
-#### 一、阿里云原生 Ingress 方式
+#### 一、Alicloud原生 Ingress 方式
 **前置要求**
 
 1. 集群已安装 Ingress 组件
@@ -235,6 +235,6 @@ istio 高可用性保证？
 
 
 **参考文档**
-阿里云 Ingress：[https://help.aliyun.com/document_detail/200941.html#section-t2t-eik-oyr](https://help.aliyun.com/document_detail/200941.html#section-t2t-eik-oyr)
+Alicloud Ingress：[https://help.aliyun.com/document_detail/200941.html#section-t2t-eik-oyr](https://help.aliyun.com/document_detail/200941.html#section-t2t-eik-oyr)
 Istio 官网：[https://istio.io/latest/zh/docs/concepts/traffic-management/](https://istio.io/latest/zh/docs/concepts/traffic-management/)
 

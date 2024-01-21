@@ -1,9 +1,10 @@
 ---
 title: Openssl 原理与操作
 categories:
-  - Linux
+  - Operations
 tags:
   - openssl
+  - Linux
 abbrlink: b8bc
 date: 2022-12-08 22:52:20
 ---

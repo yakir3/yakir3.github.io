@@ -1,10 +1,10 @@
 ---
-title: K8S-RBAC 权限控制
+title: Kubernetes-RBAC 权限控制
 categories:
   - CNCF
 tags:
-  - 阿里云
-  - K8S
+  - Alicloud
+  - Kubernetes
 abbrlink: fa45
 date: 2022-03-01 23:55:02
 ---
@@ -24,13 +24,13 @@ date: 2022-03-01 23:55:02
 
 
 **Role和ClusterRole是权限规则的定义**
-- rules代表具体的授权规则，类似于阿里云RAM中的权限策略Policy
+- rules代表具体的授权规则，类似于AlicloudRAM中的权限策略Policy
 - Role和ClusterRole区别只在于一个是集群级别的资源控制
 
 <!--more-->
 
-**RoleBinding和ClusterRoleBinding是将User、Group、ServiceAccount绑定到Role或ClusterRole中（类似阿里云RAM中将Policy赋权给RAM角色或RAM账号）**
-- User、Group、ServiceAccount 是 K8S 集群中单独的概念，与系统级别不同。参考：[https://www.qikqiak.com/k8strain2/security/rbac/#%E5%88%9B%E5%BB%BA%E8%A7%92%E8%89%B2](https://www.qikqiak.com/k8strain2/security/rbac/#%E5%88%9B%E5%BB%BA%E8%A7%92%E8%89%B2)
+**RoleBinding和ClusterRoleBinding是将User、Group、ServiceAccount绑定到Role或ClusterRole中（类似AlicloudRAM中将Policy赋权给RAM角色或RAM账号）**
+- User、Group、ServiceAccount 是 Kubernetes 集群中单独的概念，与系统级别不同。参考：[https://www.qikqiak.com/k8strain2/security/rbac/#%E5%88%9B%E5%BB%BA%E8%A7%92%E8%89%B2](https://www.qikqiak.com/k8strain2/security/rbac/#%E5%88%9B%E5%BB%BA%E8%A7%92%E8%89%B2)
 - RoleBinding 可以引用同一个 namespace 中的任何 Role ；或者一个 RoleBinding 可以引用某 ClusterRole 并将该 ClusterRole 绑定到 RoleBinding 所在的 namespace。
 - 如需 ClusterRole 绑定到集群中所有 namespace，必须要使用 ClusterRoleBinding
 - RoleBinding 对应可引用一个 ClusterRole 对象用于在 RoleBinding 所在的 namespace 内授予用户对所引用的 ClusterRole 中定义的 namespace 资源的访问权限。（在整个集群内定义一组通用角色，然后在不同 namespace 中复用这些角色）

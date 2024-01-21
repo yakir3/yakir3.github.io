@@ -3,7 +3,7 @@ title: Helm 应用部署
 categories:
   - CNCF
 tags:
-  - 阿里云
+  - Alicloud
 abbrlink: ce0f
 date: 2022-05-04 21:46:04
 ---
@@ -13,7 +13,7 @@ date: 2022-05-04 21:46:04
 - [安装二进制命令](https://helm.sh/zh/docs/intro/install/)（本地需要连接上kubernetes 集群）
 
 <!--more-->
-- 安装阿里云helm 插件与操作
+- 安装Alicloudhelm 插件与操作
 ```bash
 # 安装 Helm 插件
 helm plugin install https://github.com/AliyunContainerService/helm-acr
@@ -106,7 +106,7 @@ helm install -f values.yaml <本地仓库名称>/<Chart 名称> --version <Chart
 
 - 基本目录结构内容：Chart.yaml（chart 信息说明） 、Values.yaml（自定义变量） 、charts（子chart目录，依赖）
 
-- templates 模板（实际安装到K8S 集群中的资源定义Yaml 模板文件，如deployment、pod 等）
+- templates 模板（实际安装到Kubernetes 集群中的资源定义Yaml 模板文件，如deployment、pod 等）
    - 资源模板：confimap.yaml、deployment.yaml 等
    - 命名模板：_helpers.tpl
 
@@ -116,7 +116,7 @@ helm install -f values.yaml <本地仓库名称>/<Chart 名称> --version <Chart
 
 
 ### 二、测试验证部署app-test
-#### 1）本地安装helm、kubectl（连接K8S 集群）二进制命令
+#### 1）本地安装helm、kubectl（连接Kubernetes 集群）二进制命令
 
 #### 2）初始化配置app-test 
 
@@ -212,9 +212,9 @@ helm install app-test aliyun-acr-repo/app-test --version 20211228100329-daily --
 
 ### 三、问题点
 
-- 使用helm 命令安装需本地连接K8S 集群（需提供API Server 公网EIP）
+- 使用helm 命令安装需本地连接Kubernetes 集群（需提供API Server 公网EIP）
 
-- 与阿里云Edas 产品兼容问题
+- 与AlicloudEdas 产品兼容问题
    - 使用helm 部署的应用与Edas 不共通，因此使用helm 部署的无法从Edas 上查看应用的相关信息
    - Edas 支持将手动部署的Deployment 手动导入，参考：[https://help.aliyun.com/document_detail/202036.html](https://help.aliyun.com/document_detail/202036.html)（自行部署导入Edas 的应用暂未确定是否能完整导入Edas 组件注入的变量）
 

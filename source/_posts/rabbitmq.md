@@ -1,7 +1,7 @@
 ---
 title: RabbitMQ 简述与使用
 categories:
-  - MiddleWare
+  - Middleware
 tags:
   - RabbitMQ
 abbrlink: 9bae
@@ -305,5 +305,5 @@ python rabbitmq_client_test2.py user.account.test
 > 参考：
 > 1、官方文档：[https://www.rabbitmq.com/](https://www.rabbitmq.com/)
 > 2、消息队列之RabbitMQ：[https://www.jianshu.com/p/79ca08116d57](https://www.jianshu.com/p/79ca08116d57)
-> 3、阿里云云产品官方文档：[https://help.aliyun.com/document_detail/141604.html](https://help.aliyun.com/document_detail/141604.html)
+> 3、Alicloud云产品官方文档：[https://help.aliyun.com/document_detail/141604.html](https://help.aliyun.com/document_detail/141604.html)
 

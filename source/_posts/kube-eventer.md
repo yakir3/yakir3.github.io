@@ -1,9 +1,9 @@
 ---
-title: K8S - kube-eventer 事件中心组件
+title: Kubernetes - kube-eventer 事件中心组件
 categories:
   - CNCF
 tags:
-  - K8S
+  - Kubernetes
 abbrlink: 2ead
 date: 2022-09-30 21:42:20
 ---
@@ -13,7 +13,7 @@ date: 2022-09-30 21:42:20
 
 + 什么是事件：Kubernetes 的架构设计基于状态机，不同的状态之间进行转换则会生成相应的事件，正常的状态之间转换会生成 Normal 等级的事件，正常状态与异常状态之间的转换会生成Warning等级的事件。
 
-+ kube-eventer 组件：阿里云开源组件，用于获取 K8S 集群中事件消息，并转存至自定义中间件或存储中。（K8S 集群默认只保存1小时内事件）
++ kube-eventer 组件：Alicloud开源组件，用于获取 Kubernetes 集群中事件消息，并转存至自定义中间件或存储中。（Kubernetes 集群默认只保存1小时内事件）
 
 + 组件官方地址：https://github.com/AliyunContainerService/kube-eventer
 
@@ -21,8 +21,8 @@ date: 2022-09-30 21:42:20
 
 | 名称                               | 功能                         | 备注               |
 | -------------------------------- | -------------------------- | ---------------- |
-| K8S 集群                           | 应用集群                       | 使用 minikube 测试集群 |
-| kube-eventer                     | 收集 K8S 集群事件                | 集群第三方组件          |
+| Kubernetes 集群                           | 应用集群                       | 使用 minikube 测试集群 |
+| kube-eventer                     | 收集 Kubernetes 集群事件                | 集群第三方组件          |
 | Kafka / Elasticsearch / influxDB | 中间件：存储事件消息                 | 存储组件（选型 Kafka）   |
 | kube-eventer-py                  | 从队列获取事件消息发送至 telegram 告警群组 | 事件消费者            |
 
@@ -268,7 +268,7 @@ class FilterMsg(object):
 
     def convert(self):
         msg_markdown = f"""
-        *K8S Cluster Event*
+        *Kubernetes Cluster Event*
     `Kind: {self.data['kind']}`
     `Namescodeace: {self.data['namespace']}`
     `Reason: {self.data['reason']}`
