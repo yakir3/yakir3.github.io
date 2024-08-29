@@ -2,7 +2,7 @@
 
 用途：个人博客，学习记录
 
-[关于](https://www.359sun.top/about/)
+[关于](https://yakir.top/about/)
 
 
 ### Deploy
@@ -44,7 +44,7 @@ hexo server
 
 # deploy to git
 npm install hexo-deployer-git --save
-hexo ddeploy
+hexo deploy
 ```
 
 

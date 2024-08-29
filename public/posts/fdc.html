@@ -20,32 +20,32 @@
 
 <script id="hexo-configurations">
     var NexT = window.NexT || {};
-    var CONFIG = {"hostname":"359sun.top","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"left","always":true,"display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":true,"show_result":true,"style":"mac"},"back2top":{"enable":true,"sidebar":true,"scrollpercent":true},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":true,"mediumzoom":false,"lazyload":true,"pangu":false,"comments":{"style":"tabs","active":"gitalk","storage":true,"lazyload":false,"nav":{"gitalk":{"order":-2}},"activeClass":"gitalk"},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+    var CONFIG = {"hostname":"yakir.top","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"left","always":true,"display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":true,"show_result":true,"style":"mac"},"back2top":{"enable":true,"sidebar":true,"scrollpercent":true},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":true,"mediumzoom":false,"lazyload":true,"pangu":false,"comments":{"style":"tabs","active":"gitalk","storage":true,"lazyload":false,"nav":{"gitalk":{"order":-2}},"activeClass":"gitalk"},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
   </script>
 
   <meta name="description" content="一、前言当通过OpenApi接口来调用云资源时（即替代控制台的操作），当前的方式有两种：  通过 AK+SK 方式直接调用，只要该AK所属的账号有相关权限即可调用对应资源（授权分为系统策略和自定义策略） Alicloud账号（RAM用户）&#x2F;Alicloud服务（ECS等）&#x2F;身份提供商（SSO） 通过扮演角色获取角色的临时令牌（即通过调用AssumeRole接口），通过该临时令牌">
 <meta property="og:type" content="article">
 <meta property="og:title" content="Alicloud-RAM 与 STS 权限">
-<meta property="og:url" content="https://359sun.top/posts/fdc.html">
+<meta property="og:url" content="https://yakir.top/posts/fdc.html">
 <meta property="og:site_name" content="Yakir Blog">
 <meta property="og:description" content="一、前言当通过OpenApi接口来调用云资源时（即替代控制台的操作），当前的方式有两种：  通过 AK+SK 方式直接调用，只要该AK所属的账号有相关权限即可调用对应资源（授权分为系统策略和自定义策略） Alicloud账号（RAM用户）&#x2F;Alicloud服务（ECS等）&#x2F;身份提供商（SSO） 通过扮演角色获取角色的临时令牌（即通过调用AssumeRole接口），通过该临时令牌">
 <meta property="og:locale" content="zh_CN">
-<meta property="og:image" content="https://359sun.top/posts/fdc/ram1.png">
-<meta property="og:image" content="https://359sun.top/posts/fdc/ram2.png">
-<meta property="og:image" content="https://359sun.top/posts/fdc/ram3.png">
-<meta property="og:image" content="https://359sun.top/posts/fdc/ram4.png">
-<meta property="og:image" content="https://359sun.top/posts/fdc/ram5.png">
-<meta property="og:image" content="https://359sun.top/posts/fdc/ram6.png">
-<meta property="og:image" content="https://359sun.top/posts/fdc/ram7.png">
-<meta property="og:image" content="https://359sun.top/posts/fdc/ram8.png">
+<meta property="og:image" content="https://yakir.top/posts/fdc/ram1.png">
+<meta property="og:image" content="https://yakir.top/posts/fdc/ram2.png">
+<meta property="og:image" content="https://yakir.top/posts/fdc/ram3.png">
+<meta property="og:image" content="https://yakir.top/posts/fdc/ram4.png">
+<meta property="og:image" content="https://yakir.top/posts/fdc/ram5.png">
+<meta property="og:image" content="https://yakir.top/posts/fdc/ram6.png">
+<meta property="og:image" content="https://yakir.top/posts/fdc/ram7.png">
+<meta property="og:image" content="https://yakir.top/posts/fdc/ram8.png">
 <meta property="article:published_time" content="2022-03-20T15:37:32.000Z">
 <meta property="article:modified_time" content="2024-01-21T15:31:32.930Z">
 <meta property="article:author" content="Yakir">
 <meta property="article:tag" content="RAM">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:image" content="https://359sun.top/posts/fdc/ram1.png">
+<meta name="twitter:image" content="https://yakir.top/posts/fdc/ram1.png">
 
-<link rel="canonical" href="https://359sun.top/posts/fdc.html">
+<link rel="canonical" href="https://yakir.top/posts/fdc.html">
 
 
 <script id="page-configurations">
@@ -211,7 +211,7 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://359sun.top/posts/fdc.html">
+    <link itemprop="mainEntityOfPage" href="https://yakir.top/posts/fdc.html">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/images/avatar.jpg">
@@ -331,7 +331,7 @@
 <li>OSS官方推荐使用 Alicloud账号 方式：<a target="_blank" rel="noopener" href="https://help.aliyun.com/document_detail/100624.html">https://help.aliyun.com/document_detail&#x2F;100624.html</a></li>
 </ul>
 </blockquote>
-<h3 id="三、创建STS角色，自定义授权OSS功能测试"><a href="#三、创建STS角色，自定义授权OSS功能测试" class="headerlink" title="三、创建STS角色，自定义授权OSS功能测试"></a>三、创建STS角色，自定义授权OSS功能测试</h3><p>1）测试账号信息<br>账号：<a href="mailto:&#x64;&#101;&#118;&#x6f;&#x70;&#x73;&#95;&#x74;&#101;&#115;&#x74;&#x40;&#x78;&#120;&#120;&#x2e;&#111;&#x6e;&#97;&#108;&#105;&#121;&#x75;&#x6e;&#x2e;&#x63;&#x6f;&#x6d;">&#x64;&#101;&#118;&#x6f;&#x70;&#x73;&#95;&#x74;&#101;&#115;&#x74;&#x40;&#x78;&#120;&#120;&#x2e;&#111;&#x6e;&#97;&#108;&#105;&#121;&#x75;&#x6e;&#x2e;&#x63;&#x6f;&#x6d;</a><br>AK：xxxxx<br>SK：xxxxx<br>ARN：acs:ram::xxxxx:role&#x2F;xxx-sts<br>OSS Bucket名称：oss-test<br>OSS授权目录：dir111&#x2F;dir111_secondline1&#x2F;</p>
+<h3 id="三、创建STS角色，自定义授权OSS功能测试"><a href="#三、创建STS角色，自定义授权OSS功能测试" class="headerlink" title="三、创建STS角色，自定义授权OSS功能测试"></a>三、创建STS角色，自定义授权OSS功能测试</h3><p>1）测试账号信息<br>账号：<a href="mailto:&#100;&#101;&#118;&#111;&#x70;&#x73;&#x5f;&#116;&#x65;&#115;&#x74;&#x40;&#x78;&#120;&#120;&#46;&#111;&#x6e;&#97;&#x6c;&#105;&#121;&#117;&#x6e;&#46;&#x63;&#111;&#x6d;">&#100;&#101;&#118;&#111;&#x70;&#x73;&#x5f;&#116;&#x65;&#115;&#x74;&#x40;&#x78;&#120;&#120;&#46;&#111;&#x6e;&#97;&#x6c;&#105;&#121;&#117;&#x6e;&#46;&#x63;&#111;&#x6d;</a><br>AK：xxxxx<br>SK：xxxxx<br>ARN：acs:ram::xxxxx:role&#x2F;xxx-sts<br>OSS Bucket名称：oss-test<br>OSS授权目录：dir111&#x2F;dir111_secondline1&#x2F;</p>
 <p>2）进行授权</p>
 <ul>
 <li>创建RAM用户（子账号），生成AK SK （此步骤忽略）</li>
@@ -403,7 +403,7 @@
   </li>
   <li class="post-copyright-link">
     <strong>本文链接：</strong>
-    <a href="https://359sun.top/posts/fdc.html" title="Alicloud-RAM 与 STS 权限">https://359sun.top/posts/fdc.html</a>
+    <a href="https://yakir.top/posts/fdc.html" title="Alicloud-RAM 与 STS 权限">https://yakir.top/posts/fdc.html</a>
   </li>
   <li class="post-copyright-license">
     <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" rel="noopener" target="_blank"><i class="fab fa-fw fa-creative-commons"></i>BY-NC-SA</a> 许可协议。转载请注明出处！

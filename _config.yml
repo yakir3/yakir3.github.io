@@ -6,16 +6,14 @@
 title: 'Yakir Blog'
 subtitle: ''
 description: 'Yakir Blog'
-keywords:
+keywords: 'blog, record'
 author: Yakir
 language: zh-CN
 timezone: ''
 
 # URL
 ## Set your site url here. For example, if you use GitHub Page, set url as 'https://username.github.io/project'
-url: https://359sun.top
-#permalink: :year/:month/:day/:title/
-#permalink_defaults:
+url: https://yakir.top
 permalink: posts/:abbrlink.html
 abbrlink:
   alg: crc16 # 算法
@@ -111,7 +109,7 @@ theme: next
 deploy:
   type: git
   repository: git@github.com:yakir3/yakir3.github.io.git
-  branch: yakir-blog
+  branch: gh-pages
 
 # custom
 #添加站内搜索按钮
@@ -142,5 +140,4 @@ feed:
   content_limit: 140
   content_limit_delim: " "
   order_by: -date
-  icon: /images/favicon_200x200.png
-
+  icon: /images/favicon-200x200.png
