@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <feed xmlns="http://www.w3.org/2005/Atom">
   <title>Yakir Blog</title>
-  <icon>https://359sun.top/images/favicon_200x200.png</icon>
+  <icon>https://yakir.top/images/favicon-200x200.png</icon>
   
-  <link href="https://359sun.top/atom.xml" rel="self"/>
+  <link href="https://yakir.top/atom.xml" rel="self"/>
   
-  <link href="https://359sun.top/"/>
+  <link href="https://yakir.top/"/>
   <updated>2024-01-21T15:33:40.702Z</updated>
-  <id>https://359sun.top/</id>
+  <id>https://yakir.top/</id>
   
   <author>
     <name>Yakir</name>
@@ -18,8 +18,8 @@
   
   <entry>
     <title>Docker</title>
-    <link href="https://359sun.top/posts/c018.html"/>
-    <id>https://359sun.top/posts/c018.html</id>
+    <link href="https://yakir.top/posts/c018.html"/>
+    <id>https://yakir.top/posts/c018.html</id>
     <published>2024-01-21T14:49:15.000Z</published>
     <updated>2024-01-21T15:33:40.702Z</updated>
     
@@ -30,17 +30,17 @@
     
     
     
-    <category term="Container" scheme="https://359sun.top/categories/container/"/>
+    <category term="Container" scheme="https://yakir.top/categories/container/"/>
     
     
-    <category term="Docker" scheme="https://359sun.top/tags/docker/"/>
+    <category term="Docker" scheme="https://yakir.top/tags/docker/"/>
     
   </entry>
   
   <entry>
     <title>Kubernetes-网络</title>
-    <link href="https://359sun.top/posts/5d90.html"/>
-    <id>https://359sun.top/posts/5d90.html</id>
+    <link href="https://yakir.top/posts/5d90.html"/>
+    <id>https://yakir.top/posts/5d90.html</id>
     <published>2023-02-08T15:20:49.000Z</published>
     <updated>2024-01-21T15:28:43.154Z</updated>
     
@@ -54,17 +54,17 @@
     
     
     
-    <category term="CNCF" scheme="https://359sun.top/categories/cncf/"/>
+    <category term="CNCF" scheme="https://yakir.top/categories/cncf/"/>
     
     
-    <category term="Kubernetes" scheme="https://359sun.top/tags/kubernetes/"/>
+    <category term="Kubernetes" scheme="https://yakir.top/tags/kubernetes/"/>
     
   </entry>
   
   <entry>
     <title>Openssl 原理与操作</title>
-    <link href="https://359sun.top/posts/b8bc.html"/>
-    <id>https://359sun.top/posts/b8bc.html</id>
+    <link href="https://yakir.top/posts/b8bc.html"/>
+    <id>https://yakir.top/posts/b8bc.html</id>
     <published>2022-12-08T14:52:20.000Z</published>
     <updated>2024-01-21T15:28:43.160Z</updated>
     
@@ -78,19 +78,19 @@
     
     
     
-    <category term="Operations" scheme="https://359sun.top/categories/operations/"/>
+    <category term="Operations" scheme="https://yakir.top/categories/operations/"/>
     
     
-    <category term="openssl" scheme="https://359sun.top/tags/openssl/"/>
+    <category term="openssl" scheme="https://yakir.top/tags/openssl/"/>
     
-    <category term="Linux" scheme="https://359sun.top/tags/linux/"/>
+    <category term="Linux" scheme="https://yakir.top/tags/linux/"/>
     
   </entry>
   
   <entry>
     <title>Kubernetes - kube-eventer 事件中心组件</title>
-    <link href="https://359sun.top/posts/2ead.html"/>
-    <id>https://359sun.top/posts/2ead.html</id>
+    <link href="https://yakir.top/posts/2ead.html"/>
+    <id>https://yakir.top/posts/2ead.html</id>
     <published>2022-09-30T13:42:20.000Z</published>
     <updated>2024-01-21T15:28:43.156Z</updated>
     
@@ -135,17 +135,17 @@
     
     
     
-    <category term="CNCF" scheme="https://359sun.top/categories/cncf/"/>
+    <category term="CNCF" scheme="https://yakir.top/categories/cncf/"/>
     
     
-    <category term="Kubernetes" scheme="https://359sun.top/tags/kubernetes/"/>
+    <category term="Kubernetes" scheme="https://yakir.top/tags/kubernetes/"/>
     
   </entry>
   
   <entry>
     <title>可观测性-Fluentd 日志组件</title>
-    <link href="https://359sun.top/posts/41fe.html"/>
-    <id>https://359sun.top/posts/41fe.html</id>
+    <link href="https://yakir.top/posts/41fe.html"/>
+    <id>https://yakir.top/posts/41fe.html</id>
     <published>2022-07-11T13:56:17.000Z</published>
     <updated>2024-01-21T15:28:43.158Z</updated>
     
@@ -168,17 +168,17 @@
     
     
     
-    <category term="CNCF" scheme="https://359sun.top/categories/cncf/"/>
+    <category term="CNCF" scheme="https://yakir.top/categories/cncf/"/>
     
     
-    <category term="Observability" scheme="https://359sun.top/tags/observability/"/>
+    <category term="Observability" scheme="https://yakir.top/tags/observability/"/>
     
   </entry>
   
   <entry>
     <title>可观测性-监控组件 Prometheus</title>
-    <link href="https://359sun.top/posts/6bfb.html"/>
-    <id>https://359sun.top/posts/6bfb.html</id>
+    <link href="https://yakir.top/posts/6bfb.html"/>
+    <id>https://yakir.top/posts/6bfb.html</id>
     <published>2022-06-28T14:02:38.000Z</published>
     <updated>2024-01-21T15:28:43.159Z</updated>
     
@@ -203,17 +203,17 @@
     
     
     
-    <category term="CNCF" scheme="https://359sun.top/categories/cncf/"/>
+    <category term="CNCF" scheme="https://yakir.top/categories/cncf/"/>
     
     
-    <category term="Observability" scheme="https://359sun.top/tags/observability/"/>
+    <category term="Observability" scheme="https://yakir.top/tags/observability/"/>
     
   </entry>
   
   <entry>
     <title>基于 Ubuntu + Containerd 部署 Kubernetes 集群</title>
-    <link href="https://359sun.top/posts/28d6.html"/>
-    <id>https://359sun.top/posts/28d6.html</id>
+    <link href="https://yakir.top/posts/28d6.html"/>
+    <id>https://yakir.top/posts/28d6.html</id>
     <published>2022-06-07T14:17:15.000Z</published>
     <updated>2024-01-21T15:28:43.162Z</updated>
     
@@ -225,17 +225,17 @@
     
     
     
-    <category term="CNCF" scheme="https://359sun.top/categories/cncf/"/>
+    <category term="CNCF" scheme="https://yakir.top/categories/cncf/"/>
     
     
-    <category term="Kubernetes" scheme="https://359sun.top/tags/kubernetes/"/>
+    <category term="Kubernetes" scheme="https://yakir.top/tags/kubernetes/"/>
     
   </entry>
   
   <entry>
     <title>RabbitMQ 简述与使用</title>
-    <link href="https://359sun.top/posts/9bae.html"/>
-    <id>https://359sun.top/posts/9bae.html</id>
+    <link href="https://yakir.top/posts/9bae.html"/>
+    <id>https://yakir.top/posts/9bae.html</id>
     <published>2022-06-06T12:33:11.000Z</published>
     <updated>2024-01-21T15:28:43.161Z</updated>
     
@@ -247,17 +247,17 @@
     
     
     
-    <category term="Middleware" scheme="https://359sun.top/categories/middleware/"/>
+    <category term="Middleware" scheme="https://yakir.top/categories/middleware/"/>
     
     
-    <category term="RabbitMQ" scheme="https://359sun.top/tags/rabbitmq/"/>
+    <category term="RabbitMQ" scheme="https://yakir.top/tags/rabbitmq/"/>
     
   </entry>
   
   <entry>
     <title>流量网关方案与灰度发布</title>
-    <link href="https://359sun.top/posts/dc02.html"/>
-    <id>https://359sun.top/posts/dc02.html</id>
+    <link href="https://yakir.top/posts/dc02.html"/>
+    <id>https://yakir.top/posts/dc02.html</id>
     <published>2022-06-06T12:28:44.000Z</published>
     <updated>2024-01-21T15:29:17.071Z</updated>
     
@@ -299,19 +299,19 @@
     
     
     
-    <category term="CNCF" scheme="https://359sun.top/categories/cncf/"/>
+    <category term="CNCF" scheme="https://yakir.top/categories/cncf/"/>
     
-    <category term="Alicloud" scheme="https://359sun.top/categories/cncf/alicloud/"/>
+    <category term="Alicloud" scheme="https://yakir.top/categories/cncf/alicloud/"/>
     
     
-    <category term="Istio" scheme="https://359sun.top/tags/istio/"/>
+    <category term="Istio" scheme="https://yakir.top/tags/istio/"/>
     
   </entry>
   
   <entry>
     <title>Kubernetes &amp; ACK 学习记录</title>
-    <link href="https://359sun.top/posts/754e.html"/>
-    <id>https://359sun.top/posts/754e.html</id>
+    <link href="https://yakir.top/posts/754e.html"/>
+    <id>https://yakir.top/posts/754e.html</id>
     <published>2022-05-31T15:04:28.000Z</published>
     <updated>2024-01-21T15:28:43.153Z</updated>
     
@@ -322,19 +322,19 @@
     
     
     
-    <category term="CNCF" scheme="https://359sun.top/categories/cncf/"/>
+    <category term="CNCF" scheme="https://yakir.top/categories/cncf/"/>
     
     
-    <category term="Alicloud" scheme="https://359sun.top/tags/alicloud/"/>
+    <category term="Alicloud" scheme="https://yakir.top/tags/alicloud/"/>
     
-    <category term="Kubernetes" scheme="https://359sun.top/tags/kubernetes/"/>
+    <category term="Kubernetes" scheme="https://yakir.top/tags/kubernetes/"/>
     
   </entry>
   
   <entry>
     <title>ACK 集群日志接入 SLS</title>
-    <link href="https://359sun.top/posts/4a2a.html"/>
-    <id>https://359sun.top/posts/4a2a.html</id>
+    <link href="https://yakir.top/posts/4a2a.html"/>
+    <id>https://yakir.top/posts/4a2a.html</id>
     <published>2022-05-31T14:38:39.000Z</published>
     <updated>2024-01-21T15:28:43.149Z</updated>
     
@@ -346,17 +346,17 @@
     
     
     
-    <category term="Alicloud" scheme="https://359sun.top/categories/alicloud/"/>
+    <category term="Alicloud" scheme="https://yakir.top/categories/alicloud/"/>
     
     
-    <category term="ACK" scheme="https://359sun.top/tags/ack/"/>
+    <category term="ACK" scheme="https://yakir.top/tags/ack/"/>
     
   </entry>
   
   <entry>
     <title>VPC 网络规划案例</title>
-    <link href="https://359sun.top/posts/64a8.html"/>
-    <id>https://359sun.top/posts/64a8.html</id>
+    <link href="https://yakir.top/posts/64a8.html"/>
+    <id>https://yakir.top/posts/64a8.html</id>
     <published>2022-05-04T14:17:00.000Z</published>
     <updated>2024-01-21T15:31:08.717Z</updated>
     
@@ -374,19 +374,19 @@
     
     
     
-    <category term="Alicloud" scheme="https://359sun.top/categories/alicloud/"/>
+    <category term="Alicloud" scheme="https://yakir.top/categories/alicloud/"/>
     
-    <category term="Network" scheme="https://359sun.top/categories/alicloud/network/"/>
+    <category term="Network" scheme="https://yakir.top/categories/alicloud/network/"/>
     
     
-    <category term="VPC" scheme="https://359sun.top/tags/vpc/"/>
+    <category term="VPC" scheme="https://yakir.top/tags/vpc/"/>
     
   </entry>
   
   <entry>
     <title>Helm 应用部署</title>
-    <link href="https://359sun.top/posts/ce0f.html"/>
-    <id>https://359sun.top/posts/ce0f.html</id>
+    <link href="https://yakir.top/posts/ce0f.html"/>
+    <id>https://yakir.top/posts/ce0f.html</id>
     <published>2022-05-04T13:46:04.000Z</published>
     <updated>2024-01-21T15:28:43.152Z</updated>
     
@@ -397,17 +397,17 @@
     
     
     
-    <category term="CNCF" scheme="https://359sun.top/categories/cncf/"/>
+    <category term="CNCF" scheme="https://yakir.top/categories/cncf/"/>
     
     
-    <category term="Alicloud" scheme="https://359sun.top/tags/alicloud/"/>
+    <category term="Alicloud" scheme="https://yakir.top/tags/alicloud/"/>
     
   </entry>
   
   <entry>
     <title>Git Flow 工作流</title>
-    <link href="https://359sun.top/posts/539.html"/>
-    <id>https://359sun.top/posts/539.html</id>
+    <link href="https://yakir.top/posts/539.html"/>
+    <id>https://yakir.top/posts/539.html</id>
     <published>2022-05-04T13:14:23.000Z</published>
     <updated>2024-01-21T15:28:43.152Z</updated>
     
@@ -426,17 +426,17 @@
     
     
     
-    <category term="Operations" scheme="https://359sun.top/categories/operations/"/>
+    <category term="Operations" scheme="https://yakir.top/categories/operations/"/>
     
     
-    <category term="git" scheme="https://359sun.top/tags/git/"/>
+    <category term="git" scheme="https://yakir.top/tags/git/"/>
     
   </entry>
   
   <entry>
     <title>Alicloud-RAM 与 STS 权限</title>
-    <link href="https://359sun.top/posts/fdc.html"/>
-    <id>https://359sun.top/posts/fdc.html</id>
+    <link href="https://yakir.top/posts/fdc.html"/>
+    <id>https://yakir.top/posts/fdc.html</id>
     <published>2022-03-20T15:37:32.000Z</published>
     <updated>2024-01-21T15:31:32.930Z</updated>
     
@@ -455,17 +455,17 @@
     
     
     
-    <category term="Alicloud" scheme="https://359sun.top/categories/alicloud/"/>
+    <category term="Alicloud" scheme="https://yakir.top/categories/alicloud/"/>
     
     
-    <category term="RAM" scheme="https://359sun.top/tags/ram/"/>
+    <category term="RAM" scheme="https://yakir.top/tags/ram/"/>
     
   </entry>
   
   <entry>
     <title>Alicloud-Promotheus &amp; Grafana 监控大盘与告警通知</title>
-    <link href="https://359sun.top/posts/9a8h.html"/>
-    <id>https://359sun.top/posts/9a8h.html</id>
+    <link href="https://yakir.top/posts/9a8h.html"/>
+    <id>https://yakir.top/posts/9a8h.html</id>
     <published>2022-03-16T15:21:06.000Z</published>
     <updated>2024-01-21T15:30:17.732Z</updated>
     
@@ -483,19 +483,19 @@
     
     
     
-    <category term="Alicloud" scheme="https://359sun.top/categories/alicloud/"/>
+    <category term="Alicloud" scheme="https://yakir.top/categories/alicloud/"/>
     
-    <category term="CNCF" scheme="https://359sun.top/categories/alicloud/cncf/"/>
+    <category term="CNCF" scheme="https://yakir.top/categories/alicloud/cncf/"/>
     
     
-    <category term="Kubernetes" scheme="https://359sun.top/tags/kubernetes/"/>
+    <category term="Kubernetes" scheme="https://yakir.top/tags/kubernetes/"/>
     
   </entry>
   
   <entry>
     <title>NetworkPolicy 隔离策略</title>
-    <link href="https://359sun.top/posts/8aa0.html"/>
-    <id>https://359sun.top/posts/8aa0.html</id>
+    <link href="https://yakir.top/posts/8aa0.html"/>
+    <id>https://yakir.top/posts/8aa0.html</id>
     <published>2022-03-07T14:01:06.000Z</published>
     <updated>2024-01-21T15:30:00.082Z</updated>
     
@@ -518,19 +518,19 @@
     
     
     
-    <category term="Alicloud" scheme="https://359sun.top/categories/alicloud/"/>
+    <category term="Alicloud" scheme="https://yakir.top/categories/alicloud/"/>
     
-    <category term="CNCF" scheme="https://359sun.top/categories/alicloud/cncf/"/>
+    <category term="CNCF" scheme="https://yakir.top/categories/alicloud/cncf/"/>
     
     
-    <category term="Kubernetes" scheme="https://359sun.top/tags/kubernetes/"/>
+    <category term="Kubernetes" scheme="https://yakir.top/tags/kubernetes/"/>
     
   </entry>
   
   <entry>
     <title>Kubernetes-RBAC 权限控制</title>
-    <link href="https://359sun.top/posts/fa45.html"/>
-    <id>https://359sun.top/posts/fa45.html</id>
+    <link href="https://yakir.top/posts/fa45.html"/>
+    <id>https://yakir.top/posts/fa45.html</id>
     <published>2022-03-01T15:55:02.000Z</published>
     <updated>2024-01-21T15:28:43.155Z</updated>
     
@@ -561,19 +561,19 @@
     
     
     
-    <category term="CNCF" scheme="https://359sun.top/categories/cncf/"/>
+    <category term="CNCF" scheme="https://yakir.top/categories/cncf/"/>
     
     
-    <category term="Alicloud" scheme="https://359sun.top/tags/alicloud/"/>
+    <category term="Alicloud" scheme="https://yakir.top/tags/alicloud/"/>
     
-    <category term="Kubernetes" scheme="https://359sun.top/tags/kubernetes/"/>
+    <category term="Kubernetes" scheme="https://yakir.top/tags/kubernetes/"/>
     
   </entry>
   
   <entry>
     <title>Hello World</title>
-    <link href="https://359sun.top/posts/3eeb.html"/>
-    <id>https://359sun.top/posts/3eeb.html</id>
+    <link href="https://yakir.top/posts/3eeb.html"/>
+    <id>https://yakir.top/posts/3eeb.html</id>
     <published>2022-02-27T15:30:35.000Z</published>
     <updated>2024-01-21T15:28:43.148Z</updated>
     

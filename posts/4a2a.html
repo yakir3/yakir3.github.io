@@ -20,40 +20,40 @@
 
 <script id="hexo-configurations">
     var NexT = window.NexT || {};
-    var CONFIG = {"hostname":"359sun.top","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"left","always":true,"display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":true,"show_result":true,"style":"mac"},"back2top":{"enable":true,"sidebar":true,"scrollpercent":true},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":true,"mediumzoom":false,"lazyload":true,"pangu":false,"comments":{"style":"tabs","active":"gitalk","storage":true,"lazyload":false,"nav":{"gitalk":{"order":-2}},"activeClass":"gitalk"},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+    var CONFIG = {"hostname":"yakir.top","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"left","always":true,"display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":true,"show_result":true,"style":"mac"},"back2top":{"enable":true,"sidebar":true,"scrollpercent":true},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":true,"mediumzoom":false,"lazyload":true,"pangu":false,"comments":{"style":"tabs","active":"gitalk","storage":true,"lazyload":false,"nav":{"gitalk":{"order":-2}},"activeClass":"gitalk"},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
   </script>
 
   <meta name="description" content="一、接入前提ACK 集群开启日志服务组件Logtail  创建集群时启用Logtail（初始化ACK 集群时操作，新集群建议开启）">
 <meta property="og:type" content="article">
 <meta property="og:title" content="ACK 集群日志接入 SLS">
-<meta property="og:url" content="https://359sun.top/posts/4a2a.html">
+<meta property="og:url" content="https://yakir.top/posts/4a2a.html">
 <meta property="og:site_name" content="Yakir Blog">
 <meta property="og:description" content="一、接入前提ACK 集群开启日志服务组件Logtail  创建集群时启用Logtail（初始化ACK 集群时操作，新集群建议开启）">
 <meta property="og:locale" content="zh_CN">
-<meta property="og:image" content="https://359sun.top/posts/4a2a/acksls1.png">
-<meta property="og:image" content="https://359sun.top/posts/4a2a/acksls2.png">
-<meta property="og:image" content="https://359sun.top/posts/4a2a/acksls3.png">
-<meta property="og:image" content="https://359sun.top/posts/4a2a/acksls4.png">
-<meta property="og:image" content="https://359sun.top/posts/4a2a/acksls5.png">
-<meta property="og:image" content="https://359sun.top/posts/4a2a/acksls6.png">
-<meta property="og:image" content="https://359sun.top/posts/4a2a/acksls7.png">
-<meta property="og:image" content="https://359sun.top/posts/4a2a/acksls8.png">
-<meta property="og:image" content="https://359sun.top/posts/4a2a/acksls9.png">
-<meta property="og:image" content="https://359sun.top/posts/4a2a/acksls10.png">
-<meta property="og:image" content="https://359sun.top/posts/4a2a/acksls11.png">
-<meta property="og:image" content="https://359sun.top/posts/4a2a/acksls12.png">
-<meta property="og:image" content="https://359sun.top/posts/4a2a/acksls13.png">
-<meta property="og:image" content="https://359sun.top/posts/4a2a/acksls14.png">
-<meta property="og:image" content="https://359sun.top/posts/4a2a/acksls15.png">
-<meta property="og:image" content="https://359sun.top/posts/4a2a/acksls16.png">
+<meta property="og:image" content="https://yakir.top/posts/4a2a/acksls1.png">
+<meta property="og:image" content="https://yakir.top/posts/4a2a/acksls2.png">
+<meta property="og:image" content="https://yakir.top/posts/4a2a/acksls3.png">
+<meta property="og:image" content="https://yakir.top/posts/4a2a/acksls4.png">
+<meta property="og:image" content="https://yakir.top/posts/4a2a/acksls5.png">
+<meta property="og:image" content="https://yakir.top/posts/4a2a/acksls6.png">
+<meta property="og:image" content="https://yakir.top/posts/4a2a/acksls7.png">
+<meta property="og:image" content="https://yakir.top/posts/4a2a/acksls8.png">
+<meta property="og:image" content="https://yakir.top/posts/4a2a/acksls9.png">
+<meta property="og:image" content="https://yakir.top/posts/4a2a/acksls10.png">
+<meta property="og:image" content="https://yakir.top/posts/4a2a/acksls11.png">
+<meta property="og:image" content="https://yakir.top/posts/4a2a/acksls12.png">
+<meta property="og:image" content="https://yakir.top/posts/4a2a/acksls13.png">
+<meta property="og:image" content="https://yakir.top/posts/4a2a/acksls14.png">
+<meta property="og:image" content="https://yakir.top/posts/4a2a/acksls15.png">
+<meta property="og:image" content="https://yakir.top/posts/4a2a/acksls16.png">
 <meta property="article:published_time" content="2022-05-31T14:38:39.000Z">
 <meta property="article:modified_time" content="2024-01-21T15:28:43.149Z">
 <meta property="article:author" content="Yakir">
 <meta property="article:tag" content="ACK">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:image" content="https://359sun.top/posts/4a2a/acksls1.png">
+<meta name="twitter:image" content="https://yakir.top/posts/4a2a/acksls1.png">
 
-<link rel="canonical" href="https://359sun.top/posts/4a2a.html">
+<link rel="canonical" href="https://yakir.top/posts/4a2a.html">
 
 
 <script id="page-configurations">
@@ -219,7 +219,7 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://359sun.top/posts/4a2a.html">
+    <link itemprop="mainEntityOfPage" href="https://yakir.top/posts/4a2a.html">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/images/avatar.jpg">
@@ -418,7 +418,7 @@
   </li>
   <li class="post-copyright-link">
     <strong>本文链接：</strong>
-    <a href="https://359sun.top/posts/4a2a.html" title="ACK 集群日志接入 SLS">https://359sun.top/posts/4a2a.html</a>
+    <a href="https://yakir.top/posts/4a2a.html" title="ACK 集群日志接入 SLS">https://yakir.top/posts/4a2a.html</a>
   </li>
   <li class="post-copyright-license">
     <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" rel="noopener" target="_blank"><i class="fab fa-fw fa-creative-commons"></i>BY-NC-SA</a> 许可协议。转载请注明出处！
